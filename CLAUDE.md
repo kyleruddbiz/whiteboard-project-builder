@@ -70,6 +70,8 @@ git log --graph --oneline --all
 - `App.xaml` / `App.xaml.cs` - Application entry point and lifecycle management
 - `Views/` - XAML pages and their code-behind files
   - `MainPage.xaml` / `MainPage.xaml.cs` - Main application page
+- `Models/` - Data models for whiteboard items
+- `Enums/` - Enumerations with their extension methods
 - `Assets/` - Application images and resources (logos, splash screen)
 - `Examples/` - PDF files with examples of expected output and design references
 - `Properties/` - Assembly information and configuration
@@ -91,6 +93,7 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 - Write clear and concise code
 - Follow the MVVM (Model-View-ViewModel) pattern
 - Use nullable reference types throughout the codebase
+- Extension methods for enums should be defined in the same file as the enum
 
 ### Comments
 - Keep comments clear and concise
