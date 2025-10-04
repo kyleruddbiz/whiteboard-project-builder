@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WhiteboardProjectBuilder (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "WhiteboardProjectBuilder (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
