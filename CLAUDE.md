@@ -41,6 +41,7 @@ dotnet restore
 - `Views/` - XAML pages and their code-behind files
   - `MainPage.xaml` / `MainPage.xaml.cs` - Main application page
 - `Assets/` - Application images and resources (logos, splash screen)
+- `Examples/` - PDF files with examples of expected output and design references
 - `Properties/` - Assembly information and configuration
 - `Package.appxmanifest` - Windows app package manifest
 - `app.manifest` - Application manifest for Windows compatibility
