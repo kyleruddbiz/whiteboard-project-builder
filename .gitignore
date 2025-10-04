@@ -173,3 +173,4 @@ publish/
 
 # Claude Code
 .claude/
+/Examples
