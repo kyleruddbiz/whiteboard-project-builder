@@ -38,6 +38,26 @@ dotnet clean
 dotnet restore
 ```
 
+### Git Commands
+Use the GitHub CLI (`gh`) and standard git commands for version control:
+
+```bash
+# Fetch latest changes
+git fetch
+
+# Commit changes
+git add .
+git commit -m "commit message"
+
+# Push changes
+git push
+
+# Review history
+git log
+git log --oneline
+git log --graph --oneline --all
+```
+
 ## Architecture
 
 ### Technology Stack
