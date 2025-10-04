@@ -64,3 +64,21 @@ dotnet restore
 
 ### Platform Support
 Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 and later.
+
+## Coding Standards
+
+### Code Style
+- Write clear and concise code
+- Follow the MVVM (Model-View-ViewModel) pattern
+- Use nullable reference types throughout the codebase
+
+### Comments
+- Keep comments clear and concise
+- Only add comments when the code's intent is not obvious
+- Do not add comments to describe basic or obvious functionality
+
+### XAML Guidelines
+- Prefer `x:Bind` over `Binding` whenever possible for better performance and compile-time checking
+
+### Development Workflow
+- Always run `dotnet build` after implementation to verify changes
