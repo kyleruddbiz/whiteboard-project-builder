@@ -172,5 +172,5 @@ publish/
 *.tlog
 
 # Claude Code
-.claude/
+.claude/settings.local.json
 /Examples

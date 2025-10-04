@@ -1,8 +1,0 @@
-{
-  "allowedCommands": [
-    "dotnet build",
-    "dotnet run",
-    "dotnet clean",
-    "dotnet restore"
-  ]
-}
