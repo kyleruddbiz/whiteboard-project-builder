@@ -6,6 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 WhiteboardProjectBuilder is a WinUI 3 desktop application built on .NET 9.0, targeting Windows 10.0.19041.0 (Windows 10 version 2004) and higher.
 
+### Application Purpose
+
+This application creates printable whiteboard items for use on physical whiteboards. Key features include:
+
+- **Multiple Templates**: Projects, Goals, and Inspiration templates
+- **Standardized Size**: All whiteboard items are the same size with template-specific content
+- **Editable Items**: Each whiteboard item can be edited based on its template
+- **List Management**: Users can add and remove whiteboard items from a list
+- **Print Functionality**: Print whiteboard items with up to four items per page
+
 ## Development Commands
 
 ### Build
