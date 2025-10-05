@@ -10,26 +10,48 @@
     <Page.Content>
         <ScrollViewer>
             <StackPanel
+                Padding="20"
                 HorizontalAlignment="Center"
-                Spacing="40"
-                Padding="20">
+                Spacing="40">
 
                 <TextBlock
-                    Text="Whiteboard Item Examples"
+                    Margin="0 20 0 20"
+                    HorizontalAlignment="Center"
                     FontSize="32"
                     FontWeight="Bold"
-                    HorizontalAlignment="Center"
-                    Margin="0 20 0 20" />
+                    Text="Whiteboard Item Examples" />
 
-                <!-- Project Item Example -->
-                <local:ProjectItemView ViewModel="{x:Bind ViewModel.SampleProject, Mode=OneWay}" />
+                <Grid>
+                    <local:ProjectItemView
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        ViewModel="{x:Bind ViewModel.SampleProject, Mode=OneWay}" />
 
-                <!-- Goal Item Example -->
-                <local:GoalItemView ViewModel="{x:Bind ViewModel.SampleGoal, Mode=OneWay}" />
+                    <Image
+                        Margin="20 0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        Opacity=".5"
+                        Source="/Assets/Examples/ProjectSingle.png"
+                        Stretch="None" />
+                </Grid>
 
-                <!-- Inspiration Item Example -->
+                <Grid>
+                    <local:GoalItemView
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        ViewModel="{x:Bind ViewModel.SampleGoal, Mode=OneWay}" />
+
+                    <Image
+                        Margin="20 0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        Opacity=".5"
+                        Source="/Assets/Examples/GoalSingle.png"
+                        Stretch="None" />
+                </Grid>
+
                 <local:InspirationItemView ViewModel="{x:Bind ViewModel.SampleInspiration, Mode=OneWay}" />
-
             </StackPanel>
         </ScrollViewer>
     </Page.Content>

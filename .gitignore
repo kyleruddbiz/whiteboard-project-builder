@@ -174,4 +174,5 @@ publish/
 # Claude Code
 .claude/settings.local.json
 /Examples
+/Assets/Examples
 /Assets/Backgrounds/Examples
