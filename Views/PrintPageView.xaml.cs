@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;
@@ -40,18 +41,30 @@ public sealed partial class PrintPageView : UserControl
 
         for (int i = 0; i < Math.Min(Items.Count, 4); i++)
         {
-            var projectItemView = new ProjectItemView
+            var viewbox = new Viewbox()
             {
-                ViewModel = Items[i]
+                Stretch = Stretch.Uniform,
             };
 
             int row = i / 2;
             int col = i % 2;
 
-            Grid.SetRow(projectItemView, row);
-            Grid.SetColumn(projectItemView, col);
+            //int leftMargin = (col == 1) ? -1 : 0;
+            int topMargin = (row == 1) ? -4 : 0;
 
-            RootGrid.Children.Add(projectItemView);
+            int leftMargin = 0;
+            //int topMargin = 0;
+
+            viewbox.Margin = new Thickness(leftMargin, topMargin, 0, 0);
+            viewbox.Child = new ProjectItemView
+            {
+                ViewModel = Items[i]
+            };
+
+            Grid.SetRow(viewbox, row);
+            Grid.SetColumn(viewbox, col);
+
+            RootGrid.Children.Add(viewbox);
         }
     }
 }

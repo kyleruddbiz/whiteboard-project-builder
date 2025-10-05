@@ -32,7 +32,6 @@ public partial class MainPageViewModel : ObservableObject
         Projects =
         [
             SampleProject,
-            // Add more test items
             new ProjectItemViewModel
             {
                 Title = "Singing Bowl",
@@ -61,15 +60,15 @@ public partial class MainPageViewModel : ObservableObject
                 DueDate = null
             },
 
-             new ProjectItemViewModel
-            {
-                Title = "222 Draw Forms",
-                Subtitle = "Practice Figure Drawing",
-                Image = "Assets/Backgrounds/Examples/portrait-3.jpg",
-                Size = ProjectSize.Medium,
-                Value = ProjectValue.Good,
-                DueDate = null
-            },
+            // new ProjectItemViewModel
+            //{
+            //    Title = "222 Draw Forms",
+            //    Subtitle = "Practice Figure Drawing",
+            //    Image = "Assets/Backgrounds/Examples/portrait-3.jpg",
+            //    Size = ProjectSize.Medium,
+            //    Value = ProjectValue.Good,
+            //    DueDate = null
+            //},
         ];
 
         SampleGoal = new GoalItemViewModel
