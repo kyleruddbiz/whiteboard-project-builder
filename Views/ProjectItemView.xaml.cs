@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml;
 using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;
@@ -21,13 +20,20 @@ public sealed partial class ProjectItemView : UserControl
     public ProjectItemView()
     {
         this.InitializeComponent();
-        this.DataContext = this;
+
+        DataContextChanged += (s, e) =>
+        {
+            if (e.NewValue is ProjectItemViewModel vm)
+            {
+                ViewModel = vm;
+            }
+        };
     }
 
-    private string GetDateIsTodayPrefix(DateTime? date)
+    private static string GetDateIsTodayPrefix(DateTime? date)
     {
         return date?.Date == DateTime.Now.Date
-            ? "Today: "
+            ? "TODAY: "
             : string.Empty;
     }
 }

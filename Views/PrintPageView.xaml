@@ -10,7 +10,7 @@
 
     <Grid
         x:Name="RootGrid"
-        Padding="20"
+        Padding="110 50"
         Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="480" />

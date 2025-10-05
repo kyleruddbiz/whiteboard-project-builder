@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     mc:Ignorable="d">
     <Page.Content>
         <Grid>
@@ -12,23 +13,30 @@
                 <StackPanel
                     Padding="20"
                     HorizontalAlignment="Center"
-                    Spacing="40">
+                    Spacing="10">
 
                     <TextBlock
-                        Margin="0 20 0 20"
+                        Margin="0 20 0 0"
                         HorizontalAlignment="Center"
-                        FontSize="32"
+                        FontSize="64"
                         FontWeight="Bold"
-                        Text="Whiteboard Item Examples" />
+                        Text="Projects" />
 
                     <Button
+                        Margin="0 0 0 20"
                         HorizontalAlignment="Center"
                         Command="{x:Bind ViewModel.PrintProjectsCommand}"
                         Content="Print Projects" />
 
-                    <local:ProjectItemView ViewModel="{x:Bind ViewModel.SampleProject, Mode=OneWay}" />
+                    <GridView ItemsSource="{x:Bind ViewModel.Projects, Mode=OneWay}">
+                        <GridView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:ProjectItemViewModel">
+                                <local:ProjectItemView Margin="10" DataContext="{x:Bind}" />
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                    </GridView>
 
-                <!--<Grid>
+                    <!--<Grid>
                     <local:GoalItemView
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Center"
