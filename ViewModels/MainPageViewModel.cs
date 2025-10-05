@@ -115,11 +115,18 @@ public partial class MainPageViewModel : ObservableObject
     [RelayCommand]
     private void AddProject()
     {
+        var random = new Random();
+
+        string imageType = (random.NextSingle() < .5f)
+            ? "landscape"
+            : "portrait";
+        int imageNumber = random.Next(1, 6);
+
         Projects.Add(new ProjectItemViewModel
         {
             Title = "New Project",
             Subtitle = "Add Details",
-            Image = "Assets/Backgrounds/Examples/landscape-1.jpg",
+            Image = $"Assets/Backgrounds/Examples/{imageType}-{imageNumber}.jpg",
             Size = ProjectSize.Medium,
             Value = ProjectValue.Good,
             DueDate = null
