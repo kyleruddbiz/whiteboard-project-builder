@@ -7,20 +7,26 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <Page.Content>
-        <ScrollViewer>
-            <StackPanel
-                Padding="20"
-                HorizontalAlignment="Center"
-                Spacing="40">
-
-                <TextBlock
-                    Margin="0 20 0 20"
+        <Grid>
+            <ScrollViewer>
+                <StackPanel
+                    Padding="20"
                     HorizontalAlignment="Center"
-                    FontSize="32"
-                    FontWeight="Bold"
-                    Text="Whiteboard Item Examples" />
+                    Spacing="40">
 
-                <local:ProjectItemView ViewModel="{x:Bind ViewModel.SampleProject, Mode=OneWay}" />
+                    <TextBlock
+                        Margin="0 20 0 20"
+                        HorizontalAlignment="Center"
+                        FontSize="32"
+                        FontWeight="Bold"
+                        Text="Whiteboard Item Examples" />
+
+                    <Button
+                        HorizontalAlignment="Center"
+                        Command="{x:Bind ViewModel.PrintProjectsCommand}"
+                        Content="Print Projects" />
+
+                    <local:ProjectItemView ViewModel="{x:Bind ViewModel.SampleProject, Mode=OneWay}" />
 
                 <!--<Grid>
                     <local:GoalItemView
@@ -38,7 +44,13 @@
                 </Grid>
 
                 <local:InspirationItemView ViewModel="{x:Bind ViewModel.SampleInspiration, Mode=OneWay}" />-->
-            </StackPanel>
-        </ScrollViewer>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Canvas
+                x:Name="PrintCanvas"
+                Margin="-2000 0 0 0"
+                Opacity="0" />
+        </Grid>
     </Page.Content>
 </Page>
