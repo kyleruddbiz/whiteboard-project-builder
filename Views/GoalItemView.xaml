@@ -17,7 +17,7 @@
             </Grid.RowDefinitions>
 
             <!-- Title and Subtitle -->
-            <StackPanel Grid.Row="0" Padding="20 20 20 10">
+            <StackPanel Grid.Row="0" Padding="30 30 30 20">
                 <TextBlock
                     Text="{x:Bind ViewModel.Title, Mode=OneWay}"
                     FontSize="36"
@@ -30,7 +30,7 @@
             </StackPanel>
 
             <!-- Main Image -->
-            <Border Grid.Row="1" Margin="20 10 20 20">
+            <Border Grid.Row="1" Margin="30 0 30 30">
                 <Image
                     Source="{x:Bind ViewModel.Image, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"
                     Stretch="UniformToFill" />
