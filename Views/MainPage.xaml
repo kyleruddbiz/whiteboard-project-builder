@@ -20,21 +20,7 @@
                     FontWeight="Bold"
                     Text="Whiteboard Item Examples" />
 
-                <Grid>
-                    <local:ProjectItemView
-                        Margin="0 6 0 0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        ViewModel="{x:Bind ViewModel.SampleProject, Mode=OneWay}" />
-
-                    <Image
-                        Visibility="Collapsed"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Opacity=".25"
-                        Source="/Assets/Examples/ProjectSingle.png"
-                        Stretch="None" />
-                </Grid>
+                <local:ProjectItemView ViewModel="{x:Bind ViewModel.SampleProject, Mode=OneWay}" />
 
                 <Grid>
                     <local:GoalItemView
