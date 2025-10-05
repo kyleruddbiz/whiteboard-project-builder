@@ -1,7 +1,5 @@
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Printing;
 using WhiteboardProjectBuilder.ViewModels;
-using WhiteboardProjectBuilder.Views;
 using Windows.Graphics.Printing;
 
 namespace WhiteboardProjectBuilder.Services;
