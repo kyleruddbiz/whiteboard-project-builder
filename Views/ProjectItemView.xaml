@@ -68,8 +68,10 @@
                 HorizontalAlignment="Center"
                 FontSize="30"
                 FontWeight="Bold"
-                Foreground="DarkRed"
-                Text="{x:Bind helpers:DateTimeHelper.ToDateFormat(ViewModel.DueDate), Mode=OneWay}" />
+                Foreground="DarkRed">
+                <Run Text="{x:Bind GetDateIsTodayPrefix(ViewModel.DueDate), Mode=OneWay}" />
+                <Run Text="{x:Bind helpers:DateTimeHelper.ToDateFormat(ViewModel.DueDate), Mode=OneWay}" />
+            </TextBlock>
         </Grid>
     </Border>
 </UserControl>

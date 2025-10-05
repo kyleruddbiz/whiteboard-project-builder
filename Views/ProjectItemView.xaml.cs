@@ -23,4 +23,11 @@ public sealed partial class ProjectItemView : UserControl
         this.InitializeComponent();
         this.DataContext = this;
     }
+
+    private string GetDateIsTodayPrefix(DateTime? date)
+    {
+        return date?.Date == DateTime.Now.Date
+            ? "Today: "
+            : string.Empty;
+    }
 }

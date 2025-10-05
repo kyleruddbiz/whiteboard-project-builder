@@ -18,7 +18,7 @@ public partial class MainPageViewModel : ObservableObject
             Image = "Assets/Backgrounds/Examples/landscape-1.jpg",
             Size = ProjectSize.Large,
             Value = ProjectValue.Grand,
-            DueDate = new DateTime(2025, 10, 23)
+            DueDate = DateTime.Now.Date // = new DateTime(2025, 10, 23)
         };
 
         SampleGoal = new GoalItemViewModel
