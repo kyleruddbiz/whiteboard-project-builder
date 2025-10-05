@@ -22,7 +22,7 @@
 
                 <local:ProjectItemView ViewModel="{x:Bind ViewModel.SampleProject, Mode=OneWay}" />
 
-                <Grid>
+                <!--<Grid>
                     <local:GoalItemView
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Center"
@@ -37,7 +37,7 @@
                         Stretch="None" />
                 </Grid>
 
-                <local:InspirationItemView ViewModel="{x:Bind ViewModel.SampleInspiration, Mode=OneWay}" />
+                <local:InspirationItemView ViewModel="{x:Bind ViewModel.SampleInspiration, Mode=OneWay}" />-->
             </StackPanel>
         </ScrollViewer>
     </Page.Content>
