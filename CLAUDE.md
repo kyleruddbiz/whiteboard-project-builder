@@ -68,10 +68,16 @@ git log --graph --oneline --all
 
 ### Project Structure
 - `App.xaml` / `App.xaml.cs` - Application entry point and lifecycle management
-- `Views/` - XAML pages and their code-behind files
+- `Views/` - XAML pages/controls and their code-behind files
   - `MainPage.xaml` / `MainPage.xaml.cs` - Main application page
+  - `ProjectItemView.xaml` / `ProjectItemView.xaml.cs` - Project item UserControl
+  - `GoalItemView.xaml` / `GoalItemView.xaml.cs` - Goal item UserControl
+  - `InspirationItemView.xaml` / `InspirationItemView.xaml.cs` - Inspiration item UserControl
+- `ViewModels/` - MVVM view models (using CommunityToolkit.Mvvm)
 - `Models/` - Data models for whiteboard items
 - `Enums/` - Enumerations with their extension methods
+- `Converters/` - XAML value converters for data binding
+  - `StringToImageSourceConverter.cs` - Converts string paths to ImageSource with ms-appx:/// URI
 - `Assets/` - Application images and resources (logos, splash screen)
 - `Examples/` - PDF files with examples of expected output and design references
 - `Properties/` - Assembly information and configuration
@@ -83,6 +89,7 @@ git log --graph --oneline --all
 - **Microsoft.WindowsAppSDK** (v1.*) - Core WinUI 3 framework
 - **Microsoft.Web.WebView2** (v1.*) - Embedded web view control
 - **Microsoft.Windows.SDK.BuildTools** (v10.*) - Windows SDK build tools
+- **CommunityToolkit.Mvvm** (v8.*) - MVVM toolkit for observable objects and commands
 
 ### Platform Support
 Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 and later.
@@ -95,6 +102,12 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 - Use nullable reference types throughout the codebase
 - Extension methods for enums should be defined in the same file as the enum
 
+### MVVM Guidelines
+- **Never use `x:Name` to reference UserControls** - Avoid directly accessing UserControl instances in code-behind
+- **Always use data binding** - Pass ViewModels to UserControls via DependencyProperty bindings, not constructor parameters or property setters
+- **UserControl ViewModels must be DependencyProperties** - Use `DependencyProperty.Register` for ViewModel properties in UserControls, not get-only properties
+- **Set DataContext in UserControl** - UserControls should set `this.DataContext = this` to enable internal binding
+
 ### Comments
 - Keep comments clear and concise
 - Only add comments when the code's intent is not obvious
@@ -102,6 +115,8 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 
 ### XAML Guidelines
 - Prefer `x:Bind` over `Binding` whenever possible for better performance and compile-time checking
+- Use spaces (not commas) to separate values in Margin and Padding attributes (e.g., `Margin="10 20 10 20"` not `Margin="10,20,10,20"`)
+- **Image binding in WinUI 3** - Always use `StringToImageSourceConverter` when binding string paths to Image.Source properties. WinUI 3 requires proper `ms-appx:///` URI scheme for packaged assets. Example: `Source="{x:Bind ViewModel.ImagePath, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"`
 
 ### Development Workflow
 - Always run `dotnet build` after implementation to verify changes

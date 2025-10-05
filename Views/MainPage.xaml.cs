@@ -1,18 +1,14 @@
-namespace WhiteboardProjectBuilder.Views
+using WhiteboardProjectBuilder.ViewModels;
+
+namespace WhiteboardProjectBuilder.Views;
+
+public partial class MainPage : Page
 {
-    /// <summary>
-    /// A simple page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public partial class MainPage : Page
+    public MainPageViewModel ViewModel { get; }
+
+    public MainPage()
     {
-        int count = 0;
-
-        public MainPage()
-        {
-            this.InitializeComponent();
-        }
-
-        private void OnCountClicked(object sender, RoutedEventArgs e)
-            => txtCount.Text = $"Current count: {count++}";
+        ViewModel = new MainPageViewModel();
+        this.InitializeComponent();
     }
 }
