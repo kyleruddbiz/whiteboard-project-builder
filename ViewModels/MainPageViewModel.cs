@@ -132,4 +132,10 @@ public partial class MainPageViewModel : ObservableObject
             DueDate = null
         });
     }
+
+    [RelayCommand]
+    private void RemoveProject(ProjectItemViewModel project)
+    {
+        Projects.Remove(project);
+    }
 }

@@ -1,5 +1,4 @@
 <Page
-    x:Name="PageRoot"
     x:Class="WhiteboardProjectBuilder.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -9,12 +8,27 @@
     xmlns:models="using:WhiteboardProjectBuilder.Models"
     xmlns:selectors="using:WhiteboardProjectBuilder.Selectors"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
+    x:Name="PageRoot"
     mc:Ignorable="d">
     <Page.Resources>
         <selectors:GridItemTemplateSelector x:Key="GridItemTemplateSelector">
             <selectors:GridItemTemplateSelector.ProjectTemplate>
                 <DataTemplate x:DataType="models:GridItemWrapper">
-                    <local:ProjectItemView Margin="10" DataContext="{x:Bind ProjectItem}" />
+                    <Grid>
+                        <local:ProjectItemView Margin="10" DataContext="{x:Bind ProjectItem}" />
+                        <Button
+                            Width="50"
+                            Height="50"
+                            Margin="0 12 12 0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Command="{Binding ViewModel.RemoveProjectCommand, ElementName=PageRoot}"
+                            CommandParameter="{x:Bind ProjectItem}">
+                            <FontIcon FontSize="20" Glyph="&#xE106;" />
+                        </Button>
+                    </Grid>
                 </DataTemplate>
             </selectors:GridItemTemplateSelector.ProjectTemplate>
             <selectors:GridItemTemplateSelector.AddButtonTemplate>
