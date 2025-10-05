@@ -30,7 +30,7 @@ public sealed partial class ProjectItemView : UserControl
         };
     }
 
-    private static string GetDateIsTodayPrefix(DateTime? date)
+    private string GetDateIsTodayPrefix(DateTime? date)
     {
         return date?.Date == DateTime.Now.Date
             ? "TODAY: "

@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WhiteboardProjectBuilder.Enums;
+using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
@@ -11,6 +13,7 @@ public partial class MainPageViewModel : ObservableObject
     private readonly PrintService printService;
 
     public ObservableCollection<ProjectItemViewModel> Projects { get; }
+    public ObservableCollection<GridItemWrapper> GridItems { get; }
     public ProjectItemViewModel SampleProject { get; }
     public GoalItemViewModel SampleGoal { get; }
     public InspirationItemViewModel SampleInspiration { get; }
@@ -18,6 +21,9 @@ public partial class MainPageViewModel : ObservableObject
     public MainPageViewModel(PrintService printService)
     {
         this.printService = printService;
+
+        Projects = [];
+        GridItems = [];
 
         SampleProject = new ProjectItemViewModel
         {
@@ -29,8 +35,8 @@ public partial class MainPageViewModel : ObservableObject
             DueDate = DateTime.Now.Date // = new DateTime(2025, 10, 23)
         };
 
-        Projects =
-        [
+        var initialProjects = new[]
+        {
             SampleProject,
             new ProjectItemViewModel
             {
@@ -59,17 +65,15 @@ public partial class MainPageViewModel : ObservableObject
                 Value = ProjectValue.Grand,
                 DueDate = null
             },
+        };
 
-            // new ProjectItemViewModel
-            //{
-            //    Title = "222 Draw Forms",
-            //    Subtitle = "Practice Figure Drawing",
-            //    Image = "Assets/Backgrounds/Examples/portrait-3.jpg",
-            //    Size = ProjectSize.Medium,
-            //    Value = ProjectValue.Good,
-            //    DueDate = null
-            //},
-        ];
+        foreach (var project in initialProjects)
+        {
+            Projects.Add(project);
+        }
+
+        Projects.CollectionChanged += Projects_CollectionChanged;
+        RebuildGridItems();
 
         SampleGoal = new GoalItemViewModel
         {
@@ -89,5 +93,36 @@ public partial class MainPageViewModel : ObservableObject
     private async Task PrintProjectsAsync()
     {
         await printService.ShowPrintUIAsync(Projects);
+    }
+
+    private void Projects_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RebuildGridItems();
+    }
+
+    private void RebuildGridItems()
+    {
+        GridItems.Clear();
+
+        foreach (var project in Projects)
+        {
+            GridItems.Add(new GridItemWrapper { ProjectItem = project });
+        }
+
+        GridItems.Add(new GridItemWrapper { IsAddButton = true });
+    }
+
+    [RelayCommand]
+    private void AddProject()
+    {
+        Projects.Add(new ProjectItemViewModel
+        {
+            Title = "New Project",
+            Subtitle = "Add Details",
+            Image = "Assets/Backgrounds/Examples/landscape-1.jpg",
+            Size = ProjectSize.Medium,
+            Value = ProjectValue.Good,
+            DueDate = null
+        });
     }
 }
