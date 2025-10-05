@@ -2,9 +2,9 @@
 
 public static class DateTimeHelper
 {
-    public static string ToMonthDayFormat(DateTime? dateTime)
+    public static string ToDateFormat(DateTime? dateTime)
     {
-        return dateTime?.ToString("M/d")
+        return dateTime?.ToShortDateString()
             ?? string.Empty;
     }
 }
