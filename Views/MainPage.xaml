@@ -22,15 +22,16 @@
 
                 <Grid>
                     <local:ProjectItemView
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center"
+                        Margin="0 6 0 0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
                         ViewModel="{x:Bind ViewModel.SampleProject, Mode=OneWay}" />
 
                     <Image
-                        Margin="20 0"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center"
-                        Opacity=".5"
+                        Visibility="Collapsed"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Opacity=".25"
                         Source="/Assets/Examples/ProjectSingle.png"
                         Stretch="None" />
                 </Grid>

@@ -16,8 +16,8 @@ public partial class MainPageViewModel : ObservableObject
             Title = "Projects App",
             Subtitle = "Whiteboard Templates",
             Image = "Assets/Backgrounds/Examples/landscape-1.jpg",
-            Size = ProjectSize.Medium,
-            Value = ProjectValue.Great,
+            Size = ProjectSize.Large,
+            Value = ProjectValue.Grand,
             DueDate = new DateTime(2025, 10, 23)
         };
 

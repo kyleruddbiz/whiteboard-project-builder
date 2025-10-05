@@ -8,49 +8,62 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
     mc:Ignorable="d">
 
-    <Border BorderBrush="Black" BorderThickness="2" Width="400" Height="500">
+    <Border
+        Width="504"
+        Height="800"
+        BorderBrush="Black"
+        BorderThickness="2">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Title and Subtitle -->
-            <StackPanel Grid.Row="0" Padding="30 30 30 15">
+            <StackPanel Grid.Row="0" Padding="0 10 0 0">
                 <TextBlock
-                    Text="{x:Bind ViewModel.Title, Mode=OneWay}"
-                    FontSize="32"
+                    FontSize="46"
                     FontWeight="Bold"
+                    Text="{x:Bind ViewModel.Title, Mode=OneWay}"
                     TextAlignment="Center" />
-                <TextBlock
-                    Text="{x:Bind ViewModel.Subtitle, Mode=OneWay}"
-                    FontSize="18"
-                    TextAlignment="Center" />
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock
+                        Margin="0 0 8 0"
+                        FontSize="30"
+                        FontWeight="Bold"
+                        Foreground="DarkRed"
+                        Text="{x:Bind ViewModel.DueDate, Mode=OneWay}" />
+                    <TextBlock FontSize="30" Text="{x:Bind ViewModel.Subtitle, Mode=OneWay}" />
+                </StackPanel>
             </StackPanel>
 
-            <!-- Main Image -->
-            <Image
+            <Border
                 Grid.Row="1"
-                Source="{x:Bind ViewModel.Image, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"
-                Stretch="UniformToFill"
-                Margin="30 0 30 15" />
+                Width="420"
+                Height="360"
+                Margin="0 38 0 0"
+                VerticalAlignment="Top"
+                BorderBrush="Black"
+                BorderThickness="2">
+                <Image Source="{x:Bind ViewModel.Image, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="UniformToFill" />
+            </Border>
 
-            <!-- Size and Value Icons -->
-            <Grid Grid.Row="2" Height="100" Margin="30 0 30 30">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <StackPanel
+                Grid.Row="2"
+                Height="228"
+                Margin="0 8 0 0"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="8">
 
-                <Border Grid.Column="0" Margin="0 0 7.5 0">
+                <Border BorderBrush="Black" BorderThickness="2">
                     <Image Source="{x:Bind ViewModel.SizeIcon, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="Uniform" />
                 </Border>
 
-                <Border Grid.Column="1" Margin="7.5 0 0 0">
+                <Border BorderBrush="Black" BorderThickness="2">
                     <Image Source="{x:Bind ViewModel.ValueIcon, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="Uniform" />
                 </Border>
-            </Grid>
+            </StackPanel>
         </Grid>
     </Border>
 </UserControl>
