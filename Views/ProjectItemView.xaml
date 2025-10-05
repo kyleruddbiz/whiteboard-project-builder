@@ -10,7 +10,7 @@
     mc:Ignorable="d">
 
     <Border
-        Width="504"
+        Width="502"
         Height="800"
         BorderBrush="Black"
         BorderThickness="2">
