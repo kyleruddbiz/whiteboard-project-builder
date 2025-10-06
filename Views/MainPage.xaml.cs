@@ -6,13 +6,15 @@ namespace WhiteboardProjectBuilder.Views;
 public partial class MainPage : Page
 {
     private readonly PrintService printService;
+    private readonly DataPersistenceService dataPersistenceService;
 
     public MainPageViewModel ViewModel { get; }
 
     public MainPage()
     {
         printService = new PrintService();
-        ViewModel = new MainPageViewModel(printService);
+        dataPersistenceService = new DataPersistenceService();
+        ViewModel = new MainPageViewModel(printService, dataPersistenceService);
         this.InitializeComponent();
 
         if (App.MainWindow != null)
@@ -23,8 +25,10 @@ public partial class MainPage : Page
         this.Unloaded += MainPage_Unloaded;
     }
 
-    private void MainPage_Unloaded(object sender, RoutedEventArgs e)
+    private async void MainPage_Unloaded(object sender, RoutedEventArgs e)
     {
+        await ViewModel.ForceSaveAsync();
+
         printService.UnregisterForPrinting();
         this.Unloaded -= MainPage_Unloaded;
     }

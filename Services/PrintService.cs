@@ -67,7 +67,16 @@ public class PrintService
 
         printPages.Clear();
         itemsToPrint.Clear();
-        printCanvas?.Children.Clear();
+
+        // Safely clear canvas children - may already be disposed on app shutdown
+        try
+        {
+            printCanvas?.Children.Clear();
+        }
+        catch (Exception)
+        {
+            // Canvas already disposed during shutdown - this is expected
+        }
     }
 
     /// <summary>

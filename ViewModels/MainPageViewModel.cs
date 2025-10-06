@@ -11,6 +11,16 @@ namespace WhiteboardProjectBuilder.ViewModels;
 public partial class MainPageViewModel : ObservableObject
 {
     private readonly PrintService printService;
+    private readonly DataPersistenceService dataPersistenceService;
+    private CancellationTokenSource? saveCts;
+
+    private const int AutoSaveDelayMs = 2000;
+
+    [ObservableProperty]
+    private bool isSaving;
+
+    [ObservableProperty]
+    private DateTime? lastSaved;
 
     public ObservableCollection<ProjectItemViewModel> Projects { get; }
     public ObservableCollection<GridItemWrapper> GridItems { get; }
@@ -18,9 +28,10 @@ public partial class MainPageViewModel : ObservableObject
     public GoalItemViewModel SampleGoal { get; }
     public InspirationItemViewModel SampleInspiration { get; }
 
-    public MainPageViewModel(PrintService printService)
+    public MainPageViewModel(PrintService printService, DataPersistenceService dataPersistenceService)
     {
         this.printService = printService;
+        this.dataPersistenceService = dataPersistenceService;
 
         Projects = [];
         GridItems = [];
@@ -32,48 +43,14 @@ public partial class MainPageViewModel : ObservableObject
             Image = "Assets/Backgrounds/Examples/landscape-1.jpg",
             Size = ProjectSize.Large,
             Value = ProjectValue.Grand,
-            DueDate = DateTime.Now.Date // = new DateTime(2025, 10, 23)
+            DueDate = DateTime.Now.Date
         };
-
-        var initialProjects = new[]
-        {
-            SampleProject,
-            new ProjectItemViewModel
-            {
-                Title = "Singing Bowl",
-                Subtitle = "Record The Sounds",
-                Image = "Assets/Backgrounds/Examples/portrait-1.jpg",
-                Size = ProjectSize.Small,
-                Value = ProjectValue.Good,
-                DueDate = new DateTime(2025, 10, 7)
-            },
-            new ProjectItemViewModel
-            {
-                Title = "Draw Forms",
-                Subtitle = "Practice Figure Drawing",
-                Image = "Assets/Backgrounds/Examples/portrait-2.jpg",
-                Size = ProjectSize.Medium,
-                Value = ProjectValue.Great,
-                DueDate = null
-            },
-            new ProjectItemViewModel
-            {
-                Title = "2026 Mazda3",
-                Subtitle = "2.5 Turbo Premium Plus",
-                Image = "Assets/Backgrounds/Examples/landscape-2.jpg",
-                Size = ProjectSize.Huge,
-                Value = ProjectValue.Grand,
-                DueDate = null
-            },
-        };
-
-        foreach (var project in initialProjects)
-        {
-            Projects.Add(project);
-        }
 
         Projects.CollectionChanged += Projects_CollectionChanged;
-        RebuildGridItems();
+        Projects.CollectionChanged += OnProjectsCollectionChanged;
+
+        // Load projects from storage
+        _ = LoadProjectsAsync();
 
         SampleGoal = new GoalItemViewModel
         {
@@ -100,6 +77,35 @@ public partial class MainPageViewModel : ObservableObject
         RebuildGridItems();
     }
 
+    private void OnProjectsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        // Subscribe to DataChanged event for new items
+        if (e.NewItems != null)
+        {
+            foreach (ProjectItemViewModel item in e.NewItems)
+            {
+                item.DataChanged += OnProjectDataChanged;
+            }
+        }
+
+        // Unsubscribe from removed items to prevent memory leaks
+        if (e.OldItems != null)
+        {
+            foreach (ProjectItemViewModel item in e.OldItems)
+            {
+                item.DataChanged -= OnProjectDataChanged;
+            }
+        }
+
+        // Trigger autosave on collection changes
+        _ = TriggerAutoSaveAsync();
+    }
+
+    private void OnProjectDataChanged(object? sender, EventArgs e)
+    {
+        _ = TriggerAutoSaveAsync();
+    }
+
     private void RebuildGridItems()
     {
         GridItems.Clear();
@@ -110,6 +116,91 @@ public partial class MainPageViewModel : ObservableObject
         }
 
         GridItems.Add(new GridItemWrapper { IsAddButton = true });
+    }
+
+    /// <summary>
+    /// Debounced autosave - waits for user to stop making changes before saving.
+    /// </summary>
+    private async Task TriggerAutoSaveAsync()
+    {
+        // Cancel any pending save operation
+        saveCts?.Cancel();
+        saveCts = new CancellationTokenSource();
+
+        try
+        {
+            // Wait for delay period - resets on each change
+            await Task.Delay(AutoSaveDelayMs, saveCts.Token);
+
+            // Delay completed without cancellation - perform save
+            await SaveDataAsync();
+        }
+        catch (TaskCanceledException)
+        {
+            // Expected when debouncing - do nothing
+        }
+    }
+
+    /// <summary>
+    /// Saves projects to JSON file.
+    /// </summary>
+    private async Task SaveDataAsync()
+    {
+        var dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+
+        dispatcherQueue.TryEnqueue(() => IsSaving = true);
+
+        try
+        {
+            await dataPersistenceService.SaveProjectsAsync(Projects);
+
+            dispatcherQueue.TryEnqueue(() =>
+            {
+                LastSaved = DateTime.Now;
+                IsSaving = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            dispatcherQueue.TryEnqueue(() =>
+            {
+                IsSaving = false;
+                // TODO: Show error message to user
+                System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
+            });
+        }
+    }
+
+    /// <summary>
+    /// Loads projects from JSON file on startup.
+    /// </summary>
+    private async Task LoadProjectsAsync()
+    {
+        try
+        {
+            var loadedProjects = await dataPersistenceService.LoadProjectsAsync();
+
+            foreach (var project in loadedProjects)
+            {
+                Projects.Add(project);
+            }
+
+            RebuildGridItems();
+        }
+        catch (Exception ex)
+        {
+            // TODO: Show error message to user
+            System.Diagnostics.Debug.WriteLine($"Load failed: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Forces immediate save, bypassing debounce. Used on app suspend.
+    /// </summary>
+    public async Task ForceSaveAsync()
+    {
+        saveCts?.Cancel();
+        await SaveDataAsync();
     }
 
     [RelayCommand]
