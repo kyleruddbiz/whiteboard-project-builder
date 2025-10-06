@@ -38,6 +38,13 @@ namespace WhiteboardProjectBuilder
             }
 
             _ = rootFrame.Navigate(typeof(MainPage), e.Arguments);
+
+            var presenter = window.AppWindow.Presenter as Microsoft.UI.Windowing.OverlappedPresenter;
+            if (presenter != null)
+            {
+                presenter.Maximize();
+            }
+
             window.Activate();
         }
 
