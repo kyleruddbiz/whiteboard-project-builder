@@ -9,7 +9,16 @@ public class StringToImageSourceConverter : IValueConverter
     {
         if (value is string path && !string.IsNullOrEmpty(path))
         {
-            return new BitmapImage(new Uri($"ms-appx:///{path}"));
+            // Check if path already has a URI scheme (ms-appdata://, ms-appx://, http://, etc.)
+            if (path.Contains("://"))
+            {
+                return new BitmapImage(new Uri(path));
+            }
+            else
+            {
+                // Relative path - assume it's in the app package (Assets folder)
+                return new BitmapImage(new Uri($"ms-appx:///{path}"));
+            }
         }
 
         return null;

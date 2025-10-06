@@ -12,6 +12,7 @@ public partial class MainPageViewModel : ObservableObject
 {
     private readonly PrintService printService;
     private readonly DataPersistenceService dataPersistenceService;
+    private readonly ImageStorageService imageStorageService;
     private CancellationTokenSource? saveCts;
 
     private const int AutoSaveDelayMs = 2000;
@@ -22,9 +23,11 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty]
     private DateTime? lastSaved;
 
+    [ObservableProperty]
+    private ProjectItemViewModel? selectedProject;
+
     public ObservableCollection<ProjectItemViewModel> Projects { get; }
     public ObservableCollection<GridItemWrapper> GridItems { get; }
-    public ProjectItemViewModel SampleProject { get; }
     public GoalItemViewModel SampleGoal { get; }
     public InspirationItemViewModel SampleInspiration { get; }
 
@@ -32,19 +35,10 @@ public partial class MainPageViewModel : ObservableObject
     {
         this.printService = printService;
         this.dataPersistenceService = dataPersistenceService;
+        this.imageStorageService = new ImageStorageService();
 
         Projects = [];
         GridItems = [];
-
-        SampleProject = new ProjectItemViewModel
-        {
-            Title = "Projects App",
-            Subtitle = "Whiteboard Templates",
-            Image = "Assets/Backgrounds/Examples/landscape-1.jpg",
-            Size = ProjectSize.Large,
-            Value = ProjectValue.Grand,
-            DueDate = DateTime.Now.Date
-        };
 
         Projects.CollectionChanged += Projects_CollectionChanged;
         Projects.CollectionChanged += OnProjectsCollectionChanged;
@@ -228,5 +222,71 @@ public partial class MainPageViewModel : ObservableObject
     private void RemoveProject(ProjectItemViewModel project)
     {
         Projects.Remove(project);
+    }
+
+    public async Task PasteImageFromClipboardAsync(Microsoft.UI.Xaml.XamlRoot xamlRoot)
+    {
+        try
+        {
+            // Generate default filename
+            string defaultFileName = imageStorageService.GenerateFileName(
+                SelectedProject?.Title,
+                SelectedProject?.Subtitle
+            );
+
+            // Show save dialog
+            var dialog = new Views.SaveImageDialog(defaultFileName)
+            {
+                XamlRoot = xamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+
+            // If user cancelled, exit
+            if (result != Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
+            {
+                return;
+            }
+
+            // Validate filename
+            if (string.IsNullOrWhiteSpace(dialog.FileName))
+            {
+                await ShowErrorDialogAsync(xamlRoot, "Invalid Filename", "Please enter a valid filename.");
+                return;
+            }
+
+            // Save the image from clipboard
+            string imageUri = await imageStorageService.SaveBitmapFromClipboardAsync(dialog.FileName);
+
+            // Update selected project if one exists
+            if (SelectedProject != null)
+            {
+                SelectedProject.Image = imageUri;
+            }
+
+            // Show success notification (optional)
+            System.Diagnostics.Debug.WriteLine($"Image saved successfully: {imageUri}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            await ShowErrorDialogAsync(xamlRoot, "Clipboard Error", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorDialogAsync(xamlRoot, "Error Saving Image", $"An unexpected error occurred: {ex.Message}");
+        }
+    }
+
+    private async Task ShowErrorDialogAsync(Microsoft.UI.Xaml.XamlRoot xamlRoot, string title, string message)
+    {
+        var errorDialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+        {
+            XamlRoot = xamlRoot,
+            Title = title,
+            Content = message,
+            CloseButtonText = "OK"
+        };
+
+        await errorDialog.ShowAsync();
     }
 }

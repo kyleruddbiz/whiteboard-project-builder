@@ -10,6 +10,12 @@
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     x:Name="PageRoot"
     mc:Ignorable="d">
+    <Page.KeyboardAccelerators>
+        <KeyboardAccelerator
+            Key="V"
+            Invoked="PasteAccelerator_Invoked"
+            Modifiers="Control" />
+    </Page.KeyboardAccelerators>
     <Page.Resources>
         <selectors:GridItemTemplateSelector x:Key="GridItemTemplateSelector">
             <selectors:GridItemTemplateSelector.ProjectTemplate>
@@ -72,7 +78,9 @@
                     <GridView
                         HorizontalAlignment="Center"
                         ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
-                        ItemsSource="{x:Bind ViewModel.GridItems, Mode=OneWay}" />
+                        ItemsSource="{x:Bind ViewModel.GridItems, Mode=OneWay}"
+                        SelectionChanged="GridView_SelectionChanged"
+                        SelectionMode="Single" />
 
                     <!--<Grid>
                     <local:GoalItemView
