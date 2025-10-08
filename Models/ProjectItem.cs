@@ -10,4 +10,5 @@ public class ProjectItem
     public required ProjectSize Size { get; set; }
     public required ProjectValue Value { get; set; }
     public DateTime? DueDate { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.Today;
 }

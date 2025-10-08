@@ -7,7 +7,8 @@
       "image": "Assets/Backgrounds/Examples/landscape-1.jpg",
       "size": "Large",
       "value": "Grand",
-      "dueDate": "2025-10-05"
+      "dueDate": "2025-10-05",
+      "createdDate": "2025-10-07"
     },
     {
       "title": "Singing Bowl",
@@ -15,7 +16,8 @@
       "image": "Assets/Backgrounds/Examples/portrait-1.jpg",
       "size": "Small",
       "value": "Good",
-      "dueDate": "2025-10-07"
+      "dueDate": "2025-10-07",
+      "createdDate": "2025-10-07"
     },
     {
       "title": "Draw Forms",
@@ -23,7 +25,8 @@
       "image": "Assets/Backgrounds/Examples/portrait-2.jpg",
       "size": "Medium",
       "value": "Great",
-      "dueDate": null
+      "dueDate": null,
+      "createdDate": "2025-10-07"
     },
     {
       "title": "2026 Mazda3",
@@ -31,7 +34,8 @@
       "image": "Assets/Backgrounds/Examples/landscape-2.jpg",
       "size": "Huge",
       "value": "Grand",
-      "dueDate": null
+      "dueDate": null,
+      "createdDate": "2025-10-07"
     }
   ]
 }

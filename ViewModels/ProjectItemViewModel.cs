@@ -28,10 +28,13 @@ public partial class ProjectItemViewModel : ObservableObject
     [ObservableProperty]
     private bool isEditing;
 
+    public DateTime CreatedDate { get; private set; } = DateTime.Today;
+
     public string SizeIcon => Size.ToIcon();
     public string ValueIcon => Value.ToIcon();
     public string DateDisplay => DueDate?.ToShortDateString() ?? string.Empty;
     public string DatePrefix => DueDate?.Date == DateTime.Now.Date ? "TODAY: " : string.Empty;
+    public string CreatedDateDisplay => CreatedDate.ToShortDateString();
 
     public List<ProjectSize> SizeOptions { get; } = Enum.GetValues(typeof(ProjectSize)).Cast<ProjectSize>().ToList();
     public List<ProjectValue> ValueOptions { get; } = Enum.GetValues(typeof(ProjectValue)).Cast<ProjectValue>().ToList();
@@ -90,7 +93,8 @@ public partial class ProjectItemViewModel : ObservableObject
             Image = Image,
             Size = Size,
             Value = Value,
-            DueDate = DueDate
+            DueDate = DueDate,
+            CreatedDate = CreatedDate
         };
     }
 
@@ -106,7 +110,8 @@ public partial class ProjectItemViewModel : ObservableObject
             Image = model.Image,
             Size = model.Size,
             Value = model.Value,
-            DueDate = model.DueDate
+            DueDate = model.DueDate,
+            CreatedDate = model.CreatedDate
         };
     }
 }

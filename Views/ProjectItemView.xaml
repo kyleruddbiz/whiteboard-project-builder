@@ -11,7 +11,7 @@
     mc:Ignorable="d">
 
     <Grid>
-        <!-- Readonly View -->
+        <!--  Readonly View  -->
         <Grid x:Name="ReadonlyView" x:Load="{x:Bind Not(ViewModel.IsEditing), Mode=OneWay}">
             <Border
                 Width="502"
@@ -67,19 +67,28 @@
                         </Border>
                     </StackPanel>
 
-                    <TextBlock
-                        Grid.Row="4"
-                        HorizontalAlignment="Center"
-                        FontSize="30"
-                        FontWeight="Bold"
-                        Foreground="DarkRed">
-                        <Run Text="{x:Bind ViewModel.DatePrefix, Mode=OneWay}" />
-                        <Run Text="{x:Bind ViewModel.DateDisplay, Mode=OneWay}" />
-                    </TextBlock>
+                    <Grid Grid.Row="4">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="30"
+                            FontWeight="Bold"
+                            Foreground="DarkRed">
+                            <Run Text="{x:Bind ViewModel.DatePrefix, Mode=OneWay}" />
+                            <Run Text="{x:Bind ViewModel.DateDisplay, Mode=OneWay}" />
+                        </TextBlock>
+
+                        <TextBlock
+                            Margin="0 0 8 -4"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            FontSize="12"
+                            Foreground="Black"
+                            Text="{x:Bind ViewModel.CreatedDateDisplay, Mode=OneWay}" />
+                    </Grid>
                 </Grid>
             </Border>
 
-            <!-- Hover Overlay -->
+            <!--  Hover Overlay  -->
             <Border
                 Background="Transparent"
                 PointerEntered="Overlay_PointerEntered"
@@ -90,16 +99,16 @@
                     Background="Black"
                     Opacity="0">
                     <FontIcon
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
                         FontSize="80"
                         Foreground="White"
-                        Glyph="&#xE70F;"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center" />
+                        Glyph="&#xE70F;" />
                 </Border>
             </Border>
         </Grid>
 
-        <!-- Edit View -->
+        <!--  Edit View  -->
         <Grid x:Name="EditView" x:Load="{x:Bind ViewModel.IsEditing, Mode=OneWay}">
             <local:ProjectItemEditView DataContext="{x:Bind ViewModel, Mode=OneWay}" />
         </Grid>
