@@ -128,12 +128,12 @@ public sealed partial class ImageEditor : UserControl
 
     private void UpdateTransform()
     {
-        if (ImageTransform != null)
+        if (ZoomTransform != null && PanTransform != null)
         {
-            ImageTransform.ScaleX = Scale;
-            ImageTransform.ScaleY = Scale;
-            ImageTransform.TranslateX = OffsetX;
-            ImageTransform.TranslateY = OffsetY;
+            ZoomTransform.ScaleX = Scale;
+            ZoomTransform.ScaleY = Scale;
+            PanTransform.X = OffsetX;
+            PanTransform.Y = OffsetY;
         }
     }
 

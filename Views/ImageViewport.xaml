@@ -8,19 +8,31 @@
 
     <Border BorderBrush="Black" BorderThickness="2">
         <Grid x:Name="ClipContainer">
-            <Image
-                Stretch="Uniform"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Source="{x:Bind ImageSource, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}">
-                <Image.RenderTransform>
-                    <CompositeTransform
-                        ScaleX="{x:Bind Scale, Mode=OneWay}"
-                        ScaleY="{x:Bind Scale, Mode=OneWay}"
-                        TranslateX="{x:Bind OffsetX, Mode=OneWay}"
-                        TranslateY="{x:Bind OffsetY, Mode=OneWay}" />
-                </Image.RenderTransform>
-            </Image>
+            <!-- Outer layer: Handles panning (translation) -->
+            <Grid RenderTransformOrigin="0.5,0.5">
+                <Grid.RenderTransform>
+                    <TranslateTransform
+                        x:Name="PanTransform"
+                        X="{x:Bind OffsetX, Mode=OneWay}"
+                        Y="{x:Bind OffsetY, Mode=OneWay}" />
+                </Grid.RenderTransform>
+
+                <!-- Inner layer: Handles zooming (scaling) -->
+                <Image
+                    x:Name="ImageElement"
+                    Stretch="Uniform"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Source="{x:Bind ImageSource, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"
+                    RenderTransformOrigin="0.5,0.5">
+                    <Image.RenderTransform>
+                        <ScaleTransform
+                            x:Name="ZoomTransform"
+                            ScaleX="{x:Bind Scale, Mode=OneWay}"
+                            ScaleY="{x:Bind Scale, Mode=OneWay}" />
+                    </Image.RenderTransform>
+                </Image>
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

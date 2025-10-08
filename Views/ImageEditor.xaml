@@ -23,15 +23,25 @@
             PointerMoved="Viewport_PointerMoved"
             PointerReleased="Viewport_PointerReleased">
             <Grid x:Name="ClipContainer">
-                <Image
-                    Stretch="Uniform"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Source="{x:Bind ImageSource, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}">
-                    <Image.RenderTransform>
-                        <CompositeTransform x:Name="ImageTransform" />
-                    </Image.RenderTransform>
-                </Image>
+                <!-- Outer layer: Handles panning (translation) -->
+                <Grid x:Name="PanContainer" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <TranslateTransform x:Name="PanTransform" />
+                    </Grid.RenderTransform>
+
+                    <!-- Inner layer: Handles zooming (scaling) -->
+                    <Image
+                        x:Name="ImageElement"
+                        Stretch="Uniform"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Source="{x:Bind ImageSource, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"
+                        RenderTransformOrigin="0.5,0.5">
+                        <Image.RenderTransform>
+                            <ScaleTransform x:Name="ZoomTransform" />
+                        </Image.RenderTransform>
+                    </Image>
+                </Grid>
             </Grid>
         </Border>
 
