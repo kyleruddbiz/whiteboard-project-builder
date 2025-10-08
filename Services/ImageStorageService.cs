@@ -42,11 +42,11 @@ public class ImageStorageService
     }
 
     /// <summary>
-    /// Saves a bitmap from the clipboard to LocalFolder and returns the ms-appdata:/// URI.
+    /// Saves a bitmap from the clipboard to LocalFolder and returns the ms-appdata:/// URI with dimensions.
     /// </summary>
     /// <param name="fileName">Desired file name for the saved image (without extension)</param>
-    /// <returns>URI path for the saved image (ms-appdata:///local/Images/fileName.png)</returns>
-    public async Task<string> SaveBitmapFromClipboardAsync(string fileName)
+    /// <returns>Tuple of (uri, width, height) for the saved image</returns>
+    public async Task<(string uri, int width, int height)> SaveBitmapFromClipboardAsync(string fileName)
     {
         var dataPackageView = Clipboard.GetContent();
 
@@ -86,11 +86,18 @@ public class ImageStorageService
             CreationCollisionOption.GenerateUniqueName
         );
 
+        int width;
+        int height;
+
         using (var imageStream = await imageReference.OpenReadAsync())
         using (var fileStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite))
         {
             // Decode the bitmap
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(imageStream);
+
+            // Capture dimensions before decoder goes out of scope
+            width = (int)decoder.PixelWidth;
+            height = (int)decoder.PixelHeight;
 
             // Encode as PNG
             BitmapEncoder encoder = await BitmapEncoder.CreateAsync(
@@ -114,7 +121,7 @@ public class ImageStorageService
             await encoder.FlushAsync();
         }
 
-        return $"ms-appdata:///local/{ImagesFolderName}/{storageFile.Name}";
+        return ($"ms-appdata:///local/{ImagesFolderName}/{storageFile.Name}", width, height);
     }
 
     /// <summary>

@@ -13,6 +13,8 @@ public partial class MainPageViewModel : ObservableObject
     private readonly PrintService printService;
     private readonly DataPersistenceService dataPersistenceService;
     private readonly ImageStorageService imageStorageService;
+    private readonly ImageTransformService imageTransformService;
+    private readonly ImageDimensionService imageDimensionService;
     private CancellationTokenSource? saveCts;
 
     private const int AutoSaveDelayMs = 2000;
@@ -36,6 +38,8 @@ public partial class MainPageViewModel : ObservableObject
         this.printService = printService;
         this.dataPersistenceService = dataPersistenceService;
         this.imageStorageService = new ImageStorageService();
+        this.imageTransformService = new ImageTransformService();
+        this.imageDimensionService = new ImageDimensionService();
 
         Projects = [];
         GridItems = [];
@@ -212,7 +216,7 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void AddProject()
+    private async Task AddProject()
     {
         ExitEditMode();
 
@@ -223,15 +227,20 @@ public partial class MainPageViewModel : ObservableObject
             : "portrait";
         int imageNumber = random.Next(1, 6);
 
+        string imagePath = $"Assets/Backgrounds/Examples/{imageType}-{imageNumber}.jpg";
+
         var newProject = new ProjectItemViewModel
         {
             Title = "New Project",
             Subtitle = "Add Details",
-            Image = $"Assets/Backgrounds/Examples/{imageType}-{imageNumber}.jpg",
+            Image = imagePath,
             Size = ProjectSize.Medium,
             Value = ProjectValue.Good,
             DueDate = null
         };
+
+        // Apply UniformToFill transform for default background
+        await ApplyUniformToFillTransformAsync(newProject, imagePath);
 
         Projects.Add(newProject);
         EnterEditMode(newProject);
@@ -300,12 +309,18 @@ public partial class MainPageViewModel : ObservableObject
                 return;
             }
 
-            // Save the image from clipboard
-            string imageUri = await imageStorageService.SaveBitmapFromClipboardAsync(dialog.FileName);
+            // Save the image from clipboard (returns URI and dimensions)
+            var (imageUri, width, height) = await imageStorageService.SaveBitmapFromClipboardAsync(dialog.FileName);
 
             // Update selected project if one exists
             if (SelectedProject != null)
             {
+                // Calculate and apply UniformToFill transform
+                var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
+
+                SelectedProject.ImageScale = scale;
+                SelectedProject.ImageOffsetX = offsetX;
+                SelectedProject.ImageOffsetY = offsetY;
                 SelectedProject.Image = imageUri;
             }
 
@@ -333,5 +348,27 @@ public partial class MainPageViewModel : ObservableObject
         };
 
         await errorDialog.ShowAsync();
+    }
+
+    /// <summary>
+    /// Applies UniformToFill transform to a project item based on its image URI.
+    /// Used for default background images loaded from ms-appx:// URIs.
+    /// </summary>
+    private async Task ApplyUniformToFillTransformAsync(ProjectItemViewModel project, string imageUri)
+    {
+        try
+        {
+            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
+            var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
+
+            project.ImageScale = scale;
+            project.ImageOffsetX = offsetX;
+            project.ImageOffsetY = offsetY;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
+            // Leave default values (scale=1.0, offset=0,0)
+        }
     }
 }
