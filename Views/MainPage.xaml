@@ -21,7 +21,11 @@
             <selectors:GridItemTemplateSelector.ProjectTemplate>
                 <DataTemplate x:DataType="models:GridItemWrapper">
                     <Grid>
-                        <local:ProjectItemView Margin="10" DataContext="{x:Bind ProjectItem}" />
+                        <local:ProjectItemView
+                            x:Name="ItemView"
+                            Margin="10"
+                            DataContext="{x:Bind ProjectItem}"
+                            EditRequested="ProjectItemView_EditRequested" />
                         <Button
                             Width="50"
                             Height="50"

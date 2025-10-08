@@ -24,8 +24,16 @@ public partial class ProjectItemViewModel : ObservableObject
     [ObservableProperty]
     private DateTime? dueDate;
 
+    [ObservableProperty]
+    private bool isEditing;
+
     public string SizeIcon => Size.ToIcon();
     public string ValueIcon => Value.ToIcon();
+    public string DateDisplay => DueDate?.ToShortDateString() ?? string.Empty;
+    public string DatePrefix => DueDate?.Date == DateTime.Now.Date ? "TODAY: " : string.Empty;
+
+    public List<ProjectSize> SizeOptions { get; } = Enum.GetValues(typeof(ProjectSize)).Cast<ProjectSize>().ToList();
+    public List<ProjectValue> ValueOptions { get; } = Enum.GetValues(typeof(ProjectValue)).Cast<ProjectValue>().ToList();
 
     /// <summary>
     /// Raised when any property changes to trigger autosave.
@@ -62,6 +70,8 @@ public partial class ProjectItemViewModel : ObservableObject
     partial void OnDueDateChanged(DateTime? value)
     {
         DataChanged?.Invoke(this, EventArgs.Empty);
+        OnPropertyChanged(nameof(DateDisplay));
+        OnPropertyChanged(nameof(DatePrefix));
     }
 
     /// <summary>

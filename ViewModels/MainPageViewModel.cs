@@ -200,6 +200,8 @@ public partial class MainPageViewModel : ObservableObject
     [RelayCommand]
     private void AddProject()
     {
+        ExitEditMode();
+
         var random = new Random();
 
         string imageType = (random.NextSingle() < .5f)
@@ -207,7 +209,7 @@ public partial class MainPageViewModel : ObservableObject
             : "portrait";
         int imageNumber = random.Next(1, 6);
 
-        Projects.Add(new ProjectItemViewModel
+        var newProject = new ProjectItemViewModel
         {
             Title = "New Project",
             Subtitle = "Add Details",
@@ -215,13 +217,42 @@ public partial class MainPageViewModel : ObservableObject
             Size = ProjectSize.Medium,
             Value = ProjectValue.Good,
             DueDate = null
-        });
+        };
+
+        Projects.Add(newProject);
+        EnterEditMode(newProject);
     }
 
     [RelayCommand]
     private void RemoveProject(ProjectItemViewModel project)
     {
+        if (SelectedProject == project)
+        {
+            ExitEditMode();
+        }
         Projects.Remove(project);
+    }
+
+    [RelayCommand]
+    private void EnterEditMode(ProjectItemViewModel item)
+    {
+        if (SelectedProject != null && SelectedProject != item)
+        {
+            SelectedProject.IsEditing = false;
+        }
+
+        SelectedProject = item;
+        item.IsEditing = true;
+    }
+
+    [RelayCommand]
+    private void ExitEditMode()
+    {
+        if (SelectedProject != null)
+        {
+            SelectedProject.IsEditing = false;
+            SelectedProject = null;
+        }
     }
 
     public async Task PasteImageFromClipboardAsync(Microsoft.UI.Xaml.XamlRoot xamlRoot)

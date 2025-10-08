@@ -1,0 +1,65 @@
+<UserControl
+    x:Class="WhiteboardProjectBuilder.Views.ProjectItemEditView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
+    mc:Ignorable="d">
+
+    <UserControl.KeyboardAccelerators>
+        <KeyboardAccelerator Key="Escape" Invoked="EscapeAccelerator_Invoked" />
+    </UserControl.KeyboardAccelerators>
+
+    <Border
+        Width="502"
+        Height="800"
+        BorderBrush="Blue"
+        BorderThickness="4">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Padding="20" Spacing="16">
+                <TextBox
+                    x:Name="TitleTextBox"
+                    Header="Title"
+                    Text="{x:Bind ViewModel.Title, Mode=TwoWay}" />
+
+                <TextBox
+                    Header="Subtitle"
+                    Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay}" />
+
+                <StackPanel Spacing="8">
+                    <TextBlock
+                        FontWeight="SemiBold"
+                        Text="Image" />
+                    <Button
+                        Content="Choose Image"
+                        Click="ChooseImageButton_Click" />
+                    <Border
+                        Height="280"
+                        BorderBrush="Black"
+                        BorderThickness="2">
+                        <Image
+                            Source="{x:Bind ViewModel.Image, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"
+                            Stretch="UniformToFill" />
+                    </Border>
+                </StackPanel>
+
+                <ComboBox
+                    Header="Size"
+                    ItemsSource="{x:Bind ViewModel.SizeOptions, Mode=OneWay}"
+                    SelectedItem="{Binding Size, Mode=TwoWay}" />
+
+                <ComboBox
+                    Header="Value"
+                    ItemsSource="{x:Bind ViewModel.ValueOptions, Mode=OneWay}"
+                    SelectedItem="{Binding Value, Mode=TwoWay}" />
+
+                <CalendarDatePicker
+                    Header="Due Date"
+                    PlaceholderText="Select a date"
+                    Date="{x:Bind ViewModel.DueDate, Mode=TwoWay, Converter={StaticResource NullableDateTimeToDateTimeOffsetConverter}}" />
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>

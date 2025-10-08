@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Windows.ApplicationModel.DataTransfer;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
@@ -26,6 +27,36 @@ public partial class MainPage : Page
         }
 
         this.Unloaded += MainPage_Unloaded;
+        this.PointerPressed += MainPage_PointerPressed;
+    }
+
+    private void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (ViewModel.SelectedProject?.IsEditing != true)
+            return;
+
+        var point = e.GetCurrentPoint(this);
+        var elements = VisualTreeHelper.FindElementsInHostCoordinates(point.Position, this);
+
+        bool clickedInsideEditView = elements.Any(el =>
+            el is FrameworkElement fe &&
+            (fe.Name == "EditView" || IsDescendantOfName(el, "EditView")));
+
+        if (!clickedInsideEditView)
+        {
+            ViewModel.ExitEditModeCommand.Execute(null);
+        }
+    }
+
+    private bool IsDescendantOfName(DependencyObject element, string ancestorName)
+    {
+        while (element != null)
+        {
+            if (element is FrameworkElement fe && fe.Name == ancestorName)
+                return true;
+            element = VisualTreeHelper.GetParent(element);
+        }
+        return false;
     }
 
     private async void MainPage_Unloaded(object sender, RoutedEventArgs e)
@@ -38,6 +69,12 @@ public partial class MainPage : Page
 
     private void GridView_SelectionChanged(object sender, Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs e)
     {
+        // Exit edit mode on currently editing item before changing selection
+        if (ViewModel.SelectedProject?.IsEditing == true)
+        {
+            ViewModel.SelectedProject.IsEditing = false;
+        }
+
         var gridView = (GridView)sender;
         if (gridView.SelectedItem is GridItemWrapper wrapper)
         {
@@ -64,5 +101,10 @@ public partial class MainPage : Page
         // Image found, handle paste
         args.Handled = true;
         await ViewModel.PasteImageFromClipboardAsync(this.XamlRoot);
+    }
+
+    private void ProjectItemView_EditRequested(object? sender, ProjectItemViewModel e)
+    {
+        ViewModel.EnterEditModeCommand.Execute(e);
     }
 }

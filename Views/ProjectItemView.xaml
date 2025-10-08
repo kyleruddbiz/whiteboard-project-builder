@@ -4,74 +4,104 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:WhiteboardProjectBuilder.Helpers"
+    xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
     mc:Ignorable="d">
 
-    <Border
-        Width="502"
-        Height="800"
-        BorderBrush="Black"
-        BorderThickness="2">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <StackPanel Grid.Row="0" Padding="0 10 0 0">
-                <TextBlock
-                    FontSize="46"
-                    FontWeight="Bold"
-                    Text="{x:Bind ViewModel.Title, Mode=OneWay}"
-                    TextAlignment="Center" />
-
-                <TextBlock
-                    FontSize="30"
-                    Text="{x:Bind ViewModel.Subtitle, Mode=OneWay}"
-                    TextAlignment="Center" />
-            </StackPanel>
-
+    <Grid>
+        <!-- Readonly View -->
+        <Grid x:Name="ReadonlyView" x:Load="{x:Bind Not(ViewModel.IsEditing), Mode=OneWay}">
             <Border
-                Grid.Row="1"
-                Width="420"
-                Height="360"
-                Margin="0 38 0 0"
-                VerticalAlignment="Top"
+                Width="502"
+                Height="800"
                 BorderBrush="Black"
                 BorderThickness="2">
-                <Image Source="{x:Bind ViewModel.Image, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="UniformToFill" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Padding="0 10 0 0">
+                        <TextBlock
+                            FontSize="46"
+                            FontWeight="Bold"
+                            Text="{x:Bind ViewModel.Title, Mode=OneWay}"
+                            TextAlignment="Center" />
+
+                        <TextBlock
+                            FontSize="30"
+                            Text="{x:Bind ViewModel.Subtitle, Mode=OneWay}"
+                            TextAlignment="Center" />
+                    </StackPanel>
+
+                    <Border
+                        Grid.Row="1"
+                        Width="420"
+                        Height="360"
+                        Margin="0 38 0 0"
+                        VerticalAlignment="Top"
+                        BorderBrush="Black"
+                        BorderThickness="2">
+                        <Image Source="{x:Bind ViewModel.Image, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="UniformToFill" />
+                    </Border>
+
+                    <StackPanel
+                        Grid.Row="2"
+                        Height="228"
+                        Margin="0 8 0 0"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+
+                        <Border BorderBrush="Black" BorderThickness="2">
+                            <Image Source="{x:Bind ViewModel.SizeIcon, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="Uniform" />
+                        </Border>
+
+                        <Border BorderBrush="Black" BorderThickness="2">
+                            <Image Source="{x:Bind ViewModel.ValueIcon, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="Uniform" />
+                        </Border>
+                    </StackPanel>
+
+                    <TextBlock
+                        Grid.Row="4"
+                        HorizontalAlignment="Center"
+                        FontSize="30"
+                        FontWeight="Bold"
+                        Foreground="DarkRed">
+                        <Run Text="{x:Bind ViewModel.DatePrefix, Mode=OneWay}" />
+                        <Run Text="{x:Bind ViewModel.DateDisplay, Mode=OneWay}" />
+                    </TextBlock>
+                </Grid>
             </Border>
 
-            <StackPanel
-                Grid.Row="2"
-                Height="228"
-                Margin="0 8 0 0"
-                HorizontalAlignment="Center"
-                Orientation="Horizontal"
-                Spacing="8">
-
-                <Border BorderBrush="Black" BorderThickness="2">
-                    <Image Source="{x:Bind ViewModel.SizeIcon, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="Uniform" />
+            <!-- Hover Overlay -->
+            <Border
+                Background="Transparent"
+                PointerEntered="Overlay_PointerEntered"
+                PointerExited="Overlay_PointerExited"
+                Tapped="Overlay_Tapped">
+                <Border
+                    x:Name="HoverIndicator"
+                    Background="Black"
+                    Opacity="0">
+                    <FontIcon
+                        FontSize="80"
+                        Foreground="White"
+                        Glyph="&#xE70F;"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
                 </Border>
-
-                <Border BorderBrush="Black" BorderThickness="2">
-                    <Image Source="{x:Bind ViewModel.ValueIcon, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="Uniform" />
-                </Border>
-            </StackPanel>
-
-            <TextBlock
-                Grid.Row="4"
-                HorizontalAlignment="Center"
-                FontSize="30"
-                FontWeight="Bold"
-                Foreground="DarkRed">
-                <Run Text="{x:Bind GetDateIsTodayPrefix(ViewModel.DueDate), Mode=OneWay}" />
-                <Run Text="{x:Bind helpers:DateTimeHelper.ToDateFormat(ViewModel.DueDate), Mode=OneWay}" />
-            </TextBlock>
+            </Border>
         </Grid>
-    </Border>
+
+        <!-- Edit View -->
+        <Grid x:Name="EditView" x:Load="{x:Bind ViewModel.IsEditing, Mode=OneWay}">
+            <local:ProjectItemEditView DataContext="{x:Bind ViewModel, Mode=OneWay}" />
+        </Grid>
+    </Grid>
 </UserControl>

@@ -16,6 +16,7 @@
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
             <converters:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
+            <converters:NullableDateTimeToDateTimeOffsetConverter x:Key="NullableDateTimeToDateTimeOffsetConverter" />
 
             <Color x:Key="Primary">#512BD4</Color>
 
