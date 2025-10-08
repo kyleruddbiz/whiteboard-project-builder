@@ -66,6 +66,20 @@ public partial class MainPageViewModel : ObservableObject
         await printService.ShowPrintUIAsync(Projects);
     }
 
+    [RelayCommand]
+    private async Task OpenImagesFolderAsync()
+    {
+        try
+        {
+            string folderPath = await imageStorageService.GetImagesFolderPathAsync();
+            System.Diagnostics.Process.Start("explorer.exe", folderPath);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to open images folder: {ex.Message}");
+        }
+    }
+
     private void Projects_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         RebuildGridItems();

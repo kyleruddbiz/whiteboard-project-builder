@@ -73,11 +73,18 @@
                         FontWeight="Bold"
                         Text="Projects" />
 
-                    <Button
+                    <StackPanel
                         Margin="0 0 0 20"
                         HorizontalAlignment="Center"
-                        Command="{x:Bind ViewModel.PrintProjectsCommand}"
-                        Content="Print Projects" />
+                        Orientation="Horizontal"
+                        Spacing="10">
+                        <Button
+                            Command="{x:Bind ViewModel.PrintProjectsCommand}"
+                            Content="Print Projects" />
+                        <Button
+                            Command="{x:Bind ViewModel.OpenImagesFolderCommand}"
+                            Content="Open Images Folder" />
+                    </StackPanel>
 
                     <GridView
                         HorizontalAlignment="Center"
