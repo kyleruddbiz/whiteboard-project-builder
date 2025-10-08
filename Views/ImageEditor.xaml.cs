@@ -1,5 +1,4 @@
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Enums;
 
 namespace WhiteboardProjectBuilder.Views;
@@ -24,21 +23,21 @@ public sealed partial class ImageEditor : UserControl
             nameof(OffsetX),
             typeof(double),
             typeof(ImageEditor),
-            new PropertyMetadata(0.0, OnTransformChanged));
+            new PropertyMetadata(0.0));
 
     public static readonly DependencyProperty OffsetYProperty =
         DependencyProperty.Register(
             nameof(OffsetY),
             typeof(double),
             typeof(ImageEditor),
-            new PropertyMetadata(0.0, OnTransformChanged));
+            new PropertyMetadata(0.0));
 
     public static readonly DependencyProperty ScaleProperty =
         DependencyProperty.Register(
             nameof(Scale),
             typeof(double),
             typeof(ImageEditor),
-            new PropertyMetadata(1.0, OnTransformChanged));
+            new PropertyMetadata(1.0));
 
     public static readonly DependencyProperty EditModeProperty =
         DependencyProperty.Register(
@@ -84,38 +83,11 @@ public sealed partial class ImageEditor : UserControl
     {
         this.InitializeComponent();
         this.Loaded += ImageEditor_Loaded;
-        this.SizeChanged += ImageEditor_SizeChanged;
     }
 
     private void ImageEditor_Loaded(object sender, RoutedEventArgs e)
     {
-        UpdateTransform();
         UpdateButtonStyles();
-        UpdateClip();
-    }
-
-    private void ImageEditor_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        UpdateClip();
-    }
-
-    private void UpdateClip()
-    {
-        if (ClipContainer != null && ClipContainer.ActualWidth > 0 && ClipContainer.ActualHeight > 0)
-        {
-            ClipContainer.Clip = new RectangleGeometry
-            {
-                Rect = new Windows.Foundation.Rect(0, 0, ClipContainer.ActualWidth, ClipContainer.ActualHeight)
-            };
-        }
-    }
-
-    private static void OnTransformChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is ImageEditor editor)
-        {
-            editor.UpdateTransform();
-        }
     }
 
     private static void OnEditModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -123,17 +95,6 @@ public sealed partial class ImageEditor : UserControl
         if (d is ImageEditor editor)
         {
             editor.UpdateButtonStyles();
-        }
-    }
-
-    private void UpdateTransform()
-    {
-        if (ZoomTransform != null && PanTransform != null)
-        {
-            ZoomTransform.ScaleX = Scale;
-            ZoomTransform.ScaleY = Scale;
-            PanTransform.X = OffsetX;
-            PanTransform.Y = OffsetY;
         }
     }
 

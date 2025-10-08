@@ -17,32 +17,14 @@
         <Border
             x:Name="Viewport"
             Background="#00B0F0"
-            BorderBrush="Black"
-            BorderThickness="2"
             PointerPressed="Viewport_PointerPressed"
             PointerMoved="Viewport_PointerMoved"
             PointerReleased="Viewport_PointerReleased">
-            <Grid x:Name="ClipContainer">
-                <!-- Outer layer: Handles panning (translation) -->
-                <Grid x:Name="PanContainer" RenderTransformOrigin="0.5,0.5">
-                    <Grid.RenderTransform>
-                        <TranslateTransform x:Name="PanTransform" />
-                    </Grid.RenderTransform>
-
-                    <!-- Inner layer: Handles zooming (scaling) -->
-                    <Image
-                        x:Name="ImageElement"
-                        Stretch="Uniform"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Source="{x:Bind ImageSource, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"
-                        RenderTransformOrigin="0.5,0.5">
-                        <Image.RenderTransform>
-                            <ScaleTransform x:Name="ZoomTransform" />
-                        </Image.RenderTransform>
-                    </Image>
-                </Grid>
-            </Grid>
+            <local:ImageViewport
+                ImageSource="{x:Bind ImageSource, Mode=OneWay}"
+                OffsetX="{x:Bind OffsetX, Mode=OneWay}"
+                OffsetY="{x:Bind OffsetY, Mode=OneWay}"
+                Scale="{x:Bind Scale, Mode=OneWay}" />
         </Border>
 
         <StackPanel
