@@ -48,9 +48,13 @@ public class ImageTransformService
 
         System.Diagnostics.Debug.WriteLine($"Final dimensions: {finalWidth}x{finalHeight}");
 
-        // For center-based transforms, offset to align top-left corners
-        double offsetX = -(finalWidth - ViewportWidth) / 2;
-        double offsetY = -(finalHeight - ViewportHeight) / 2;
+        // For center-based transforms (RenderTransformOrigin="0.5,0.5"), position image at top-left
+        // The viewport's center is at (0,0) in this coordinate system
+        // The viewport's top-left corner is at (-ViewportWidth/2, -ViewportHeight/2)
+        // The scaled image's top-left corner is at (-finalWidth/2, -finalHeight/2) relative to its center
+        // To align them: offset = viewportTopLeft - imageTopLeft
+        double offsetX = (-ViewportWidth / 2) - (-finalWidth / 2);
+        double offsetY = (-ViewportHeight / 2) - (-finalHeight / 2);
 
         System.Diagnostics.Debug.WriteLine($"Final transform: scale={finalScale}, offsetX={offsetX}, offsetY={offsetY}");
 
