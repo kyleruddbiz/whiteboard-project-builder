@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
     mc:Ignorable="d">
@@ -45,15 +46,20 @@
                     </Border>
                 </StackPanel>
 
-                <ComboBox
-                    Header="Size"
-                    ItemsSource="{x:Bind ViewModel.SizeOptions, Mode=OneWay}"
-                    SelectedItem="{Binding Size, Mode=TwoWay}" />
-
-                <ComboBox
-                    Header="Value"
-                    ItemsSource="{x:Bind ViewModel.ValueOptions, Mode=OneWay}"
-                    SelectedItem="{Binding Value, Mode=TwoWay}" />
+                <StackPanel>
+                    <TextBlock
+                        FontWeight="SemiBold"
+                        Text="Size and Value"
+                        Margin="0 0 0 8" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <local:IconSelector
+                            IconOptions="{x:Bind ViewModel.SizeIconOptions, Mode=OneWay}"
+                            SelectedValue="{Binding Size, Mode=TwoWay}" />
+                        <local:IconSelector
+                            IconOptions="{x:Bind ViewModel.ValueIconOptions, Mode=OneWay}"
+                            SelectedValue="{Binding Value, Mode=TwoWay}" />
+                    </StackPanel>
+                </StackPanel>
 
                 <CalendarDatePicker
                     Header="Due Date"

@@ -1,0 +1,68 @@
+<UserControl
+    x:Class="WhiteboardProjectBuilder.Views.IconSelector"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:WhiteboardProjectBuilder.Converters"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:StringToImageSourceConverter x:Key="LocalStringToImageSourceConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Button
+            x:Name="SelectorButton"
+            Padding="0"
+            Click="SelectorButton_Click">
+            <Border
+                Width="114"
+                Height="114"
+                BorderBrush="Black"
+                BorderThickness="2">
+                <Image
+                    x:Name="SelectedIconImage"
+                    Stretch="Uniform" />
+            </Border>
+        </Button>
+
+        <Popup
+            x:Name="IconPopup"
+            IsLightDismissEnabled="True">
+            <Border
+                Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                BorderBrush="Black"
+                BorderThickness="2"
+                Padding="12">
+                <GridView
+                    x:Name="IconGridView"
+                    MaxWidth="500"
+                    SelectionMode="Single"
+                    SelectionChanged="IconGridView_SelectionChanged">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Width="114"
+                                Height="114"
+                                BorderBrush="Gray"
+                                BorderThickness="2"
+                                CornerRadius="4">
+                                <Image
+                                    Source="{Binding IconPath, Converter={StaticResource LocalStringToImageSourceConverter}}"
+                                    Stretch="Uniform" />
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                    <GridView.ItemContainerStyle>
+                        <Style TargetType="GridViewItem">
+                            <Setter Property="Margin" Value="4" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </GridView.ItemContainerStyle>
+                </GridView>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>

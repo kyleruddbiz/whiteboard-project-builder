@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using WhiteboardProjectBuilder.Enums;
+using WhiteboardProjectBuilder.Helpers;
 using WhiteboardProjectBuilder.Models;
 
 namespace WhiteboardProjectBuilder.ViewModels;
@@ -34,6 +35,9 @@ public partial class ProjectItemViewModel : ObservableObject
 
     public List<ProjectSize> SizeOptions { get; } = Enum.GetValues(typeof(ProjectSize)).Cast<ProjectSize>().ToList();
     public List<ProjectValue> ValueOptions { get; } = Enum.GetValues(typeof(ProjectValue)).Cast<ProjectValue>().ToList();
+
+    public List<IconOption<ProjectSize>> SizeIconOptions { get; } = IconOption<ProjectSize>.Create(s => s.ToIcon());
+    public List<IconOption<ProjectValue>> ValueIconOptions { get; } = IconOption<ProjectValue>.Create(v => v.ToIcon());
 
     /// <summary>
     /// Raised when any property changes to trigger autosave.
