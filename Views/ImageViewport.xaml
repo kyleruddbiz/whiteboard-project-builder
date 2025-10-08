@@ -1,0 +1,26 @@
+<UserControl
+    x:Class="WhiteboardProjectBuilder.Views.ImageViewport"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Border BorderBrush="Black" BorderThickness="2">
+        <Grid x:Name="ClipContainer">
+            <Image
+                Stretch="Uniform"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Source="{x:Bind ImageSource, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}">
+                <Image.RenderTransform>
+                    <CompositeTransform
+                        ScaleX="{x:Bind Scale, Mode=OneWay}"
+                        ScaleY="{x:Bind Scale, Mode=OneWay}"
+                        TranslateX="{x:Bind OffsetX, Mode=OneWay}"
+                        TranslateY="{x:Bind OffsetY, Mode=OneWay}" />
+                </Image.RenderTransform>
+            </Image>
+        </Grid>
+    </Border>
+</UserControl>

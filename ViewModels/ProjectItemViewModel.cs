@@ -17,6 +17,15 @@ public partial class ProjectItemViewModel : ObservableObject
     private string image = string.Empty;
 
     [ObservableProperty]
+    private double imageOffsetX = 0;
+
+    [ObservableProperty]
+    private double imageOffsetY = 0;
+
+    [ObservableProperty]
+    private double imageScale = 1.0;
+
+    [ObservableProperty]
     private ProjectSize size;
 
     [ObservableProperty]
@@ -62,6 +71,21 @@ public partial class ProjectItemViewModel : ObservableObject
         DataChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    partial void OnImageOffsetXChanged(double value)
+    {
+        DataChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    partial void OnImageOffsetYChanged(double value)
+    {
+        DataChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    partial void OnImageScaleChanged(double value)
+    {
+        DataChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     partial void OnSizeChanged(ProjectSize value)
     {
         DataChanged?.Invoke(this, EventArgs.Empty);
@@ -86,11 +110,23 @@ public partial class ProjectItemViewModel : ObservableObject
     /// </summary>
     public ProjectItem ToModel()
     {
+        ImageTransform? transform = null;
+        if (ImageOffsetX != 0 || ImageOffsetY != 0 || ImageScale != 1.0)
+        {
+            transform = new ImageTransform
+            {
+                OffsetX = ImageOffsetX,
+                OffsetY = ImageOffsetY,
+                Scale = ImageScale
+            };
+        }
+
         return new ProjectItem
         {
             Title = Title,
             Subtitle = Subtitle,
             Image = Image,
+            Transform = transform,
             Size = Size,
             Value = Value,
             DueDate = DueDate,
@@ -108,6 +144,9 @@ public partial class ProjectItemViewModel : ObservableObject
             Title = model.Title,
             Subtitle = model.Subtitle,
             Image = model.Image,
+            ImageOffsetX = model.Transform?.OffsetX ?? 0,
+            ImageOffsetY = model.Transform?.OffsetY ?? 0,
+            ImageScale = model.Transform?.Scale ?? 1.0,
             Size = model.Size,
             Value = model.Value,
             DueDate = model.DueDate,

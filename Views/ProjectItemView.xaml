@@ -39,16 +39,18 @@
                             TextAlignment="Center" />
                     </StackPanel>
 
-                    <Border
+                    <Grid
                         Grid.Row="1"
                         Width="420"
                         Height="360"
                         Margin="0 38 0 0"
-                        VerticalAlignment="Top"
-                        BorderBrush="Black"
-                        BorderThickness="2">
-                        <Image Source="{x:Bind ViewModel.Image, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}" Stretch="UniformToFill" />
-                    </Border>
+                        VerticalAlignment="Top">
+                        <local:ImageViewport
+                            ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
+                            OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=OneWay}"
+                            OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=OneWay}"
+                            Scale="{x:Bind ViewModel.ImageScale, Mode=OneWay}" />
+                    </Grid>
 
                     <StackPanel
                         Grid.Row="2"

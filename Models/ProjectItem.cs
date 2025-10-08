@@ -7,6 +7,7 @@ public class ProjectItem
     public required string Title { get; set; }
     public string? Subtitle { get; set; }
     public required string Image { get; set; }
+    public ImageTransform? Transform { get; set; }
     public required ProjectSize Size { get; set; }
     public required ProjectValue Value { get; set; }
     public DateTime? DueDate { get; set; }
