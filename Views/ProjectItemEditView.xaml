@@ -3,8 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
     mc:Ignorable="d">
@@ -16,7 +16,7 @@
     <Border
         Width="502"
         Height="800"
-        BorderBrush="Blue"
+        BorderBrush="#005FBA"
         BorderThickness="4">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Padding="16" Spacing="12">
@@ -25,43 +25,35 @@
                     Header="Title"
                     Text="{x:Bind ViewModel.Title, Mode=TwoWay}" />
 
-                <TextBox
-                    Header="Subtitle"
-                    Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay}" />
+                <TextBox Header="Subtitle" Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay}" />
 
                 <StackPanel Spacing="8">
-                    <TextBlock
-                        FontWeight="SemiBold"
-                        Text="Image" />
+                    <TextBlock FontWeight="SemiBold" Text="Image" />
                     <local:ImageEditor
                         Width="420"
                         Height="360"
+                        ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
                         ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                         OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
                         OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=TwoWay}"
-                        Scale="{x:Bind ViewModel.ImageScale, Mode=TwoWay}"
-                        ImageReplaceRequested="ImageEditor_ImageReplaceRequested" />
+                        Scale="{x:Bind ViewModel.ImageScale, Mode=TwoWay}" />
                 </StackPanel>
 
                 <StackPanel>
                     <TextBlock
+                        Margin="0 0 0 8"
                         FontWeight="SemiBold"
-                        Text="Size and Value"
-                        Margin="0 0 0 8" />
+                        Text="Size and Value" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <local:IconSelector
-                            IconOptions="{x:Bind ViewModel.SizeIconOptions, Mode=OneWay}"
-                            SelectedValue="{Binding Size, Mode=TwoWay}" />
-                        <local:IconSelector
-                            IconOptions="{x:Bind ViewModel.ValueIconOptions, Mode=OneWay}"
-                            SelectedValue="{Binding Value, Mode=TwoWay}" />
+                        <local:IconSelector IconOptions="{x:Bind ViewModel.SizeIconOptions, Mode=OneWay}" SelectedValue="{Binding Size, Mode=TwoWay}" />
+                        <local:IconSelector IconOptions="{x:Bind ViewModel.ValueIconOptions, Mode=OneWay}" SelectedValue="{Binding Value, Mode=TwoWay}" />
                     </StackPanel>
                 </StackPanel>
 
                 <CalendarDatePicker
+                    Date="{x:Bind ViewModel.DueDate, Mode=TwoWay, Converter={StaticResource NullableDateTimeToDateTimeOffsetConverter}}"
                     Header="Due Date"
-                    PlaceholderText="Select a date"
-                    Date="{x:Bind ViewModel.DueDate, Mode=TwoWay, Converter={StaticResource NullableDateTimeToDateTimeOffsetConverter}}" />
+                    PlaceholderText="Select a date" />
             </StackPanel>
         </ScrollViewer>
     </Border>
