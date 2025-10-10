@@ -231,8 +231,6 @@ public partial class MainPageViewModel : ObservableObject
 
         var newProject = new ProjectItemViewModel
         {
-            Title = "New Project",
-            Subtitle = "Add Details",
             Image = imagePath,
             Size = ProjectSize.Medium,
             Value = ProjectValue.Good,

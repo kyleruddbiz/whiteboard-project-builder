@@ -23,9 +23,13 @@
                 <TextBox
                     x:Name="TitleTextBox"
                     Header="Title"
+                    PlaceholderText="New Project"
                     Text="{x:Bind ViewModel.Title, Mode=TwoWay}" />
 
-                <TextBox Header="Subtitle" Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay}" />
+                <TextBox
+                    Header="Subtitle"
+                    PlaceholderText="Add Details"
+                    Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay}" />
 
                 <StackPanel Spacing="8">
                     <TextBlock FontWeight="SemiBold" Text="Image" />
