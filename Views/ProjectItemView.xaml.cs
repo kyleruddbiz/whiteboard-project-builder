@@ -19,6 +19,7 @@ public sealed partial class ProjectItemView : UserControl
     }
 
     public event EventHandler<ProjectItemViewModel>? EditRequested;
+    public event EventHandler? ImageReplaceRequested;
 
     public ProjectItemView()
     {
@@ -75,5 +76,10 @@ public sealed partial class ProjectItemView : UserControl
         {
             EditRequested?.Invoke(this, ViewModel);
         }
+    }
+
+    private void ProjectItemEditView_ImageReplaceRequested(object? sender, EventArgs e)
+    {
+        ImageReplaceRequested?.Invoke(this, EventArgs.Empty);
     }
 }

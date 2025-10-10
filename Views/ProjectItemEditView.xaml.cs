@@ -5,6 +5,8 @@ namespace WhiteboardProjectBuilder.Views;
 
 public sealed partial class ProjectItemEditView : UserControl
 {
+    public event EventHandler? ImageReplaceRequested;
+
     public static readonly DependencyProperty ViewModelProperty =
         DependencyProperty.Register(
             nameof(ViewModel),
@@ -45,5 +47,10 @@ public sealed partial class ProjectItemEditView : UserControl
             ViewModel.IsEditing = false;
             args.Handled = true;
         }
+    }
+
+    private void ImageEditor_ImageReplaceRequested(object? sender, EventArgs e)
+    {
+        ImageReplaceRequested?.Invoke(this, EventArgs.Empty);
     }
 }

@@ -112,7 +112,9 @@
 
         <!--  Edit View  -->
         <Grid x:Name="EditView" x:Load="{x:Bind ViewModel.IsEditing, Mode=OneWay}">
-            <local:ProjectItemEditView DataContext="{x:Bind ViewModel, Mode=OneWay}" />
+            <local:ProjectItemEditView
+                DataContext="{x:Bind ViewModel, Mode=OneWay}"
+                ImageReplaceRequested="ProjectItemEditView_ImageReplaceRequested" />
         </Grid>
     </Grid>
 </UserControl>

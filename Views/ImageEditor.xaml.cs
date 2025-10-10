@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Input;
 using WhiteboardProjectBuilder.Enums;
+using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.Views;
 
@@ -10,6 +11,8 @@ public sealed partial class ImageEditor : UserControl
     private double startOffsetX;
     private double startOffsetY;
     private double startScale;
+
+    public event EventHandler? ImageReplaceRequested;
 
     public static readonly DependencyProperty ImageSourceProperty =
         DependencyProperty.Register(
@@ -192,6 +195,13 @@ public sealed partial class ImageEditor : UserControl
     {
         isDragging = false;
         Viewport.ReleasePointerCapture(e.Pointer);
+        e.Handled = true;
+    }
+
+    private async void Viewport_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        await ClipboardService.CopyImagesFolderPathToClipboardAsync();
+        ImageReplaceRequested?.Invoke(this, EventArgs.Empty);
         e.Handled = true;
     }
 }

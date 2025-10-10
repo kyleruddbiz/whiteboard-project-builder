@@ -75,7 +75,7 @@ public partial class MainPageViewModel : ObservableObject
     {
         try
         {
-            string folderPath = await imageStorageService.GetImagesFolderPathAsync();
+            string folderPath = await ImageStorageService.GetImagesFolderPathAsync();
             System.Diagnostics.Process.Start("explorer.exe", folderPath);
         }
         catch (Exception ex)
@@ -334,6 +334,64 @@ public partial class MainPageViewModel : ObservableObject
         catch (Exception ex)
         {
             await ShowErrorDialogAsync(xamlRoot, "Error Saving Image", $"An unexpected error occurred: {ex.Message}");
+        }
+    }
+
+    public async Task ReplaceImageAsync(Microsoft.UI.Xaml.XamlRoot xamlRoot)
+    {
+        if (SelectedProject == null)
+        {
+            return;
+        }
+
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker
+            {
+                ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail,
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary
+            };
+
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".bmp");
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var file = await picker.PickSingleFileAsync();
+
+            if (file == null)
+            {
+                return;
+            }
+
+            // Get dimensions from the original file path
+            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(file.Path);
+
+            // Generate filename from project details
+            string fileName = imageStorageService.GenerateFileName(
+                SelectedProject.Title,
+                SelectedProject.Subtitle
+            );
+
+            // Save the image
+            var imageUri = await imageStorageService.SaveImageAsync(file.Path, fileName + System.IO.Path.GetExtension(file.Path));
+
+            // Calculate and apply UniformToFill transform
+            var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
+
+            SelectedProject.ImageScale = scale;
+            SelectedProject.ImageOffsetX = offsetX;
+            SelectedProject.ImageOffsetY = offsetY;
+            SelectedProject.Image = imageUri;
+
+            System.Diagnostics.Debug.WriteLine($"Image replaced successfully: {imageUri}");
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorDialogAsync(xamlRoot, "Error Replacing Image", $"An unexpected error occurred: {ex.Message}");
         }
     }
 

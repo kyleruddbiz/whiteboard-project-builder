@@ -107,4 +107,9 @@ public partial class MainPage : Page
     {
         ViewModel.EnterEditModeCommand.Execute(e);
     }
+
+    private async void ProjectItemView_ImageReplaceRequested(object? sender, EventArgs e)
+    {
+        await ViewModel.ReplaceImageAsync(this.XamlRoot);
+    }
 }

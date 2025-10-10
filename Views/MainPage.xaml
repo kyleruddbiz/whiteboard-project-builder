@@ -25,7 +25,8 @@
                             x:Name="ItemView"
                             Margin="10"
                             DataContext="{x:Bind ProjectItem}"
-                            EditRequested="ProjectItemView_EditRequested" />
+                            EditRequested="ProjectItemView_EditRequested"
+                            ImageReplaceRequested="ProjectItemView_ImageReplaceRequested" />
                         <Button
                             Width="50"
                             Height="50"

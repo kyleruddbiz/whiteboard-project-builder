@@ -16,7 +16,7 @@ public class ImageStorageService
     /// <summary>
     /// Ensures the images folder exists in LocalFolder.
     /// </summary>
-    public async Task EnsureImagesFolderExistsAsync()
+    public static async Task EnsureImagesFolderExistsAsync()
     {
         await ApplicationData.Current.LocalFolder.CreateFolderAsync(
             ImagesFolderName,
@@ -182,7 +182,7 @@ public class ImageStorageService
     /// <summary>
     /// Gets the full path to the images folder in LocalFolder.
     /// </summary>
-    public async Task<string> GetImagesFolderPathAsync()
+    public static async Task<string> GetImagesFolderPathAsync()
     {
         await EnsureImagesFolderExistsAsync();
         var imagesFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(ImagesFolderName);

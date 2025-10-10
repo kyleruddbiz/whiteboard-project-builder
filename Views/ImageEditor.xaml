@@ -19,7 +19,8 @@
             Background="#00B0F0"
             PointerPressed="Viewport_PointerPressed"
             PointerMoved="Viewport_PointerMoved"
-            PointerReleased="Viewport_PointerReleased">
+            PointerReleased="Viewport_PointerReleased"
+            DoubleTapped="Viewport_DoubleTapped">
             <local:ImageViewport
                 ImageSource="{x:Bind ImageSource, Mode=OneWay}"
                 OffsetX="{x:Bind OffsetX, Mode=OneWay}"

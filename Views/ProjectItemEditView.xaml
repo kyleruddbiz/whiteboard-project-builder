@@ -39,7 +39,8 @@
                         ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                         OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
                         OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=TwoWay}"
-                        Scale="{x:Bind ViewModel.ImageScale, Mode=TwoWay}" />
+                        Scale="{x:Bind ViewModel.ImageScale, Mode=TwoWay}"
+                        ImageReplaceRequested="ImageEditor_ImageReplaceRequested" />
                 </StackPanel>
 
                 <StackPanel>
