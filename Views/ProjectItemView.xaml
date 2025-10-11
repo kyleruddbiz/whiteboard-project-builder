@@ -31,11 +31,13 @@
                         <TextBlock
                             FontSize="46"
                             FontWeight="Bold"
+                            Foreground="{x:Bind ViewModel.IsUsingTemporaryImage, Mode=OneWay, Converter={StaticResource BoolToTemporaryImageTextConverter}}"
                             Text="{x:Bind ViewModel.Title, Mode=OneWay}"
                             TextAlignment="Center" />
 
                         <TextBlock
                             FontSize="30"
+                            Foreground="{x:Bind ViewModel.IsUsingTemporaryImage, Mode=OneWay, Converter={StaticResource BoolToTemporaryImageTextConverter}}"
                             Text="{x:Bind ViewModel.Subtitle, Mode=OneWay}"
                             TextAlignment="Center" />
                     </StackPanel>
@@ -46,11 +48,15 @@
                         Height="360"
                         Margin="0 38 0 0"
                         VerticalAlignment="Top">
-                        <local:ImageViewport
-                            ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
-                            OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=OneWay}"
-                            OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=OneWay}"
-                            ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=OneWay}" />
+                        <Border
+                            BorderBrush="{x:Bind ViewModel.IsUsingTemporaryImage, Mode=OneWay, Converter={StaticResource BoolToTemporaryImageBorderConverter}}"
+                            BorderThickness="3">
+                            <local:ImageViewport
+                                ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
+                                OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=OneWay}"
+                                OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=OneWay}"
+                                ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=OneWay}" />
+                        </Border>
                     </Grid>
 
                     <StackPanel
