@@ -1,6 +1,9 @@
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Input;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Services;
+using Windows.System;
+using Windows.UI.Core;
 
 namespace WhiteboardProjectBuilder.Views;
 
@@ -9,12 +12,16 @@ public sealed partial class ImageEditor : UserControl
     private const double ZoomSensitivityFactor = 300.0;
     private const double MinZoomFactor = 0.5;
     private const double MaxZoomFactor = 3.0;
+    private const double AxisLockHysteresis = 2.0;
+    private const double AxisSwitchMaxDistance = 150.0;
 
     private bool isDragging = false;
     private Windows.Foundation.Point startPoint;
+    private Windows.Foundation.Point dragOrigin;
     private double startOffsetX;
     private double startOffsetY;
     private double startZoomFactor;
+    private LockedAxis? lockedAxis = null;
 
     public event EventHandler? ImageReplaceRequested;
 
@@ -144,9 +151,11 @@ public sealed partial class ImageEditor : UserControl
     {
         isDragging = true;
         startPoint = e.GetCurrentPoint(Viewport).Position;
+        dragOrigin = startPoint;
         startOffsetX = OffsetX;
         startOffsetY = OffsetY;
         startZoomFactor = ZoomFactor;
+        lockedAxis = null;
         Viewport.CapturePointer(e.Pointer);
         e.Handled = true;
     }
@@ -161,6 +170,58 @@ public sealed partial class ImageEditor : UserControl
 
         if (EditMode == ImageEditMode.Pan)
         {
+            var isShiftPressed = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
+
+            if (isShiftPressed)
+            {
+                var absDeltaX = Math.Abs(deltaX);
+                var absDeltaY = Math.Abs(deltaY);
+
+                // Calculate distance from drag origin
+                var distanceFromOriginX = Math.Abs(currentPoint.X - dragOrigin.X);
+                var distanceFromOriginY = Math.Abs(currentPoint.Y - dragOrigin.Y);
+                var maxDistanceFromOrigin = Math.Max(distanceFromOriginX, distanceFromOriginY);
+
+                if (lockedAxis == null)
+                {
+                    // Initial lock: choose axis with larger movement
+                    if (absDeltaX > absDeltaY)
+                    {
+                        lockedAxis = LockedAxis.X;
+                    }
+                    else
+                    {
+                        lockedAxis = LockedAxis.Y;
+                    }
+                }
+                else if (maxDistanceFromOrigin <= AxisSwitchMaxDistance)
+                {
+                    // Only allow axis switching when close to origin
+                    if (lockedAxis == LockedAxis.X && absDeltaY > absDeltaX * AxisLockHysteresis)
+                    {
+                        lockedAxis = LockedAxis.Y;
+                    }
+                    else if (lockedAxis == LockedAxis.Y && absDeltaX > absDeltaY * AxisLockHysteresis)
+                    {
+                        lockedAxis = LockedAxis.X;
+                    }
+                }
+
+                // Apply axis lock
+                if (lockedAxis == LockedAxis.X)
+                {
+                    deltaY = 0;
+                }
+                else
+                {
+                    deltaX = 0;
+                }
+            }
+            else
+            {
+                lockedAxis = null;
+            }
+
             OffsetX = startOffsetX + deltaX;
             OffsetY = startOffsetY + deltaY;
 
@@ -203,6 +264,7 @@ public sealed partial class ImageEditor : UserControl
     private void Viewport_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
         isDragging = false;
+        lockedAxis = null;
         Viewport.ReleasePointerCapture(e.Pointer);
         e.Handled = true;
     }
