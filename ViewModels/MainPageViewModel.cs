@@ -332,28 +332,7 @@ public partial class MainPageViewModel : ObservableObject
     private void ToggleShowArchived()
     {
         ShowArchived = !ShowArchived;
-
-        if (ShowArchived)
-        {
-            foreach (var project in Projects)
-            {
-                if (project.IsArchived)
-                {
-                    AddGridItem(project);
-                }
-            }
-        }
-        else
-        {
-            var archivedWrappers = GridItems
-                .Where(w => w.ProjectItem?.IsArchived == true)
-                .ToList();
-
-            foreach (var wrapper in archivedWrappers)
-            {
-                GridItems.Remove(wrapper);
-            }
-        }
+        RebuildGridItems();
     }
 
     [RelayCommand]
