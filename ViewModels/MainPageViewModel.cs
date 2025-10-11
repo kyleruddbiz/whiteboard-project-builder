@@ -73,7 +73,8 @@ public partial class MainPageViewModel : ObservableObject
     [RelayCommand]
     private async Task PrintProjectsAsync()
     {
-        await printService.ShowPrintUIAsync(Projects);
+        var activeProjects = Projects.Where(p => !p.IsArchived);
+        await printService.ShowPrintUIAsync(activeProjects);
     }
 
     [RelayCommand]
