@@ -50,7 +50,7 @@
                             ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                             OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=OneWay}"
                             OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=OneWay}"
-                            Scale="{x:Bind ViewModel.ImageScale, Mode=OneWay}" />
+                            ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=OneWay}" />
                     </Grid>
 
                     <StackPanel

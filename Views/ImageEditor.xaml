@@ -25,7 +25,7 @@
                 ImageSource="{x:Bind ImageSource, Mode=OneWay}"
                 OffsetX="{x:Bind OffsetX, Mode=OneWay}"
                 OffsetY="{x:Bind OffsetY, Mode=OneWay}"
-                Scale="{x:Bind Scale, Mode=OneWay}" />
+                ZoomFactor="{x:Bind ZoomFactor, Mode=OneWay}" />
         </Border>
 
         <StackPanel

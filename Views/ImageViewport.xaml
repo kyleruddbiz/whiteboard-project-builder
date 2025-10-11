@@ -28,8 +28,8 @@
                     <Image.RenderTransform>
                         <ScaleTransform
                             x:Name="ZoomTransform"
-                            ScaleX="{x:Bind Scale, Mode=OneWay}"
-                            ScaleY="{x:Bind Scale, Mode=OneWay}" />
+                            ScaleX="{x:Bind ZoomFactor, Mode=OneWay}"
+                            ScaleY="{x:Bind ZoomFactor, Mode=OneWay}" />
                     </Image.RenderTransform>
                 </Image>
             </Grid>

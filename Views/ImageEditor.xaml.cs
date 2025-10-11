@@ -6,11 +6,15 @@ namespace WhiteboardProjectBuilder.Views;
 
 public sealed partial class ImageEditor : UserControl
 {
+    private const double ZoomSensitivityFactor = 300.0;
+    private const double MinZoomFactor = 0.5;
+    private const double MaxZoomFactor = 3.0;
+
     private bool isDragging = false;
     private Windows.Foundation.Point startPoint;
     private double startOffsetX;
     private double startOffsetY;
-    private double startScale;
+    private double startZoomFactor;
 
     public event EventHandler? ImageReplaceRequested;
 
@@ -35,9 +39,9 @@ public sealed partial class ImageEditor : UserControl
             typeof(ImageEditor),
             new PropertyMetadata(0.0));
 
-    public static readonly DependencyProperty ScaleProperty =
+    public static readonly DependencyProperty ZoomFactorProperty =
         DependencyProperty.Register(
-            nameof(Scale),
+            nameof(ZoomFactor),
             typeof(double),
             typeof(ImageEditor),
             new PropertyMetadata(1.0));
@@ -67,10 +71,10 @@ public sealed partial class ImageEditor : UserControl
         set => SetValue(OffsetYProperty, value);
     }
 
-    public double Scale
+    public double ZoomFactor
     {
-        get => (double)GetValue(ScaleProperty);
-        set => SetValue(ScaleProperty, value);
+        get => (double)GetValue(ZoomFactorProperty);
+        set => SetValue(ZoomFactorProperty, value);
     }
 
     public ImageEditMode EditMode
@@ -142,7 +146,7 @@ public sealed partial class ImageEditor : UserControl
         startPoint = e.GetCurrentPoint(Viewport).Position;
         startOffsetX = OffsetX;
         startOffsetY = OffsetY;
-        startScale = Scale;
+        startZoomFactor = ZoomFactor;
         Viewport.CapturePointer(e.Pointer);
         e.Handled = true;
     }
@@ -167,23 +171,28 @@ public sealed partial class ImageEditor : UserControl
         }
         else if (EditMode == ImageEditMode.Zoom)
         {
-            // Zoom with vertical drag: down = zoom out, up = zoom in
-            var scaleDelta = 1 - (deltaY / 300.0);
-            var newScale = startScale * scaleDelta;
-            newScale = Math.Clamp(newScale, 0.5, 3.0);
+            // Zoom with dominant axis: use the larger of horizontal or vertical movement
+            var absDeltaX = Math.Abs(deltaX);
+            var absDeltaY = Math.Abs(deltaY);
+            var dominantDelta = absDeltaX > absDeltaY ? -deltaX : deltaY;
+
+            // Zoom: right/up = zoom in, left/down = zoom out
+            var scaleDelta = 1 - (dominantDelta / ZoomSensitivityFactor);
+            var newZoomFactor = startZoomFactor * scaleDelta;
+            newZoomFactor = Math.Clamp(newZoomFactor, MinZoomFactor, MaxZoomFactor);
 
             // Adjust offsets proportionally to maintain visual center
-            var scaleRatio = newScale / startScale;
+            var scaleRatio = newZoomFactor / startZoomFactor;
             var newOffsetX = startOffsetX * scaleRatio;
             var newOffsetY = startOffsetY * scaleRatio;
 
-            Scale = newScale;
+            ZoomFactor = newZoomFactor;
             OffsetX = newOffsetX;
             OffsetY = newOffsetY;
 
             // Update start values for next movement segment
             startPoint = currentPoint;
-            startScale = Scale;
+            startZoomFactor = ZoomFactor;
             startOffsetX = OffsetX;
             startOffsetY = OffsetY;
         }

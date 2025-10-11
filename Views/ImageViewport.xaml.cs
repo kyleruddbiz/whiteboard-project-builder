@@ -25,9 +25,9 @@ public sealed partial class ImageViewport : UserControl
             typeof(ImageViewport),
             new PropertyMetadata(0.0));
 
-    public static readonly DependencyProperty ScaleProperty =
+    public static readonly DependencyProperty ZoomFactorProperty =
         DependencyProperty.Register(
-            nameof(Scale),
+            nameof(ZoomFactor),
             typeof(double),
             typeof(ImageViewport),
             new PropertyMetadata(1.0));
@@ -50,10 +50,10 @@ public sealed partial class ImageViewport : UserControl
         set => SetValue(OffsetYProperty, value);
     }
 
-    public double Scale
+    public double ZoomFactor
     {
-        get => (double)GetValue(ScaleProperty);
-        set => SetValue(ScaleProperty, value);
+        get => (double)GetValue(ZoomFactorProperty);
+        set => SetValue(ZoomFactorProperty, value);
     }
 
     public ImageViewport()

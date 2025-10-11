@@ -23,7 +23,7 @@ public partial class ProjectItemViewModel : ObservableObject
     private double imageOffsetY = 0;
 
     [ObservableProperty]
-    private double imageScale = 1.0;
+    private double imageZoomFactor = 1.0;
 
     [ObservableProperty]
     private ProjectSize size;
@@ -84,7 +84,7 @@ public partial class ProjectItemViewModel : ObservableObject
         DataChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    partial void OnImageScaleChanged(double value)
+    partial void OnImageZoomFactorChanged(double value)
     {
         DataChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -119,13 +119,13 @@ public partial class ProjectItemViewModel : ObservableObject
     public ProjectItem ToModel()
     {
         ImageTransform? transform = null;
-        if (ImageOffsetX != 0 || ImageOffsetY != 0 || ImageScale != 1.0)
+        if (ImageOffsetX != 0 || ImageOffsetY != 0 || ImageZoomFactor != 1.0)
         {
             transform = new ImageTransform
             {
                 OffsetX = ImageOffsetX,
                 OffsetY = ImageOffsetY,
-                Scale = ImageScale
+                ZoomFactor = ImageZoomFactor
             };
         }
 
@@ -155,7 +155,7 @@ public partial class ProjectItemViewModel : ObservableObject
             Image = model.Image,
             ImageOffsetX = model.Transform?.OffsetX ?? 0,
             ImageOffsetY = model.Transform?.OffsetY ?? 0,
-            ImageScale = model.Transform?.Scale ?? 1.0,
+            ImageZoomFactor = model.Transform?.ZoomFactor ?? 1.0,
             Size = model.Size,
             Value = model.Value,
             DueDate = model.DueDate,

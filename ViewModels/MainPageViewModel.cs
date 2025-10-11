@@ -424,7 +424,7 @@ public partial class MainPageViewModel : ObservableObject
                 // Calculate and apply UniformToFill transform
                 var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
-                SelectedProject.ImageScale = scale;
+                SelectedProject.ImageZoomFactor = scale;
                 SelectedProject.ImageOffsetX = offsetX;
                 SelectedProject.ImageOffsetY = offsetY;
                 SelectedProject.Image = imageUri;
@@ -488,7 +488,7 @@ public partial class MainPageViewModel : ObservableObject
             // Calculate and apply UniformToFill transform
             var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
-            SelectedProject.ImageScale = scale;
+            SelectedProject.ImageZoomFactor = scale;
             SelectedProject.ImageOffsetX = offsetX;
             SelectedProject.ImageOffsetY = offsetY;
             SelectedProject.Image = imageUri;
@@ -525,7 +525,7 @@ public partial class MainPageViewModel : ObservableObject
             var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
             var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
-            project.ImageScale = scale;
+            project.ImageZoomFactor = scale;
             project.ImageOffsetX = offsetX;
             project.ImageOffsetY = offsetY;
         }
