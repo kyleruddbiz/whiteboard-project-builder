@@ -1,9 +1,13 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Models;
 
-public class GridItemWrapper
+public partial class GridItemWrapper : ObservableObject
 {
-    public ProjectItemViewModel? ProjectItem { get; init; }
-    public bool IsAddButton { get; init; }
+    [ObservableProperty]
+    private ProjectItemViewModel? projectItem;
+
+    [ObservableProperty]
+    private bool isAddButton;
 }

@@ -47,6 +47,9 @@ public partial class MainPageViewModel : ObservableObject
         Projects = [];
         GridItems = [];
 
+        // Add the "Add" button initially
+        GridItems.Add(new GridItemWrapper { IsAddButton = true });
+
         Projects.CollectionChanged += Projects_CollectionChanged;
         Projects.CollectionChanged += OnProjectsCollectionChanged;
 
@@ -89,17 +92,47 @@ public partial class MainPageViewModel : ObservableObject
 
     private void Projects_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        RebuildGridItems();
+        switch (e.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                if (e.NewItems != null)
+                {
+                    foreach (ProjectItemViewModel item in e.NewItems)
+                    {
+                        AddGridItem(item);
+                    }
+                }
+                break;
+
+            case NotifyCollectionChangedAction.Remove:
+                if (e.OldItems != null)
+                {
+                    foreach (ProjectItemViewModel item in e.OldItems)
+                    {
+                        RemoveGridItem(item);
+                    }
+                }
+                break;
+
+            case NotifyCollectionChangedAction.Reset:
+                RebuildGridItems();
+                break;
+
+            case NotifyCollectionChangedAction.Replace:
+            case NotifyCollectionChangedAction.Move:
+                RebuildGridItems();
+                break;
+        }
     }
 
     private void OnProjectsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        // Subscribe to DataChanged event for new items
         if (e.NewItems != null)
         {
             foreach (ProjectItemViewModel item in e.NewItems)
             {
                 item.DataChanged += OnProjectDataChanged;
+                item.PropertyChanged += OnProjectPropertyChanged;
             }
         }
 
@@ -109,6 +142,7 @@ public partial class MainPageViewModel : ObservableObject
             foreach (ProjectItemViewModel item in e.OldItems)
             {
                 item.DataChanged -= OnProjectDataChanged;
+                item.PropertyChanged -= OnProjectPropertyChanged;
             }
         }
 
@@ -121,13 +155,58 @@ public partial class MainPageViewModel : ObservableObject
         _ = TriggerAutoSaveAsync();
     }
 
+    private void OnProjectPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ProjectItemViewModel.IsArchived) && sender is ProjectItemViewModel project)
+        {
+            if (!ShowArchived)
+            {
+                if (project.IsArchived)
+                {
+                    RemoveGridItem(project);
+                }
+                else
+                {
+                    AddGridItem(project);
+                }
+            }
+        }
+    }
+
+    private void AddGridItem(ProjectItemViewModel project)
+    {
+        if (!ShowArchived && project.IsArchived)
+        {
+            return;
+        }
+
+        if (GridItems.Any(w => w.ProjectItem == project))
+        {
+            return;
+        }
+
+        int insertIndex = GridItems.Count > 0 && GridItems[^1].IsAddButton
+            ? GridItems.Count - 1
+            : GridItems.Count;
+
+        GridItems.Insert(insertIndex, new GridItemWrapper { ProjectItem = project });
+    }
+
+    private void RemoveGridItem(ProjectItemViewModel project)
+    {
+        var wrapper = GridItems.FirstOrDefault(w => w.ProjectItem == project);
+        if (wrapper != null)
+        {
+            GridItems.Remove(wrapper);
+        }
+    }
+
     private void RebuildGridItems()
     {
         GridItems.Clear();
 
         foreach (var project in Projects)
         {
-            // Filter based on ShowArchived setting
             if (ShowArchived || !project.IsArchived)
             {
                 GridItems.Add(new GridItemWrapper { ProjectItem = project });
@@ -203,8 +282,6 @@ public partial class MainPageViewModel : ObservableObject
             {
                 Projects.Add(project);
             }
-
-            RebuildGridItems();
         }
         catch (Exception ex)
         {
@@ -255,7 +332,28 @@ public partial class MainPageViewModel : ObservableObject
     private void ToggleShowArchived()
     {
         ShowArchived = !ShowArchived;
-        RebuildGridItems();
+
+        if (ShowArchived)
+        {
+            foreach (var project in Projects)
+            {
+                if (project.IsArchived)
+                {
+                    AddGridItem(project);
+                }
+            }
+        }
+        else
+        {
+            var archivedWrappers = GridItems
+                .Where(w => w.ProjectItem?.IsArchived == true)
+                .ToList();
+
+            foreach (var wrapper in archivedWrappers)
+            {
+                GridItems.Remove(wrapper);
+            }
+        }
     }
 
     [RelayCommand]
@@ -275,7 +373,6 @@ public partial class MainPageViewModel : ObservableObject
         else
         {
             project.IsArchived = true;
-            RebuildGridItems();
         }
     }
 
@@ -283,7 +380,6 @@ public partial class MainPageViewModel : ObservableObject
     private void ReactivateProject(ProjectItemViewModel project)
     {
         project.IsArchived = false;
-        RebuildGridItems();
         ExitEditMode();
     }
 
