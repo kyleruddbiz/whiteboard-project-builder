@@ -39,7 +39,7 @@ public sealed partial class ProjectItemView : UserControl
 
     private void Overlay_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (this.FindName("HoverIndicator") is Border indicator)
+        if (sender is Border overlay && overlay.Child is Border indicator)
         {
             var animation = new DoubleAnimation
             {
@@ -56,7 +56,7 @@ public sealed partial class ProjectItemView : UserControl
 
     private void Overlay_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (this.FindName("HoverIndicator") is Border indicator)
+        if (sender is Border overlay && overlay.Child is Border indicator)
         {
             var animation = new DoubleAnimation
             {
@@ -84,7 +84,41 @@ public sealed partial class ProjectItemView : UserControl
         ImageReplaceRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    private void ReactivateButton_Click(object sender, RoutedEventArgs e)
+    private void ReactivateOverlay_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (sender is Border overlay && overlay.Child is Border indicator)
+        {
+            var animation = new DoubleAnimation
+            {
+                To = 0.3,
+                Duration = TimeSpan.FromMilliseconds(200)
+            };
+            Storyboard.SetTarget(animation, indicator);
+            Storyboard.SetTargetProperty(animation, "Opacity");
+            var storyboard = new Storyboard();
+            storyboard.Children.Add(animation);
+            storyboard.Begin();
+        }
+    }
+
+    private void ReactivateOverlay_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (sender is Border overlay && overlay.Child is Border indicator)
+        {
+            var animation = new DoubleAnimation
+            {
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(200)
+            };
+            Storyboard.SetTarget(animation, indicator);
+            Storyboard.SetTargetProperty(animation, "Opacity");
+            var storyboard = new Storyboard();
+            storyboard.Children.Add(animation);
+            storyboard.Begin();
+        }
+    }
+
+    private void ReactivateOverlay_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
         if (ViewModel != null)
         {

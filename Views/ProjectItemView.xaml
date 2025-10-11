@@ -91,8 +91,10 @@
                 </Grid>
             </Border>
 
-            <!--  Hover Overlay  -->
+            <!--  Hover Overlay (Not Archived - Edit)  -->
             <Border
+                x:Name="EditOverlay"
+                x:Load="{x:Bind Not(ViewModel.IsArchived), Mode=OneWay}"
                 Background="Transparent"
                 PointerEntered="Overlay_PointerEntered"
                 PointerExited="Overlay_PointerExited"
@@ -109,36 +111,43 @@
                         Glyph="&#xE70F;" />
                 </Border>
             </Border>
+
+            <!--  Hover Overlay (Archived - Reactivate)  -->
+            <Border
+                x:Name="ReactivateOverlay"
+                x:Load="{x:Bind ViewModel.IsArchived, Mode=OneWay}"
+                Background="Transparent"
+                PointerEntered="ReactivateOverlay_PointerEntered"
+                PointerExited="ReactivateOverlay_PointerExited"
+                Tapped="ReactivateOverlay_Tapped">
+                <Border
+                    x:Name="ReactivateHoverIndicator"
+                    Background="Black"
+                    Opacity="0">
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="8">
+                        <FontIcon
+                            FontSize="80"
+                            Foreground="White"
+                            Glyph="&#xE8AB;" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="24"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            Text="Reactivate" />
+                    </StackPanel>
+                </Border>
+            </Border>
         </Grid>
 
         <!--  Edit View  -->
         <Grid x:Name="EditView" x:Load="{x:Bind ViewModel.IsEditing, Mode=OneWay}">
-            <!--  Normal Edit View (Not Archived)  -->
             <local:ProjectItemEditView
-                x:Name="NormalEditView"
-                x:Load="{x:Bind Not(ViewModel.IsArchived), Mode=OneWay}"
                 DataContext="{x:Bind ViewModel, Mode=OneWay}"
                 ImageReplaceRequested="ProjectItemEditView_ImageReplaceRequested" />
-
-            <!--  Reactivate View (Archived)  -->
-            <Button
-                x:Name="ReactivateView"
-                x:Load="{x:Bind ViewModel.IsArchived, Mode=OneWay}"
-                Width="502"
-                Height="800"
-                Padding="0"
-                Background="Transparent"
-                BorderBrush="Black"
-                BorderThickness="2"
-                Click="ReactivateButton_Click">
-                <StackPanel Spacing="16">
-                    <FontIcon FontSize="120" Glyph="&#xE8AB;" />
-                    <TextBlock
-                        FontSize="32"
-                        FontWeight="SemiBold"
-                        Text="Reactivate" />
-                </StackPanel>
-            </Button>
         </Grid>
     </Grid>
 </UserControl>
