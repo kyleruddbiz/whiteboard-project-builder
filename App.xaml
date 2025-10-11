@@ -21,8 +21,10 @@
             <converters:ArchivedBackgroundConverter x:Key="ArchivedBackgroundConverter" />
 
             <Color x:Key="Primary">#512BD4</Color>
+            <Color x:Key="MainAccentColor">#00B0F0</Color>
 
             <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}" />
+            <SolidColorBrush x:Key="MainAccentBrush" Color="{StaticResource MainAccentColor}" />
             <SolidColorBrush x:Key="WhiteBrush" Color="White" />
             <SolidColorBrush x:Key="BlackBrush" Color="Black" />
 

@@ -16,7 +16,7 @@
     <Grid>
         <Border
             x:Name="Viewport"
-            Background="#00B0F0"
+            Background="{StaticResource MainAccentBrush}"
             PointerPressed="Viewport_PointerPressed"
             PointerMoved="Viewport_PointerMoved"
             PointerReleased="Viewport_PointerReleased"
