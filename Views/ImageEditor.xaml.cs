@@ -12,7 +12,7 @@ public sealed partial class ImageEditor : UserControl
     private const double ZoomSensitivityFactor = 300.0;
     private const double MinZoomFactor = 0.5;
     private const double MaxZoomFactor = 3.0;
-    private const double AxisLockHysteresis = 2.0;
+    private const double AxisLockHysteresis = 2.5;
     private const double AxisSwitchMaxDistance = 150.0;
     private const double ArrowKeyStepSize = 1.0;
 

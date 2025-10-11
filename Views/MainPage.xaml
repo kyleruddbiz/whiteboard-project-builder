@@ -9,6 +9,7 @@
     xmlns:selectors="using:WhiteboardProjectBuilder.Selectors"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     x:Name="PageRoot"
+    KeyboardAcceleratorPlacementMode="Hidden"
     mc:Ignorable="d">
     <Page.KeyboardAccelerators>
         <KeyboardAccelerator
@@ -80,15 +81,9 @@
                         HorizontalAlignment="Center"
                         Orientation="Horizontal"
                         Spacing="10">
-                        <Button
-                            Command="{x:Bind ViewModel.PrintProjectsCommand}"
-                            Content="Print Projects" />
-                        <Button
-                            Command="{x:Bind ViewModel.OpenImagesFolderCommand}"
-                            Content="Open Images Folder" />
-                        <Button
-                            Command="{x:Bind ViewModel.ToggleShowArchivedCommand}"
-                            Content="{x:Bind ViewModel.ShowArchived, Mode=OneWay, Converter={StaticResource ShowArchivedButtonTextConverter}}" />
+                        <Button Command="{x:Bind ViewModel.PrintProjectsCommand}" Content="Print Projects" />
+                        <Button Command="{x:Bind ViewModel.OpenImagesFolderCommand}" Content="Open Images Folder" />
+                        <Button Command="{x:Bind ViewModel.ToggleShowArchivedCommand}" Content="{x:Bind ViewModel.ShowArchived, Mode=OneWay, Converter={StaticResource ShowArchivedButtonTextConverter}}" />
                     </StackPanel>
 
                     <GridView

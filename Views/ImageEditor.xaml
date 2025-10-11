@@ -6,6 +6,7 @@
     xmlns:enums="using:WhiteboardProjectBuilder.Enums"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    KeyboardAcceleratorPlacementMode="Hidden"
     mc:Ignorable="d">
 
     <UserControl.KeyboardAccelerators>
@@ -21,10 +22,10 @@
         <Border
             x:Name="Viewport"
             Background="{StaticResource MainAccentBrush}"
-            PointerPressed="Viewport_PointerPressed"
+            DoubleTapped="Viewport_DoubleTapped"
             PointerMoved="Viewport_PointerMoved"
-            PointerReleased="Viewport_PointerReleased"
-            DoubleTapped="Viewport_DoubleTapped">
+            PointerPressed="Viewport_PointerPressed"
+            PointerReleased="Viewport_PointerReleased">
             <local:ImageViewport
                 ImageSource="{x:Bind ImageSource, Mode=OneWay}"
                 OffsetX="{x:Bind OffsetX, Mode=OneWay}"
@@ -33,9 +34,9 @@
         </Border>
 
         <StackPanel
+            Margin="0 8 8 0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            Margin="0 8 8 0"
             Orientation="Horizontal"
             Spacing="4">
             <Button

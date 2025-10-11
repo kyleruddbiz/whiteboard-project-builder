@@ -50,6 +50,48 @@ public class ImageStorageService
     {
         var dataPackageView = Clipboard.GetContent();
 
+        await EnsureImagesFolderExistsAsync();
+        var imagesFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(ImagesFolderName);
+
+        // Ensure .png extension
+        var sanitizedFileName = SanitizeFileName(fileName);
+        if (!sanitizedFileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+        {
+            sanitizedFileName += ".png";
+        }
+
+        var storageFile = await imagesFolder.CreateFileAsync(
+            sanitizedFileName,
+            CreationCollisionOption.GenerateUniqueName
+        );
+
+        int width;
+        int height;
+
+        // Try to get PNG format first (preserves transparency better)
+        if (dataPackageView.AvailableFormats.Contains("PNG"))
+        {
+            var pngData = await dataPackageView.GetDataAsync("PNG") as IRandomAccessStream;
+            if (pngData != null)
+            {
+                using (var fileStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite))
+                {
+                    // Decode to get dimensions
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(pngData);
+                    width = (int)decoder.PixelWidth;
+                    height = (int)decoder.PixelHeight;
+
+                    // Copy PNG data directly to preserve transparency
+                    pngData.Seek(0);
+                    await RandomAccessStream.CopyAsync(pngData, fileStream);
+                    await fileStream.FlushAsync();
+                }
+
+                return ($"ms-appdata:///local/{ImagesFolderName}/{storageFile.Name}", width, height);
+            }
+        }
+
+        // Fallback to standard bitmap format
         if (!dataPackageView.Contains(StandardDataFormats.Bitmap))
         {
             throw new InvalidOperationException("Clipboard does not contain a bitmap image.");
@@ -70,25 +112,6 @@ public class ImageStorageService
             throw new InvalidOperationException("Failed to retrieve bitmap from clipboard.");
         }
 
-        await EnsureImagesFolderExistsAsync();
-
-        var imagesFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(ImagesFolderName);
-
-        // Ensure .png extension
-        var sanitizedFileName = SanitizeFileName(fileName);
-        if (!sanitizedFileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-        {
-            sanitizedFileName += ".png";
-        }
-
-        var storageFile = await imagesFolder.CreateFileAsync(
-            sanitizedFileName,
-            CreationCollisionOption.GenerateUniqueName
-        );
-
-        int width;
-        int height;
-
         using (var imageStream = await imageReference.OpenReadAsync())
         using (var fileStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite))
         {
@@ -105,12 +128,19 @@ public class ImageStorageService
                 fileStream
             );
 
-            var pixelDataProvider = await decoder.GetPixelDataAsync();
+            // Request pixel data with premultiplied alpha to preserve transparency
+            var pixelDataProvider = await decoder.GetPixelDataAsync(
+                BitmapPixelFormat.Bgra8,
+                BitmapAlphaMode.Premultiplied,
+                new BitmapTransform(),
+                ExifOrientationMode.RespectExifOrientation,
+                ColorManagementMode.DoNotColorManage
+            );
             var pixelData = pixelDataProvider.DetachPixelData();
 
             encoder.SetPixelData(
-                decoder.BitmapPixelFormat,
-                decoder.BitmapAlphaMode,
+                BitmapPixelFormat.Bgra8,
+                BitmapAlphaMode.Premultiplied,
                 decoder.PixelWidth,
                 decoder.PixelHeight,
                 decoder.DpiX,
