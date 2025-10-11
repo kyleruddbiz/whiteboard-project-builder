@@ -17,6 +17,8 @@
             <!-- Other app resources here -->
             <converters:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
             <converters:NullableDateTimeToDateTimeOffsetConverter x:Key="NullableDateTimeToDateTimeOffsetConverter" />
+            <converters:ShowArchivedButtonTextConverter x:Key="ShowArchivedButtonTextConverter" />
+            <converters:ArchivedBackgroundConverter x:Key="ArchivedBackgroundConverter" />
 
             <Color x:Key="Primary">#512BD4</Color>
 

@@ -37,6 +37,9 @@ public partial class ProjectItemViewModel : ObservableObject
     [ObservableProperty]
     private bool isEditing;
 
+    [ObservableProperty]
+    private bool isArchived;
+
     public DateTime CreatedDate { get; private set; } = DateTime.Today;
 
     public string SizeIcon => Size.ToIcon();
@@ -105,6 +108,11 @@ public partial class ProjectItemViewModel : ObservableObject
         OnPropertyChanged(nameof(DatePrefix));
     }
 
+    partial void OnIsArchivedChanged(bool value)
+    {
+        DataChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     /// <summary>
     /// Converts this ViewModel to a Model for serialization.
     /// </summary>
@@ -130,7 +138,8 @@ public partial class ProjectItemViewModel : ObservableObject
             Size = Size,
             Value = Value,
             DueDate = DueDate,
-            CreatedDate = CreatedDate
+            CreatedDate = CreatedDate,
+            IsArchived = IsArchived
         };
     }
 
@@ -150,7 +159,8 @@ public partial class ProjectItemViewModel : ObservableObject
             Size = model.Size,
             Value = model.Value,
             DueDate = model.DueDate,
-            CreatedDate = model.CreatedDate
+            CreatedDate = model.CreatedDate,
+            IsArchived = model.IsArchived
         };
     }
 }

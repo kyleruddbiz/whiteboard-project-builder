@@ -12,4 +12,5 @@ public class ProjectItem
     public required ProjectValue Value { get; set; }
     public DateTime? DueDate { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.Today;
+    public bool IsArchived { get; set; }
 }

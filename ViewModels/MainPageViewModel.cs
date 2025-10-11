@@ -28,6 +28,9 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty]
     private ProjectItemViewModel? selectedProject;
 
+    [ObservableProperty]
+    private bool showArchived;
+
     public ObservableCollection<ProjectItemViewModel> Projects { get; }
     public ObservableCollection<GridItemWrapper> GridItems { get; }
     public GoalItemViewModel SampleGoal { get; }
@@ -124,7 +127,11 @@ public partial class MainPageViewModel : ObservableObject
 
         foreach (var project in Projects)
         {
-            GridItems.Add(new GridItemWrapper { ProjectItem = project });
+            // Filter based on ShowArchived setting
+            if (ShowArchived || !project.IsArchived)
+            {
+                GridItems.Add(new GridItemWrapper { ProjectItem = project });
+            }
         }
 
         GridItems.Add(new GridItemWrapper { IsAddButton = true });
@@ -245,13 +252,31 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void ToggleShowArchived()
+    {
+        ShowArchived = !ShowArchived;
+        RebuildGridItems();
+    }
+
+    [RelayCommand]
     private void RemoveProject(ProjectItemViewModel project)
     {
         if (SelectedProject == project)
         {
             ExitEditMode();
         }
-        Projects.Remove(project);
+
+        // If already archived, permanently delete
+        // If not archived, archive it
+        if (project.IsArchived)
+        {
+            Projects.Remove(project);
+        }
+        else
+        {
+            project.IsArchived = true;
+            RebuildGridItems();
+        }
     }
 
     [RelayCommand]

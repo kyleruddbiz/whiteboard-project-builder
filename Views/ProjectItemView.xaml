@@ -16,6 +16,7 @@
             <Border
                 Width="502"
                 Height="800"
+                Background="{x:Bind ViewModel.IsArchived, Mode=OneWay, Converter={StaticResource ArchivedBackgroundConverter}}"
                 BorderBrush="Black"
                 BorderThickness="2">
                 <Grid>
