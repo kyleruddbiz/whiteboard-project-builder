@@ -14,6 +14,7 @@ public sealed partial class ImageEditor : UserControl
     private const double MaxZoomFactor = 3.0;
     private const double AxisLockHysteresis = 2.0;
     private const double AxisSwitchMaxDistance = 150.0;
+    private const double ArrowKeyStepSize = 1.0;
 
     private bool isDragging = false;
     private Windows.Foundation.Point startPoint;
@@ -144,6 +145,32 @@ public sealed partial class ImageEditor : UserControl
     private void ZoomAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         EditMode = ImageEditMode.Zoom;
+        args.Handled = true;
+    }
+
+    private void ArrowKeyAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (EditMode != ImageEditMode.Pan)
+        {
+            return;
+        }
+
+        switch (sender.Key)
+        {
+            case VirtualKey.Left:
+                OffsetX -= ArrowKeyStepSize;
+                break;
+            case VirtualKey.Right:
+                OffsetX += ArrowKeyStepSize;
+                break;
+            case VirtualKey.Up:
+                OffsetY -= ArrowKeyStepSize;
+                break;
+            case VirtualKey.Down:
+                OffsetY += ArrowKeyStepSize;
+                break;
+        }
+
         args.Handled = true;
     }
 

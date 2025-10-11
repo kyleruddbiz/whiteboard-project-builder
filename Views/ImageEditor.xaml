@@ -11,6 +11,10 @@
     <UserControl.KeyboardAccelerators>
         <KeyboardAccelerator Key="W" Invoked="PanAccelerator_Invoked" />
         <KeyboardAccelerator Key="E" Invoked="ZoomAccelerator_Invoked" />
+        <KeyboardAccelerator Key="Left" Invoked="ArrowKeyAccelerator_Invoked" />
+        <KeyboardAccelerator Key="Right" Invoked="ArrowKeyAccelerator_Invoked" />
+        <KeyboardAccelerator Key="Up" Invoked="ArrowKeyAccelerator_Invoked" />
+        <KeyboardAccelerator Key="Down" Invoked="ArrowKeyAccelerator_Invoked" />
     </UserControl.KeyboardAccelerators>
 
     <Grid>
