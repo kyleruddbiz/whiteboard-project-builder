@@ -112,4 +112,9 @@ public partial class MainPage : Page
     {
         await ViewModel.ReplaceImageAsync(this.XamlRoot);
     }
+
+    private void ProjectItemView_ReactivateRequested(object? sender, ProjectItemViewModel e)
+    {
+        ViewModel.ReactivateProjectCommand.Execute(e);
+    }
 }

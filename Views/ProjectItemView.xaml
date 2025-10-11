@@ -113,9 +113,32 @@
 
         <!--  Edit View  -->
         <Grid x:Name="EditView" x:Load="{x:Bind ViewModel.IsEditing, Mode=OneWay}">
+            <!--  Normal Edit View (Not Archived)  -->
             <local:ProjectItemEditView
+                x:Name="NormalEditView"
+                x:Load="{x:Bind Not(ViewModel.IsArchived), Mode=OneWay}"
                 DataContext="{x:Bind ViewModel, Mode=OneWay}"
                 ImageReplaceRequested="ProjectItemEditView_ImageReplaceRequested" />
+
+            <!--  Reactivate View (Archived)  -->
+            <Button
+                x:Name="ReactivateView"
+                x:Load="{x:Bind ViewModel.IsArchived, Mode=OneWay}"
+                Width="502"
+                Height="800"
+                Padding="0"
+                Background="Transparent"
+                BorderBrush="Black"
+                BorderThickness="2"
+                Click="ReactivateButton_Click">
+                <StackPanel Spacing="16">
+                    <FontIcon FontSize="120" Glyph="&#xE8AB;" />
+                    <TextBlock
+                        FontSize="32"
+                        FontWeight="SemiBold"
+                        Text="Reactivate" />
+                </StackPanel>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>

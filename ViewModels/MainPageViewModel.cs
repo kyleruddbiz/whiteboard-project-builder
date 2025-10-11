@@ -280,6 +280,14 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void ReactivateProject(ProjectItemViewModel project)
+    {
+        project.IsArchived = false;
+        RebuildGridItems();
+        ExitEditMode();
+    }
+
+    [RelayCommand]
     private void EnterEditMode(ProjectItemViewModel item)
     {
         if (SelectedProject != null && SelectedProject != item)

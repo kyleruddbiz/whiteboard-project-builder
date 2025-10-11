@@ -26,7 +26,8 @@
                             Margin="10"
                             DataContext="{x:Bind ProjectItem}"
                             EditRequested="ProjectItemView_EditRequested"
-                            ImageReplaceRequested="ProjectItemView_ImageReplaceRequested" />
+                            ImageReplaceRequested="ProjectItemView_ImageReplaceRequested"
+                            ReactivateRequested="ProjectItemView_ReactivateRequested" />
                         <Button
                             Width="50"
                             Height="50"
