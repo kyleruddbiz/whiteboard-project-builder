@@ -17,7 +17,7 @@
             <Border
                 Width="502"
                 Height="800"
-                Background="{x:Bind converters:BackgroundColorHelper.GetBackgroundBrush(ViewModel.IsArchived, ViewModel.IsUsingTemporaryImage), Mode=OneWay}"
+                Background="{x:Bind converters:BackgroundColorHelper.GetBackgroundBrush(ViewModel.IsArchived, ViewModel.HasError), Mode=OneWay}"
                 BorderBrush="Black"
                 BorderThickness="2">
                 <Grid>

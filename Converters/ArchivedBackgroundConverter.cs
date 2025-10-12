@@ -4,9 +4,9 @@ namespace WhiteboardProjectBuilder.Converters;
 
 public static class BackgroundColorHelper
 {
-    public static SolidColorBrush GetBackgroundBrush(bool isArchived, bool isUsingTemporaryImage)
+    public static SolidColorBrush GetBackgroundBrush(bool isArchived, bool hasError)
     {
-        if (isArchived && isUsingTemporaryImage)
+        if (isArchived && hasError)
         {
             // Blended color: average of tan (245, 222, 179) and light red (255, 220, 220)
             return new SolidColorBrush(Windows.UI.Color.FromArgb(255, 250, 221, 200));
@@ -16,9 +16,9 @@ public static class BackgroundColorHelper
             // Light tan for archived
             return new SolidColorBrush(Windows.UI.Color.FromArgb(255, 245, 222, 179));
         }
-        else if (isUsingTemporaryImage)
+        else if (hasError)
         {
-            // Light red for temporary image
+            // Light red for error state (empty title or default image)
             return new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 220, 220));
         }
 

@@ -48,6 +48,7 @@ public partial class ProjectItemViewModel : ObservableObject
     public string DatePrefix => DueDate?.Date == DateTime.Now.Date ? "TODAY: " : string.Empty;
     public string CreatedDateDisplay => CreatedDate.ToShortDateString();
     public bool IsUsingTemporaryImage => Image.StartsWith("Assets/Backgrounds/Examples/");
+    public bool HasError => string.IsNullOrWhiteSpace(Title) || IsUsingTemporaryImage;
 
     public List<ProjectSize> SizeOptions { get; } = Enum.GetValues(typeof(ProjectSize)).Cast<ProjectSize>().ToList();
     public List<ProjectValue> ValueOptions { get; } = Enum.GetValues(typeof(ProjectValue)).Cast<ProjectValue>().ToList();
@@ -63,6 +64,7 @@ public partial class ProjectItemViewModel : ObservableObject
     partial void OnTitleChanged(string value)
     {
         DataChanged?.Invoke(this, EventArgs.Empty);
+        OnPropertyChanged(nameof(HasError));
     }
 
     partial void OnSubtitleChanged(string? value)
@@ -74,6 +76,7 @@ public partial class ProjectItemViewModel : ObservableObject
     {
         DataChanged?.Invoke(this, EventArgs.Empty);
         OnPropertyChanged(nameof(IsUsingTemporaryImage));
+        OnPropertyChanged(nameof(HasError));
     }
 
     partial void OnImageOffsetXChanged(double value)
