@@ -18,6 +18,7 @@
             <converters:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
             <converters:NullableDateTimeToDateTimeOffsetConverter x:Key="NullableDateTimeToDateTimeOffsetConverter" />
             <converters:ShowArchivedButtonTextConverter x:Key="ShowArchivedButtonTextConverter" />
+            <converters:SortOrderButtonTextConverter x:Key="SortOrderButtonTextConverter" />
             <converters:ArchivedBackgroundConverter x:Key="ArchivedBackgroundConverter" />
             <converters:BoolToTemporaryImageBorderConverter x:Key="BoolToTemporaryImageBorderConverter" />
             <converters:BoolToTemporaryImageTextConverter x:Key="BoolToTemporaryImageTextConverter" />

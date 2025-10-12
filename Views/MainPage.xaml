@@ -84,6 +84,7 @@
                         <Button Command="{x:Bind ViewModel.PrintProjectsCommand}" Content="Print Projects" />
                         <Button Command="{x:Bind ViewModel.OpenImagesFolderCommand}" Content="Open Images Folder" />
                         <Button Command="{x:Bind ViewModel.ToggleShowArchivedCommand}" Content="{x:Bind ViewModel.ShowArchived, Mode=OneWay, Converter={StaticResource ShowArchivedButtonTextConverter}}" />
+                        <Button Command="{x:Bind ViewModel.ToggleSortOrderCommand}" Content="{x:Bind ViewModel.IsSortDescending, Mode=OneWay, Converter={StaticResource SortOrderButtonTextConverter}}" />
                     </StackPanel>
 
                     <GridView

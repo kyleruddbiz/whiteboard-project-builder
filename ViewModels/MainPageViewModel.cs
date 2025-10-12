@@ -31,6 +31,9 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty]
     private bool showArchived;
 
+    [ObservableProperty]
+    private bool isSortDescending;
+
     public ObservableCollection<ProjectItemViewModel> Projects { get; }
     public ObservableCollection<GridItemWrapper> GridItems { get; }
     public GoalItemViewModel SampleGoal { get; }
@@ -186,9 +189,18 @@ public partial class MainPageViewModel : ObservableObject
             return;
         }
 
-        int insertIndex = GridItems.Count > 0 && GridItems[^1].IsAddButton
-            ? GridItems.Count - 1
-            : GridItems.Count;
+        int insertIndex;
+
+        if (IsSortDescending)
+        {
+            insertIndex = GridItems.Count > 0 && GridItems[0].IsAddButton ? 1 : 0;
+        }
+        else
+        {
+            insertIndex = GridItems.Count > 0 && GridItems[^1].IsAddButton
+                ? GridItems.Count - 1
+                : GridItems.Count;
+        }
 
         GridItems.Insert(insertIndex, new GridItemWrapper { ProjectItem = project });
     }
@@ -206,15 +218,26 @@ public partial class MainPageViewModel : ObservableObject
     {
         GridItems.Clear();
 
-        foreach (var project in Projects)
+        if (IsSortDescending)
         {
-            if (ShowArchived || !project.IsArchived)
-            {
-                GridItems.Add(new GridItemWrapper { ProjectItem = project });
-            }
+            GridItems.Add(new GridItemWrapper { IsAddButton = true });
         }
 
-        GridItems.Add(new GridItemWrapper { IsAddButton = true });
+        var projectsToDisplay = Projects.Where(p => ShowArchived || !p.IsArchived);
+
+        var sortedProjects = IsSortDescending
+            ? projectsToDisplay.Reverse()
+            : projectsToDisplay;
+
+        foreach (var project in sortedProjects)
+        {
+            GridItems.Add(new GridItemWrapper { ProjectItem = project });
+        }
+
+        if (!IsSortDescending)
+        {
+            GridItems.Add(new GridItemWrapper { IsAddButton = true });
+        }
     }
 
     /// <summary>
@@ -333,6 +356,13 @@ public partial class MainPageViewModel : ObservableObject
     private void ToggleShowArchived()
     {
         ShowArchived = !ShowArchived;
+        RebuildGridItems();
+    }
+
+    [RelayCommand]
+    private void ToggleSortOrder()
+    {
+        IsSortDescending = !IsSortDescending;
         RebuildGridItems();
     }
 
