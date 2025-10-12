@@ -63,54 +63,41 @@
     </Page.Resources>
     <Page.Content>
         <Grid>
-            <ScrollViewer>
-                <StackPanel
-                    Padding="20"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel
+                Padding="20"
+                HorizontalAlignment="Center"
+                Spacing="10">
+
+                <TextBlock
+                    Margin="0 20 0 0"
                     HorizontalAlignment="Center"
+                    FontSize="64"
+                    FontWeight="Bold"
+                    Text="Projects" />
+
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
                     Spacing="10">
-
-                    <TextBlock
-                        Margin="0 20 0 0"
-                        HorizontalAlignment="Center"
-                        FontSize="64"
-                        FontWeight="Bold"
-                        Text="Projects" />
-
-                    <StackPanel
-                        Margin="0 0 0 20"
-                        HorizontalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="10">
-                        <Button Command="{x:Bind ViewModel.PrintProjectsCommand}" Content="Print Projects" />
-                        <Button Command="{x:Bind ViewModel.OpenImagesFolderCommand}" Content="Open Images Folder" />
-                        <Button Command="{x:Bind ViewModel.ToggleShowArchivedCommand}" Content="{x:Bind ViewModel.ShowArchived, Mode=OneWay, Converter={StaticResource ShowArchivedButtonTextConverter}}" />
-                        <Button Command="{x:Bind ViewModel.ToggleSortOrderCommand}" Content="{x:Bind ViewModel.IsSortDescending, Mode=OneWay, Converter={StaticResource SortOrderButtonTextConverter}}" />
-                    </StackPanel>
-
-                    <GridView
-                        HorizontalAlignment="Center"
-                        ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
-                        ItemsSource="{x:Bind ViewModel.GridItems, Mode=OneWay}"
-                        SelectionChanged="GridView_SelectionChanged"
-                        SelectionMode="Single" />
-
-                    <!--<Grid>
-                    <local:GoalItemView
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center"
-                        ViewModel="{x:Bind ViewModel.SampleGoal, Mode=OneWay}" />
-
-                    <Image
-                        Margin="20 0"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center"
-                        Opacity=".5"
-                        Source="/Assets/Examples/GoalSingle.png"
-                        Stretch="None" />
-                </Grid>
-
-                <local:InspirationItemView ViewModel="{x:Bind ViewModel.SampleInspiration, Mode=OneWay}" />-->
+                    <Button Command="{x:Bind ViewModel.PrintProjectsCommand}" Content="Print Projects" />
+                    <Button Command="{x:Bind ViewModel.OpenImagesFolderCommand}" Content="Open Images Folder" />
+                    <Button Command="{x:Bind ViewModel.ToggleShowArchivedCommand}" Content="{x:Bind ViewModel.ShowArchived, Mode=OneWay, Converter={StaticResource ShowArchivedButtonTextConverter}}" />
+                    <Button Command="{x:Bind ViewModel.ToggleSortOrderCommand}" Content="{x:Bind ViewModel.IsSortDescending, Mode=OneWay, Converter={StaticResource SortOrderButtonTextConverter}}" />
                 </StackPanel>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1" Margin="0 20 0 0">
+                <GridView
+                    HorizontalAlignment="Center"
+                    ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
+                    ItemsSource="{x:Bind ViewModel.GridItems, Mode=OneWay}"
+                    SelectionChanged="GridView_SelectionChanged"
+                    SelectionMode="Single" />
             </ScrollViewer>
 
             <Canvas
