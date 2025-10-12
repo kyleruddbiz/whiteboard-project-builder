@@ -19,9 +19,6 @@
             <converters:NullableDateTimeToDateTimeOffsetConverter x:Key="NullableDateTimeToDateTimeOffsetConverter" />
             <converters:ShowArchivedButtonTextConverter x:Key="ShowArchivedButtonTextConverter" />
             <converters:SortOrderButtonTextConverter x:Key="SortOrderButtonTextConverter" />
-            <converters:ArchivedBackgroundConverter x:Key="ArchivedBackgroundConverter" />
-            <converters:BoolToTemporaryImageBorderConverter x:Key="BoolToTemporaryImageBorderConverter" />
-            <converters:BoolToTemporaryImageTextConverter x:Key="BoolToTemporaryImageTextConverter" />
 
             <Color x:Key="Primary">#512BD4</Color>
             <Color x:Key="MainAccentColor">#00B0F0</Color>
