@@ -28,6 +28,7 @@
                     Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBox
+                    x:Name="SubtitleTextBox"
                     Header="Subtitle"
                     PlaceholderText="Add Details"
                     Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -35,6 +36,7 @@
                 <StackPanel Spacing="8">
                     <TextBlock FontWeight="SemiBold" Text="Image" />
                     <local:ImageEditor
+                        x:Name="MainImageEditor"
                         Width="420"
                         Height="360"
                         ImageReplaceRequested="ImageEditor_ImageReplaceRequested"

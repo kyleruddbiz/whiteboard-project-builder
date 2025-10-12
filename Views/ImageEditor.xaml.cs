@@ -302,4 +302,9 @@ public sealed partial class ImageEditor : UserControl
         ImageReplaceRequested?.Invoke(this, EventArgs.Empty);
         e.Handled = true;
     }
+
+    public void SetFocus()
+    {
+        PanButton.Focus(FocusState.Programmatic);
+    }
 }

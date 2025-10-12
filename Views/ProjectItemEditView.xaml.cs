@@ -37,7 +37,18 @@ public sealed partial class ProjectItemEditView : UserControl
 
     private void ProjectItemEditView_Loaded(object sender, RoutedEventArgs e)
     {
-        TitleTextBox.Focus(FocusState.Programmatic);
+        if (string.IsNullOrEmpty(ViewModel?.Title))
+        {
+            TitleTextBox.Focus(FocusState.Programmatic);
+        }
+        else if (string.IsNullOrEmpty(ViewModel?.Subtitle))
+        {
+            SubtitleTextBox.Focus(FocusState.Programmatic);
+        }
+        else
+        {
+            MainImageEditor.SetFocus();
+        }
     }
 
     private void EscapeAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
