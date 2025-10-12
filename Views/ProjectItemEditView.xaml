@@ -25,12 +25,12 @@
                     x:Name="TitleTextBox"
                     Header="Title"
                     PlaceholderText="New Project"
-                    Text="{x:Bind ViewModel.Title, Mode=TwoWay}" />
+                    Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBox
                     Header="Subtitle"
                     PlaceholderText="Add Details"
-                    Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay}" />
+                    Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <StackPanel Spacing="8">
                     <TextBlock FontWeight="SemiBold" Text="Image" />
