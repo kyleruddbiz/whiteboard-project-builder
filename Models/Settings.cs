@@ -7,4 +7,5 @@ public class Settings
 {
     public bool ShowArchived { get; set; }
     public bool IsSortDescending { get; set; }
+    public bool IsDeveloperMode { get; set; }
 }

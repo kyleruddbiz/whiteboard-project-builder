@@ -56,8 +56,6 @@ public partial class MainPageViewModel : ObservableObject
         Projects.CollectionChanged += Projects_CollectionChanged;
         Projects.CollectionChanged += OnProjectsCollectionChanged;
 
-        LoadExampleImagePaths();
-
         _ = LoadDataAsync();
     }
 
@@ -66,11 +64,21 @@ public partial class MainPageViewModel : ObservableObject
         if (oldValue != null)
         {
             oldValue.DataChanged -= OnSettingsDataChanged;
+            oldValue.PropertyChanged -= OnSettingsPropertyChanged;
         }
 
         if (newValue != null)
         {
             newValue.DataChanged += OnSettingsDataChanged;
+            newValue.PropertyChanged += OnSettingsPropertyChanged;
+        }
+    }
+
+    private void OnSettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SettingsViewModel.IsDeveloperMode))
+        {
+            LoadExampleImagePaths();
         }
     }
 
@@ -296,6 +304,8 @@ public partial class MainPageViewModel : ObservableObject
         {
             var loadedSettings = await settingsService.LoadSettingsAsync();
             Settings = SettingsViewModel.FromModel(loadedSettings);
+
+            LoadExampleImagePaths();
 
             var loadedProjects = await dataPersistenceService.LoadProjectsAsync();
 
@@ -587,13 +597,16 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Loads all example background image paths from the Assets/Backgrounds/Examples directory.
+    /// Loads all example background image paths from the Assets/Backgrounds/Examples or ExamplesAlt directory.
     /// </summary>
     private void LoadExampleImagePaths()
     {
         try
         {
-            string examplesPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Backgrounds", "Examples");
+            string folderName = Settings.IsDeveloperMode ? "ExamplesAlt" : "Examples";
+            string examplesPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Backgrounds", folderName);
+
+            exampleImagePaths.Clear();
 
             if (Directory.Exists(examplesPath))
             {
@@ -603,7 +616,7 @@ public partial class MainPageViewModel : ObservableObject
                 {
                     if (imageExtensions.Contains(Path.GetExtension(filePath)))
                     {
-                        string relativePath = $"Assets/Backgrounds/Examples/{Path.GetFileName(filePath)}";
+                        string relativePath = $"Assets/Backgrounds/{folderName}/{Path.GetFileName(filePath)}";
                         exampleImagePaths.Add(relativePath);
                     }
                 }
@@ -611,7 +624,7 @@ public partial class MainPageViewModel : ObservableObject
 
             if (exampleImagePaths.Count == 0)
             {
-                System.Diagnostics.Debug.WriteLine("Warning: No example images found in Assets/Backgrounds/Examples");
+                System.Diagnostics.Debug.WriteLine($"Warning: No example images found in Assets/Backgrounds/{folderName}");
             }
         }
         catch (Exception ex)

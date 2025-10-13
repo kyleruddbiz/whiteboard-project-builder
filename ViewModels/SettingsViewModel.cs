@@ -11,6 +11,9 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool isSortDescending;
 
+    [ObservableProperty]
+    private bool isDeveloperMode;
+
     /// <summary>
     /// Raised when any property changes to trigger autosave.
     /// </summary>
@@ -26,6 +29,11 @@ public partial class SettingsViewModel : ObservableObject
         DataChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    partial void OnIsDeveloperModeChanged(bool value)
+    {
+        DataChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     /// <summary>
     /// Converts this ViewModel to a Model for serialization.
     /// </summary>
@@ -34,7 +42,8 @@ public partial class SettingsViewModel : ObservableObject
         return new Settings
         {
             ShowArchived = ShowArchived,
-            IsSortDescending = IsSortDescending
+            IsSortDescending = IsSortDescending,
+            IsDeveloperMode = IsDeveloperMode
         };
     }
 
@@ -46,7 +55,8 @@ public partial class SettingsViewModel : ObservableObject
         return new SettingsViewModel
         {
             ShowArchived = model.ShowArchived,
-            IsSortDescending = model.IsSortDescending
+            IsSortDescending = model.IsSortDescending,
+            IsDeveloperMode = model.IsDeveloperMode
         };
     }
 }

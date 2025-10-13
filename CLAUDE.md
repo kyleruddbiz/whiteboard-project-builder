@@ -117,6 +117,7 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 - Prefer `x:Bind` over `Binding` whenever possible for better performance and compile-time checking
 - Use spaces (not commas) to separate values in Margin and Padding attributes (e.g., `Margin="10 20 10 20"` not `Margin="10,20,10,20"`)
 - **Image binding in WinUI 3** - Always use `StringToImageSourceConverter` when binding string paths to Image.Source properties. WinUI 3 requires proper `ms-appx:///` URI scheme for packaged assets. Example: `Source="{x:Bind ViewModel.ImagePath, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"`
+- **Conditional visibility** - Always use `x:Load` instead of `Visibility` for conditional element rendering. Elements using `x:Load` MUST have an `x:Name` attribute. Example: `<Button x:Name="MyButton" x:Load="{x:Bind ViewModel.IsVisible, Mode=OneWay}" />`
 
 ### Development Workflow
 - Always run `dotnet build` after implementation to verify changes
