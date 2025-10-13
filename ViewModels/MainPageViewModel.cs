@@ -12,10 +12,12 @@ public partial class MainPageViewModel : ObservableObject
 {
     private readonly PrintService printService;
     private readonly DataPersistenceService dataPersistenceService;
+    private readonly SettingsService settingsService;
     private readonly ImageStorageService imageStorageService;
     private readonly ImageTransformService imageTransformService;
     private readonly ImageDimensionService imageDimensionService;
     private CancellationTokenSource? saveCts;
+    private CancellationTokenSource? settingsSaveCts;
 
     private const int AutoSaveDelayMs = 2000;
     private readonly List<string> exampleImagePaths = [];
@@ -30,21 +32,21 @@ public partial class MainPageViewModel : ObservableObject
     private ProjectItemViewModel? selectedProject;
 
     [ObservableProperty]
-    private bool showArchived;
-
-    [ObservableProperty]
-    private bool isSortDescending;
+    private SettingsViewModel settings = null!;
 
     public ObservableCollection<ProjectItemViewModel> Projects { get; }
     public ObservableCollection<GridItemWrapper> GridItems { get; }
 
-    public MainPageViewModel(PrintService printService, DataPersistenceService dataPersistenceService)
+    public MainPageViewModel(PrintService printService, DataPersistenceService dataPersistenceService, SettingsService settingsService)
     {
         this.printService = printService;
         this.dataPersistenceService = dataPersistenceService;
+        this.settingsService = settingsService;
         this.imageStorageService = new ImageStorageService();
         this.imageTransformService = new ImageTransformService();
         this.imageDimensionService = new ImageDimensionService();
+
+        Settings = new SettingsViewModel();
 
         Projects = [];
         GridItems = [];
@@ -56,7 +58,20 @@ public partial class MainPageViewModel : ObservableObject
 
         LoadExampleImagePaths();
 
-        _ = LoadProjectsAsync();
+        _ = LoadDataAsync();
+    }
+
+    partial void OnSettingsChanged(SettingsViewModel? oldValue, SettingsViewModel newValue)
+    {
+        if (oldValue != null)
+        {
+            oldValue.DataChanged -= OnSettingsDataChanged;
+        }
+
+        if (newValue != null)
+        {
+            newValue.DataChanged += OnSettingsDataChanged;
+        }
     }
 
     [RelayCommand]
@@ -126,7 +141,6 @@ public partial class MainPageViewModel : ObservableObject
             }
         }
 
-        // Unsubscribe from removed items to prevent memory leaks
         if (e.OldItems != null)
         {
             foreach (ProjectItemViewModel item in e.OldItems)
@@ -148,7 +162,7 @@ public partial class MainPageViewModel : ObservableObject
     {
         if (e.PropertyName == nameof(ProjectItemViewModel.IsArchived) && sender is ProjectItemViewModel project)
         {
-            if (!ShowArchived)
+            if (!Settings.ShowArchived)
             {
                 if (project.IsArchived)
                 {
@@ -164,7 +178,7 @@ public partial class MainPageViewModel : ObservableObject
 
     private void AddGridItem(ProjectItemViewModel project)
     {
-        if (!ShowArchived && project.IsArchived)
+        if (!Settings.ShowArchived && project.IsArchived)
         {
             return;
         }
@@ -176,7 +190,7 @@ public partial class MainPageViewModel : ObservableObject
 
         int insertIndex;
 
-        if (IsSortDescending)
+        if (Settings.IsSortDescending)
         {
             insertIndex = GridItems.Count > 0 && GridItems[0].IsAddButton ? 1 : 0;
         }
@@ -203,14 +217,14 @@ public partial class MainPageViewModel : ObservableObject
     {
         GridItems.Clear();
 
-        if (IsSortDescending)
+        if (Settings.IsSortDescending)
         {
             GridItems.Add(new GridItemWrapper { IsAddButton = true });
         }
 
-        var projectsToDisplay = Projects.Where(p => ShowArchived || !p.IsArchived);
+        var projectsToDisplay = Projects.Where(p => Settings.ShowArchived || !p.IsArchived);
 
-        var sortedProjects = IsSortDescending
+        var sortedProjects = Settings.IsSortDescending
             ? projectsToDisplay.Reverse()
             : projectsToDisplay;
 
@@ -219,7 +233,7 @@ public partial class MainPageViewModel : ObservableObject
             GridItems.Add(new GridItemWrapper { ProjectItem = project });
         }
 
-        if (!IsSortDescending)
+        if (!Settings.IsSortDescending)
         {
             GridItems.Add(new GridItemWrapper { IsAddButton = true });
         }
@@ -230,20 +244,16 @@ public partial class MainPageViewModel : ObservableObject
     /// </summary>
     private async Task TriggerAutoSaveAsync()
     {
-        // Cancel any pending save operation
         saveCts?.Cancel();
         saveCts = new CancellationTokenSource();
 
         try
         {
             await Task.Delay(AutoSaveDelayMs, saveCts.Token);
-
-            // Delay completed without cancellation - perform save
             await SaveDataAsync();
         }
         catch (TaskCanceledException)
         {
-            // Expected when debouncing - do nothing
         }
     }
 
@@ -278,12 +288,15 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Loads projects from JSON file on startup.
+    /// Loads projects and settings from JSON files on startup.
     /// </summary>
-    private async Task LoadProjectsAsync()
+    private async Task LoadDataAsync()
     {
         try
         {
+            var loadedSettings = await settingsService.LoadSettingsAsync();
+            Settings = SettingsViewModel.FromModel(loadedSettings);
+
             var loadedProjects = await dataPersistenceService.LoadProjectsAsync();
 
             foreach (var project in loadedProjects)
@@ -293,8 +306,45 @@ public partial class MainPageViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            // TODO: Show error message to user
             System.Diagnostics.Debug.WriteLine($"Load failed: {ex.Message}");
+        }
+    }
+
+    private void OnSettingsDataChanged(object? sender, EventArgs e)
+    {
+        _ = TriggerSettingsAutoSaveAsync();
+    }
+
+    /// <summary>
+    /// Debounced autosave for settings - waits for user to stop making changes before saving.
+    /// </summary>
+    private async Task TriggerSettingsAutoSaveAsync()
+    {
+        settingsSaveCts?.Cancel();
+        settingsSaveCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(AutoSaveDelayMs, settingsSaveCts.Token);
+            await SaveSettingsAsync();
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Saves settings to JSON file.
+    /// </summary>
+    private async Task SaveSettingsAsync()
+    {
+        try
+        {
+            await settingsService.SaveSettingsAsync(Settings.ToModel());
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Settings save failed: {ex.Message}");
         }
     }
 
@@ -304,7 +354,8 @@ public partial class MainPageViewModel : ObservableObject
     public async Task ForceSaveAsync()
     {
         saveCts?.Cancel();
-        await SaveDataAsync();
+        settingsSaveCts?.Cancel();
+        await Task.WhenAll(SaveDataAsync(), SaveSettingsAsync());
     }
 
     [RelayCommand]
@@ -338,14 +389,14 @@ public partial class MainPageViewModel : ObservableObject
     [RelayCommand]
     private void ToggleShowArchived()
     {
-        ShowArchived = !ShowArchived;
+        Settings.ShowArchived = !Settings.ShowArchived;
         RebuildGridItems();
     }
 
     [RelayCommand]
     private void ToggleSortOrder()
     {
-        IsSortDescending = !IsSortDescending;
+        Settings.IsSortDescending = !Settings.IsSortDescending;
         RebuildGridItems();
     }
 
@@ -357,8 +408,6 @@ public partial class MainPageViewModel : ObservableObject
             ExitEditMode();
         }
 
-        // If already archived, permanently delete
-        // If not archived, archive it
         if (project.IsArchived)
         {
             Projects.Remove(project);
@@ -414,7 +463,6 @@ public partial class MainPageViewModel : ObservableObject
 
             var result = await dialog.ShowAsync();
 
-            // If user cancelled, exit
             if (result != ContentDialogResult.Primary)
             {
                 return;
@@ -438,7 +486,6 @@ public partial class MainPageViewModel : ObservableObject
                 SelectedProject.Image = imageUri;
             }
 
-            // Show success notification (optional)
             System.Diagnostics.Debug.WriteLine($"Image saved successfully: {imageUri}");
         }
         catch (InvalidOperationException ex)
@@ -536,7 +583,6 @@ public partial class MainPageViewModel : ObservableObject
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
-            // Leave default values (scale=1.0, offset=0,0)
         }
     }
 

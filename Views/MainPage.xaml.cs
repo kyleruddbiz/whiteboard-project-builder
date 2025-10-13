@@ -11,6 +11,7 @@ public partial class MainPage : Page
 {
     private readonly PrintService printService;
     private readonly DataPersistenceService dataPersistenceService;
+    private readonly SettingsService settingsService;
 
     public MainPageViewModel ViewModel { get; }
 
@@ -18,7 +19,8 @@ public partial class MainPage : Page
     {
         printService = new PrintService();
         dataPersistenceService = new DataPersistenceService();
-        ViewModel = new MainPageViewModel(printService, dataPersistenceService);
+        settingsService = new SettingsService(dataPersistenceService);
+        ViewModel = new MainPageViewModel(printService, dataPersistenceService, settingsService);
         this.InitializeComponent();
 
         if (App.MainWindow != null)

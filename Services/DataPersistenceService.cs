@@ -8,7 +8,7 @@ using Windows.Storage;
 namespace WhiteboardProjectBuilder.Services;
 
 /// <summary>
-/// Manages persistence of whiteboard data to JSON files in ApplicationData.LocalFolder.
+/// Manages persistence of data to JSON files in ApplicationData.LocalFolder.
 /// </summary>
 public class DataPersistenceService
 {
@@ -23,40 +23,33 @@ public class DataPersistenceService
     private const string DataFileName = "project-items.json";
 
     /// <summary>
-    /// Saves projects to JSON file in LocalFolder.
+    /// Saves data to JSON file in LocalFolder.
     /// </summary>
-    public async Task SaveProjectsAsync(IEnumerable<ProjectItemViewModel> projects)
+    public async Task SaveAsync<T>(T data, string fileName)
     {
         await Task.Run(async () =>
         {
             try
             {
-                var data = new WhiteboardData
-                {
-                    Version = 1,
-                    Projects = projects.Select(vm => vm.ToModel()).ToList()
-                };
-
                 var json = JsonSerializer.Serialize(data, JsonOptions);
                 var filePath = Path.Combine(
                     ApplicationData.Current.LocalFolder.Path,
-                    DataFileName
+                    fileName
                 );
 
                 await File.WriteAllTextAsync(filePath, json);
             }
             catch (Exception ex)
             {
-                // Log error - for now, just rethrow to be caught by caller
-                throw new InvalidOperationException($"Failed to save projects: {ex.Message}", ex);
+                throw new InvalidOperationException($"Failed to save to {fileName}: {ex.Message}", ex);
             }
         });
     }
 
     /// <summary>
-    /// Loads projects from JSON file. Returns empty collection if no file exists.
+    /// Loads data from JSON file. Returns default if no file exists.
     /// </summary>
-    public async Task<IEnumerable<ProjectItemViewModel>> LoadProjectsAsync()
+    public async Task<T?> LoadAsync<T>(string fileName)
     {
         return await Task.Run(async () =>
         {
@@ -64,30 +57,50 @@ public class DataPersistenceService
             {
                 var filePath = Path.Combine(
                     ApplicationData.Current.LocalFolder.Path,
-                    DataFileName
+                    fileName
                 );
 
-                // If no save file exists, return empty collection
                 if (!File.Exists(filePath))
                 {
-                    return [];
+                    return default;
                 }
 
                 var json = await File.ReadAllTextAsync(filePath);
-                var data = JsonSerializer.Deserialize<WhiteboardData>(json, JsonOptions);
-
-                if (data?.Projects == null)
-                {
-                    return [];
-                }
-
-                return data.Projects.Select(m => ProjectItemViewModel.FromModel(m)).ToList();
+                return JsonSerializer.Deserialize<T>(json, JsonOptions);
             }
             catch (Exception ex)
             {
-                // Log error and return empty collection to prevent app crash
-                throw new InvalidOperationException($"Failed to load projects: {ex.Message}", ex);
+                throw new InvalidOperationException($"Failed to load from {fileName}: {ex.Message}", ex);
             }
         });
+    }
+
+    /// <summary>
+    /// Saves projects to JSON file in LocalFolder.
+    /// </summary>
+    public async Task SaveProjectsAsync(IEnumerable<ProjectItemViewModel> projects)
+    {
+        var data = new WhiteboardData
+        {
+            Version = 1,
+            Projects = projects.Select(vm => vm.ToModel()).ToList()
+        };
+
+        await SaveAsync(data, DataFileName);
+    }
+
+    /// <summary>
+    /// Loads projects from JSON file. Returns empty collection if no file exists.
+    /// </summary>
+    public async Task<IEnumerable<ProjectItemViewModel>> LoadProjectsAsync()
+    {
+        var data = await LoadAsync<WhiteboardData>(DataFileName);
+
+        if (data?.Projects == null)
+        {
+            return [];
+        }
+
+        return data.Projects.Select(m => ProjectItemViewModel.FromModel(m)).ToList();
     }
 }
