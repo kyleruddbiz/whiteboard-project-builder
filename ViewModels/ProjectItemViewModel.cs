@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Helpers;
 using WhiteboardProjectBuilder.Models;
@@ -44,6 +46,15 @@ public partial class ProjectItemViewModel : ObservableObject
 
     public string SizeIcon => Size.ToIcon();
     public string ValueIcon => Value.ToIcon();
+    public Brush SizeValueBorderBrush
+    {
+        get
+        {
+            var category = WinCategoryExtensions.GetWinCategory(Size, Value);
+            var color = category.GetBorderColor();
+            return new SolidColorBrush(color);
+        }
+    }
     public string DateDisplay => DueDate?.ToShortDateString() ?? string.Empty;
     public string DatePrefix => DueDate?.Date == DateTime.Now.Date ? "TODAY: " : string.Empty;
     public string CreatedDateDisplay => CreatedDate.ToShortDateString();
@@ -98,12 +109,14 @@ public partial class ProjectItemViewModel : ObservableObject
     {
         DataChanged?.Invoke(this, EventArgs.Empty);
         OnPropertyChanged(nameof(SizeIcon));
+        OnPropertyChanged(nameof(SizeValueBorderBrush));
     }
 
     partial void OnValueChanged(ProjectValue value)
     {
         DataChanged?.Invoke(this, EventArgs.Empty);
         OnPropertyChanged(nameof(ValueIcon));
+        OnPropertyChanged(nameof(SizeValueBorderBrush));
     }
 
     partial void OnDueDateChanged(DateTime? value)
