@@ -1,4 +1,4 @@
-namespace WhiteboardProjectBuilder.Helpers;
+namespace WhiteboardProjectBuilder.Models;
 
 public class IconOption<T> where T : struct, Enum
 {

@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Enums;
-using WhiteboardProjectBuilder.Helpers;
 using WhiteboardProjectBuilder.Models;
 
 namespace WhiteboardProjectBuilder.ViewModels;
