@@ -20,8 +20,7 @@ public class DataPersistenceService
         Converters = { new JsonStringEnumConverter() }
     };
 
-    private const string DataFileName = "whiteboard-data.json";
-    private const string DefaultDataPath = "ms-appx:///Assets/default-data.json";
+    private const string DataFileName = "project-items.json";
 
     /// <summary>
     /// Saves projects to JSON file in LocalFolder.
@@ -55,7 +54,7 @@ public class DataPersistenceService
     }
 
     /// <summary>
-    /// Loads projects from JSON file. Returns default data on first launch.
+    /// Loads projects from JSON file. Returns empty collection if no file exists.
     /// </summary>
     public async Task<IEnumerable<ProjectItemViewModel>> LoadProjectsAsync()
     {
@@ -68,18 +67,13 @@ public class DataPersistenceService
                     DataFileName
                 );
 
-                string json;
-
-                // If no save file exists, load default data
+                // If no save file exists, return empty collection
                 if (!File.Exists(filePath))
                 {
-                    json = await LoadDefaultDataAsync();
-                }
-                else
-                {
-                    json = await File.ReadAllTextAsync(filePath);
+                    return [];
                 }
 
+                var json = await File.ReadAllTextAsync(filePath);
                 var data = JsonSerializer.Deserialize<WhiteboardData>(json, JsonOptions);
 
                 if (data?.Projects == null)
@@ -95,15 +89,5 @@ public class DataPersistenceService
                 throw new InvalidOperationException($"Failed to load projects: {ex.Message}", ex);
             }
         });
-    }
-
-    /// <summary>
-    /// Loads default data from packaged Assets folder.
-    /// </summary>
-    private async Task<string> LoadDefaultDataAsync()
-    {
-        var uri = new Uri(DefaultDataPath);
-        var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
-        return await FileIO.ReadTextAsync(file);
     }
 }
