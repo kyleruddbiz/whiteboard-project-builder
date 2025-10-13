@@ -18,6 +18,7 @@ public partial class MainPageViewModel : ObservableObject
     private CancellationTokenSource? saveCts;
 
     private const int AutoSaveDelayMs = 2000;
+    private readonly List<string> exampleImagePaths = [];
 
     [ObservableProperty]
     private bool isSaving;
@@ -50,27 +51,14 @@ public partial class MainPageViewModel : ObservableObject
         Projects = [];
         GridItems = [];
 
-        // Add the "Add" button initially
         GridItems.Add(new GridItemWrapper { IsAddButton = true });
 
         Projects.CollectionChanged += Projects_CollectionChanged;
         Projects.CollectionChanged += OnProjectsCollectionChanged;
 
-        // Load projects from storage
+        LoadExampleImagePaths();
+
         _ = LoadProjectsAsync();
-
-        SampleGoal = new GoalItemViewModel
-        {
-            Title = "Draw Forms",
-            Subtitle = "Practice Figure Drawing",
-            Image = "Assets/Backgrounds/Examples/portrait-2.jpg"
-        };
-
-        SampleInspiration = new InspirationItemViewModel
-        {
-            Text = "Some text that really inspires the people and relates in a clever way to puzzles\n\n– That Famous Person",
-            Image = "Assets/Backgrounds/Examples/landscape-3.jpg"
-        };
     }
 
     [RelayCommand]
@@ -150,7 +138,6 @@ public partial class MainPageViewModel : ObservableObject
             }
         }
 
-        // Trigger autosave on collection changes
         _ = TriggerAutoSaveAsync();
     }
 
@@ -251,7 +238,6 @@ public partial class MainPageViewModel : ObservableObject
 
         try
         {
-            // Wait for delay period - resets on each change
             await Task.Delay(AutoSaveDelayMs, saveCts.Token);
 
             // Delay completed without cancellation - perform save
@@ -328,14 +314,14 @@ public partial class MainPageViewModel : ObservableObject
     {
         ExitEditMode();
 
+        if (exampleImagePaths.Count == 0)
+        {
+            throw new InvalidOperationException("No example images available. Failed to load images from Assets/Backgrounds/Examples directory.");
+        }
+
         var random = new Random();
-
-        string imageType = (random.NextSingle() < .5f)
-            ? "landscape"
-            : "portrait";
-        int imageNumber = random.Next(1, 6);
-
-        string imagePath = $"Assets/Backgrounds/Examples/{imageType}-{imageNumber}.jpg";
+        int randomIndex = random.Next(exampleImagePaths.Count);
+        string imagePath = exampleImagePaths[randomIndex];
 
         var newProject = new ProjectItemViewModel
         {
@@ -345,7 +331,6 @@ public partial class MainPageViewModel : ObservableObject
             DueDate = null
         };
 
-        // Apply UniformToFill transform for default background
         await ApplyUniformToFillTransformAsync(newProject, imagePath);
 
         Projects.Add(newProject);
@@ -419,14 +404,12 @@ public partial class MainPageViewModel : ObservableObject
     {
         try
         {
-            // Generate default filename
             string defaultFileName = imageStorageService.GenerateFileName(
                 SelectedProject?.Title,
                 SelectedProject?.Subtitle
             );
 
-            // Show save dialog
-            var dialog = new Views.SaveImageDialog(defaultFileName)
+            var dialog = new SaveImageDialog(defaultFileName)
             {
                 XamlRoot = xamlRoot
             };
@@ -434,25 +417,21 @@ public partial class MainPageViewModel : ObservableObject
             var result = await dialog.ShowAsync();
 
             // If user cancelled, exit
-            if (result != Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
+            if (result != ContentDialogResult.Primary)
             {
                 return;
             }
 
-            // Validate filename
             if (string.IsNullOrWhiteSpace(dialog.FileName))
             {
                 await ShowErrorDialogAsync(xamlRoot, "Invalid Filename", "Please enter a valid filename.");
                 return;
             }
 
-            // Save the image from clipboard (returns URI and dimensions)
             var (imageUri, width, height) = await imageStorageService.SaveBitmapFromClipboardAsync(dialog.FileName);
 
-            // Update selected project if one exists
             if (SelectedProject != null)
             {
-                // Calculate and apply UniformToFill transform
                 var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
                 SelectedProject.ImageZoomFactor = scale;
@@ -474,7 +453,7 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    public async Task ReplaceImageAsync(Microsoft.UI.Xaml.XamlRoot xamlRoot)
+    public async Task ReplaceImageAsync(XamlRoot xamlRoot)
     {
         if (SelectedProject == null)
         {
@@ -504,19 +483,15 @@ public partial class MainPageViewModel : ObservableObject
                 return;
             }
 
-            // Get dimensions from the original file path
             var (width, height) = await imageDimensionService.GetImageDimensionsAsync(file.Path);
 
-            // Generate filename from project details
             string fileName = imageStorageService.GenerateFileName(
                 SelectedProject.Title,
                 SelectedProject.Subtitle
             );
 
-            // Save the image
             var imageUri = await imageStorageService.SaveImageAsync(file.Path, fileName + System.IO.Path.GetExtension(file.Path));
 
-            // Calculate and apply UniformToFill transform
             var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
             SelectedProject.ImageZoomFactor = scale;
@@ -532,9 +507,9 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    private async Task ShowErrorDialogAsync(Microsoft.UI.Xaml.XamlRoot xamlRoot, string title, string message)
+    private async Task ShowErrorDialogAsync(XamlRoot xamlRoot, string title, string message)
     {
-        var errorDialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+        var errorDialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
             Title = title,
@@ -564,6 +539,40 @@ public partial class MainPageViewModel : ObservableObject
         {
             System.Diagnostics.Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
             // Leave default values (scale=1.0, offset=0,0)
+        }
+    }
+
+    /// <summary>
+    /// Loads all example background image paths from the Assets/Backgrounds/Examples directory.
+    /// </summary>
+    private void LoadExampleImagePaths()
+    {
+        try
+        {
+            string examplesPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Backgrounds", "Examples");
+
+            if (Directory.Exists(examplesPath))
+            {
+                var imageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png" };
+
+                foreach (var filePath in Directory.GetFiles(examplesPath))
+                {
+                    if (imageExtensions.Contains(Path.GetExtension(filePath)))
+                    {
+                        string relativePath = $"Assets/Backgrounds/Examples/{Path.GetFileName(filePath)}";
+                        exampleImagePaths.Add(relativePath);
+                    }
+                }
+            }
+
+            if (exampleImagePaths.Count == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("Warning: No example images found in Assets/Backgrounds/Examples");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load example image paths: {ex.Message}");
         }
     }
 }
