@@ -37,8 +37,6 @@ public partial class MainPageViewModel : ObservableObject
 
     public ObservableCollection<ProjectItemViewModel> Projects { get; }
     public ObservableCollection<GridItemWrapper> GridItems { get; }
-    public GoalItemViewModel SampleGoal { get; }
-    public InspirationItemViewModel SampleInspiration { get; }
 
     public MainPageViewModel(PrintService printService, DataPersistenceService dataPersistenceService)
     {
