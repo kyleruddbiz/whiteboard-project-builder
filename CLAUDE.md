@@ -58,6 +58,18 @@ git log --oneline
 git log --graph --oneline --all
 ```
 
+### Git Hooks
+This repository uses a pre-commit hook to automatically format C# code before commits.
+
+**Pre-commit Hook**:
+- Located at `.git/hooks/pre-commit`
+- Automatically runs `dotnet format` on staged C# files
+- Formats code according to .editorconfig rules
+- Re-stages formatted files automatically
+- Ensures all committed code follows consistent formatting standards
+
+**Note**: The pre-commit hook is local to your repository and not committed to version control. New contributors should set up the hook by copying it from `.git/hooks/pre-commit` or recreating it.
+
 ## Architecture
 
 ### Technology Stack
