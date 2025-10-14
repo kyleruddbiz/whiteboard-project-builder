@@ -42,9 +42,9 @@ public partial class MainPageViewModel : ObservableObject
         this.printService = printService;
         this.dataPersistenceService = dataPersistenceService;
         this.settingsService = settingsService;
-        this.imageStorageService = new ImageStorageService();
-        this.imageTransformService = new ImageTransformService();
-        this.imageDimensionService = new ImageDimensionService();
+        imageStorageService = new ImageStorageService();
+        imageTransformService = new ImageTransformService();
+        imageDimensionService = new ImageDimensionService();
 
         Settings = new SettingsViewModel();
 
@@ -369,7 +369,7 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task AddProject()
+    private async Task AddProjectAsync()
     {
         ExitEditMode();
 
@@ -528,7 +528,7 @@ public partial class MainPageViewModel : ObservableObject
             picker.FileTypeFilter.Add(".png");
             picker.FileTypeFilter.Add(".bmp");
 
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             var file = await picker.PickSingleFileAsync();
@@ -545,7 +545,7 @@ public partial class MainPageViewModel : ObservableObject
                 SelectedProject.Subtitle
             );
 
-            var imageUri = await imageStorageService.SaveImageAsync(file.Path, fileName + System.IO.Path.GetExtension(file.Path));
+            string imageUri = await imageStorageService.SaveImageAsync(file.Path, fileName + System.IO.Path.GetExtension(file.Path));
 
             var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
@@ -612,7 +612,7 @@ public partial class MainPageViewModel : ObservableObject
             {
                 var imageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png" };
 
-                foreach (var filePath in Directory.GetFiles(examplesPath))
+                foreach (string filePath in Directory.GetFiles(examplesPath))
                 {
                     if (imageExtensions.Contains(Path.GetExtension(filePath)))
                     {

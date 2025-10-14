@@ -21,7 +21,7 @@ public sealed partial class PrintPageView : UserControl
 
     public PrintPageView()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     private static void OnItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -1,5 +1,5 @@
-using Microsoft.UI.Xaml.Media.Imaging;
 using System.Collections;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace WhiteboardProjectBuilder.Views;
 
@@ -33,8 +33,8 @@ public sealed partial class IconSelector : UserControl
 
     public IconSelector()
     {
-        this.InitializeComponent();
-        this.Loaded += IconSelector_Loaded;
+        InitializeComponent();
+        Loaded += IconSelector_Loaded;
     }
 
     private void IconSelector_Loaded(object sender, RoutedEventArgs e)
@@ -69,14 +69,14 @@ public sealed partial class IconSelector : UserControl
         if (SelectedValue == null || IconOptions == null)
             return;
 
-        foreach (var option in IconOptions)
+        foreach (object? option in IconOptions)
         {
             var enumValueProp = option.GetType().GetProperty("EnumValue");
             var iconPathProp = option.GetType().GetProperty("IconPath");
 
             if (enumValueProp?.GetValue(option)?.Equals(SelectedValue) == true)
             {
-                var iconPath = iconPathProp?.GetValue(option) as string ?? string.Empty;
+                string iconPath = iconPathProp?.GetValue(option) as string ?? string.Empty;
                 if (!string.IsNullOrEmpty(iconPath))
                 {
                     var uri = new Uri($"ms-appx:///{iconPath}");
@@ -92,7 +92,7 @@ public sealed partial class IconSelector : UserControl
         if (SelectedValue == null || IconOptions == null)
             return;
 
-        foreach (var option in IconOptions)
+        foreach (object? option in IconOptions)
         {
             var enumValueProp = option.GetType().GetProperty("EnumValue");
             if (enumValueProp?.GetValue(option)?.Equals(SelectedValue) == true)
@@ -113,7 +113,7 @@ public sealed partial class IconSelector : UserControl
     {
         if (IconGridView.SelectedItem != null)
         {
-            var selectedOption = IconGridView.SelectedItem;
+            object selectedOption = IconGridView.SelectedItem;
             var enumValueProp = selectedOption.GetType().GetProperty("EnumValue");
             var iconPathProp = selectedOption.GetType().GetProperty("IconPath");
 
@@ -121,7 +121,7 @@ public sealed partial class IconSelector : UserControl
             {
                 SelectedValue = enumValueProp.GetValue(selectedOption);
 
-                var iconPath = iconPathProp?.GetValue(selectedOption) as string ?? string.Empty;
+                string iconPath = iconPathProp?.GetValue(selectedOption) as string ?? string.Empty;
                 if (!string.IsNullOrEmpty(iconPath))
                 {
                     var uri = new Uri($"ms-appx:///{iconPath}");

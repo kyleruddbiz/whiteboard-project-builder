@@ -98,9 +98,13 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 
 ### Code Style
 - Write clear and concise code
+- Use using directives instead of fully qualified names
 - Follow the MVVM (Model-View-ViewModel) pattern
 - Use nullable reference types throughout the codebase
 - Extension methods for enums should be defined in the same file as the enum
+- Include "Async" suffix on async methods
+- Use var with linq, annoymous types, and when the type is apparent
+- Avoid var for built-in types
 
 ### MVVM Guidelines
 - **Never use `x:Name` to reference UserControls** - Avoid directly accessing UserControl instances in code-behind

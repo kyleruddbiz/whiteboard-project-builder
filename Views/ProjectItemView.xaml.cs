@@ -24,7 +24,7 @@ public sealed partial class ProjectItemView : UserControl
 
     public ProjectItemView()
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
         DataContextChanged += (s, e) =>
         {

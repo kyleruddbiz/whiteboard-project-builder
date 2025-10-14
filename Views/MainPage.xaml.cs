@@ -1,9 +1,9 @@
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Windows.ApplicationModel.DataTransfer;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
 using WhiteboardProjectBuilder.ViewModels;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace WhiteboardProjectBuilder.Views;
 
@@ -21,15 +21,15 @@ public partial class MainPage : Page
         dataPersistenceService = new DataPersistenceService();
         settingsService = new SettingsService(dataPersistenceService);
         ViewModel = new MainPageViewModel(printService, dataPersistenceService, settingsService);
-        this.InitializeComponent();
+        InitializeComponent();
 
         if (App.MainWindow != null)
         {
             printService.RegisterForPrinting(App.MainWindow, PrintCanvas);
         }
 
-        this.Unloaded += MainPage_Unloaded;
-        this.PointerPressed += MainPage_PointerPressed;
+        Unloaded += MainPage_Unloaded;
+        PointerPressed += MainPage_PointerPressed;
     }
 
     private void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -66,7 +66,7 @@ public partial class MainPage : Page
         await ViewModel.ForceSaveAsync();
 
         printService.UnregisterForPrinting();
-        this.Unloaded -= MainPage_Unloaded;
+        Unloaded -= MainPage_Unloaded;
     }
 
     private void GridView_SelectionChanged(object sender, Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs e)
@@ -102,7 +102,7 @@ public partial class MainPage : Page
 
         // Image found, handle paste
         args.Handled = true;
-        await ViewModel.PasteImageFromClipboardAsync(this.XamlRoot);
+        await ViewModel.PasteImageFromClipboardAsync(XamlRoot);
     }
 
     private void ProjectItemView_EditRequested(object? sender, ProjectItemViewModel e)
@@ -112,7 +112,7 @@ public partial class MainPage : Page
 
     private async void ProjectItemView_ImageReplaceRequested(object? sender, EventArgs e)
     {
-        await ViewModel.ReplaceImageAsync(this.XamlRoot);
+        await ViewModel.ReplaceImageAsync(XamlRoot);
     }
 
     private void ProjectItemView_ReactivateRequested(object? sender, ProjectItemViewModel e)

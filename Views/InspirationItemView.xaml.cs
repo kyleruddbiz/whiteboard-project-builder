@@ -20,7 +20,7 @@ public sealed partial class InspirationItemView : UserControl
 
     public InspirationItemView()
     {
-        this.InitializeComponent();
-        this.DataContext = this;
+        InitializeComponent();
+        DataContext = this;
     }
 }

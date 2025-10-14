@@ -54,7 +54,7 @@ public class ImageStorageService
         var imagesFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(ImagesFolderName);
 
         // Ensure .png extension
-        var sanitizedFileName = SanitizeFileName(fileName);
+        string sanitizedFileName = SanitizeFileName(fileName);
         if (!sanitizedFileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
         {
             sanitizedFileName += ".png";
@@ -136,7 +136,7 @@ public class ImageStorageService
                 ExifOrientationMode.RespectExifOrientation,
                 ColorManagementMode.DoNotColorManage
             );
-            var pixelData = pixelDataProvider.DetachPixelData();
+            byte[] pixelData = pixelDataProvider.DetachPixelData();
 
             encoder.SetPixelData(
                 BitmapPixelFormat.Bgra8,
@@ -179,7 +179,7 @@ public class ImageStorageService
             return $"clipboard-image-{DateTime.Now:yyyy-MM-dd-HHmmss}";
         }
 
-        var baseFileName = string.Join("-", parts);
+        string baseFileName = string.Join("-", parts);
         return SanitizeFileName(baseFileName);
     }
 
@@ -191,8 +191,8 @@ public class ImageStorageService
     private string SanitizeFileName(string fileName)
     {
         // Remove invalid filename characters
-        var invalidChars = Path.GetInvalidFileNameChars();
-        var sanitized = new string(fileName.Where(ch => !invalidChars.Contains(ch)).ToArray());
+        char[] invalidChars = Path.GetInvalidFileNameChars();
+        string sanitized = new string(fileName.Where(ch => !invalidChars.Contains(ch)).ToArray());
 
         // Replace multiple spaces/dashes with single dash
         sanitized = Regex.Replace(sanitized, @"[\s\-]+", "-");

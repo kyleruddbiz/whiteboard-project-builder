@@ -58,9 +58,9 @@ public sealed partial class ImageViewport : UserControl
 
     public ImageViewport()
     {
-        this.InitializeComponent();
-        this.Loaded += ImageViewport_Loaded;
-        this.SizeChanged += ImageViewport_SizeChanged;
+        InitializeComponent();
+        Loaded += ImageViewport_Loaded;
+        SizeChanged += ImageViewport_SizeChanged;
     }
 
     private void ImageViewport_Loaded(object sender, RoutedEventArgs e)

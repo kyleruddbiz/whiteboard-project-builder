@@ -31,8 +31,8 @@ public class DataPersistenceService
         {
             try
             {
-                var json = JsonSerializer.Serialize(data, JsonOptions);
-                var filePath = Path.Combine(
+                string json = JsonSerializer.Serialize(data, JsonOptions);
+                string filePath = Path.Combine(
                     ApplicationData.Current.LocalFolder.Path,
                     fileName
                 );
@@ -55,7 +55,7 @@ public class DataPersistenceService
         {
             try
             {
-                var filePath = Path.Combine(
+                string filePath = Path.Combine(
                     ApplicationData.Current.LocalFolder.Path,
                     fileName
                 );
@@ -65,7 +65,7 @@ public class DataPersistenceService
                     return default;
                 }
 
-                var json = await File.ReadAllTextAsync(filePath);
+                string json = await File.ReadAllTextAsync(filePath);
                 return JsonSerializer.Deserialize<T>(json, JsonOptions);
             }
             catch (Exception ex)

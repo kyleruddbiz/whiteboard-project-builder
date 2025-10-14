@@ -96,8 +96,8 @@ public sealed partial class ImageEditor : UserControl
 
     public ImageEditor()
     {
-        this.InitializeComponent();
-        this.Loaded += ImageEditor_Loaded;
+        InitializeComponent();
+        Loaded += ImageEditor_Loaded;
     }
 
     private void ImageEditor_Loaded(object sender, RoutedEventArgs e)
@@ -189,25 +189,26 @@ public sealed partial class ImageEditor : UserControl
 
     private void Viewport_PointerMoved(object sender, PointerRoutedEventArgs e)
     {
-        if (!isDragging) return;
+        if (!isDragging)
+            return;
 
         var currentPoint = e.GetCurrentPoint(Viewport).Position;
-        var deltaX = currentPoint.X - startPoint.X;
-        var deltaY = currentPoint.Y - startPoint.Y;
+        double deltaX = currentPoint.X - startPoint.X;
+        double deltaY = currentPoint.Y - startPoint.Y;
 
         if (EditMode == ImageEditMode.Pan)
         {
-            var isShiftPressed = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
+            bool isShiftPressed = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
 
             if (isShiftPressed)
             {
-                var absDeltaX = Math.Abs(deltaX);
-                var absDeltaY = Math.Abs(deltaY);
+                double absDeltaX = Math.Abs(deltaX);
+                double absDeltaY = Math.Abs(deltaY);
 
                 // Calculate distance from drag origin
-                var distanceFromOriginX = Math.Abs(currentPoint.X - dragOrigin.X);
-                var distanceFromOriginY = Math.Abs(currentPoint.Y - dragOrigin.Y);
-                var maxDistanceFromOrigin = Math.Max(distanceFromOriginX, distanceFromOriginY);
+                double distanceFromOriginX = Math.Abs(currentPoint.X - dragOrigin.X);
+                double distanceFromOriginY = Math.Abs(currentPoint.Y - dragOrigin.Y);
+                double maxDistanceFromOrigin = Math.Max(distanceFromOriginX, distanceFromOriginY);
 
                 if (lockedAxis == null)
                 {
@@ -260,19 +261,19 @@ public sealed partial class ImageEditor : UserControl
         else if (EditMode == ImageEditMode.Zoom)
         {
             // Zoom with dominant axis: use the larger of horizontal or vertical movement
-            var absDeltaX = Math.Abs(deltaX);
-            var absDeltaY = Math.Abs(deltaY);
-            var dominantDelta = absDeltaX > absDeltaY ? -deltaX : deltaY;
+            double absDeltaX = Math.Abs(deltaX);
+            double absDeltaY = Math.Abs(deltaY);
+            double dominantDelta = absDeltaX > absDeltaY ? -deltaX : deltaY;
 
             // Zoom: right/up = zoom in, left/down = zoom out
-            var scaleDelta = 1 - (dominantDelta / ZoomSensitivityFactor);
-            var newZoomFactor = startZoomFactor * scaleDelta;
+            double scaleDelta = 1 - (dominantDelta / ZoomSensitivityFactor);
+            double newZoomFactor = startZoomFactor * scaleDelta;
             newZoomFactor = Math.Clamp(newZoomFactor, MinZoomFactor, MaxZoomFactor);
 
             // Adjust offsets proportionally to maintain visual center
-            var scaleRatio = newZoomFactor / startZoomFactor;
-            var newOffsetX = startOffsetX * scaleRatio;
-            var newOffsetY = startOffsetY * scaleRatio;
+            double scaleRatio = newZoomFactor / startZoomFactor;
+            double newOffsetX = startOffsetX * scaleRatio;
+            double newOffsetY = startOffsetY * scaleRatio;
 
             ZoomFactor = newZoomFactor;
             OffsetX = newOffsetX;

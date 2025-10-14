@@ -20,7 +20,7 @@ public sealed partial class GoalItemView : UserControl
 
     public GoalItemView()
     {
-        this.InitializeComponent();
-        this.DataContext = this;
+        InitializeComponent();
+        DataContext = this;
     }
 }

@@ -6,7 +6,7 @@ public sealed partial class SaveImageDialog : ContentDialog
 
     public SaveImageDialog(string defaultFileName)
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
         FileNameTextBox.Text = defaultFileName;
         FileName = defaultFileName;
@@ -22,7 +22,7 @@ public sealed partial class SaveImageDialog : ContentDialog
 
     private void UpdatePreview()
     {
-        var fileName = string.IsNullOrWhiteSpace(FileName) ? "[empty]" : FileName;
+        string fileName = string.IsNullOrWhiteSpace(FileName) ? "[empty]" : FileName;
 
         if (!fileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
         {

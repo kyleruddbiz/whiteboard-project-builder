@@ -13,7 +13,7 @@ public class PrintService
     private PrintDocument? printDocument;
     private IPrintDocumentSource? printDocumentSource;
     private PrintManager? printManager;
-    private List<UIElement> printPages = new();
+    private readonly List<UIElement> printPages = new();
     private List<ProjectItemViewModel> itemsToPrint = new();
     private Canvas? printCanvas;
 
@@ -37,7 +37,7 @@ public class PrintService
             printDocument.GetPreviewPage += PrintDocument_GetPreviewPage;
             printDocument.AddPages += PrintDocument_AddPages;
 
-            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+            nint hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
             printManager = PrintManagerInterop.GetForWindow(hWnd);
             printManager.PrintTaskRequested += PrintManager_PrintTaskRequested;
         }
@@ -107,7 +107,7 @@ public class PrintService
 
         try
         {
-            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            nint hWnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
             await PrintManagerInterop.ShowPrintUIForWindowAsync(hWnd);
         }
         catch (Exception ex)
@@ -144,7 +144,7 @@ public class PrintService
             int startIndex = pageIndex * itemsPerPage;
             int itemsOnThisPage = Math.Min(itemsPerPage, itemsToPrint.Count - startIndex);
 
-            List<ProjectItemViewModel> pageItems = itemsToPrint
+            var pageItems = itemsToPrint
                 .Skip(startIndex)
                 .Take(itemsOnThisPage)
                 .ToList();

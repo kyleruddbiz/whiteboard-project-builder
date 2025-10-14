@@ -22,7 +22,7 @@ public sealed partial class ProjectItemEditView : UserControl
 
     public ProjectItemEditView()
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
         DataContextChanged += (s, e) =>
         {
@@ -32,7 +32,7 @@ public sealed partial class ProjectItemEditView : UserControl
             }
         };
 
-        this.Loaded += ProjectItemEditView_Loaded;
+        Loaded += ProjectItemEditView_Loaded;
     }
 
     private void ProjectItemEditView_Loaded(object sender, RoutedEventArgs e)
