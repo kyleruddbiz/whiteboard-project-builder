@@ -26,9 +26,13 @@
     </PropertyGroup>
     <ItemGroup>
       <Compile Remove="Examples\**" />
+      <Compile Remove="hooks\**" />
       <EmbeddedResource Remove="Examples\**" />
+      <EmbeddedResource Remove="hooks\**" />
       <None Remove="Examples\**" />
+      <None Remove="hooks\**" />
       <Page Remove="Examples\**" />
+      <Page Remove="hooks\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -69,5 +73,8 @@
     </PropertyGroup>
     <ItemGroup>
       <PRIResource Remove="Examples\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <PRIResource Remove="hooks\**" />
     </ItemGroup>
 </Project>

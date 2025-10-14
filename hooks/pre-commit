@@ -2,6 +2,12 @@
 
 # Pre-commit hook that runs dotnet format on staged files
 
+# On Windows (when running from GitHub Desktop), delegate to the .cmd version
+if [ -n "$COMSPEC" ] && [ -f "$(dirname "$0")/pre-commit.cmd" ]; then
+    cmd.exe /c "\"$(dirname "$0")/pre-commit.cmd\""
+    exit $?
+fi
+
 echo "Running dotnet format on staged files..."
 
 # Get list of staged C# files
