@@ -9,3 +9,4 @@ public class Settings
     public bool IsSortDescending { get; set; }
     public bool IsDeveloperMode { get; set; }
 }
+// comment to test commit

@@ -73,10 +73,14 @@ This repository uses a pre-commit hook to automatically format C# code before co
 **Setup Instructions**:
 To install the pre-commit hook after cloning the repository:
 
-**On Windows (for both Git Bash and GitHub Desktop)**:
+**On Windows with GitHub Desktop (or if you get bash errors)**:
+```bash
+copy hooks\pre-commit.cmd .git\hooks\pre-commit
+```
+
+**On Windows with Git Bash/WSL**:
 ```bash
 cp hooks/pre-commit .git/hooks/pre-commit
-cp hooks/pre-commit.cmd .git/hooks/pre-commit.cmd
 ```
 
 **On Linux/macOS**:
@@ -85,7 +89,7 @@ cp hooks/pre-commit .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 ```
 
-The bash script will automatically delegate to the `.cmd` version when running on Windows through GitHub Desktop.
+**Note**: If you're on Windows and see WSL/bash errors when committing, use the GitHub Desktop setup (copy the .cmd file as pre-commit without extension).
 
 ## Architecture
 

@@ -1,36 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/sh
+":"; exec "$(dirname "$0")/pre-commit.cmd" # 2>/dev/null
+": <<'BATCH_SCRIPT'"
+@echo off
+REM Pre-commit hook that runs dotnet format on staged files (Windows batch version)
 
-# Pre-commit hook that runs dotnet format on staged files
+echo Running dotnet format on staged files...
 
-# On Windows (when running from GitHub Desktop), delegate to the .cmd version
-if [ -n "$COMSPEC" ] && [ -f "$(dirname "$0")/pre-commit.cmd" ]; then
-    cmd.exe /c "\"$(dirname "$0")/pre-commit.cmd\""
-    exit $?
-fi
+REM Run dotnet format on the entire solution
+dotnet format WhiteboardProjectBuilder.sln >nul 2>&1
 
-echo "Running dotnet format on staged files..."
+if %errorlevel% neq 0 (
+    echo dotnet format failed. Please fix the issues and try again.
+    exit /b 1
+)
 
-# Get list of staged C# files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.cs$')
-
-if [ -z "$STAGED_FILES" ]; then
-    echo "No C# files staged for commit."
-    exit 0
-fi
-
-# Run dotnet format on the solution with only the staged files included
-# Note: dotnet format works at the solution/project level, not individual files
-dotnet format WhiteboardProjectBuilder.sln --include $(echo $STAGED_FILES | tr '\n' ',' | sed 's/,$//')
-
-# Check if dotnet format made any changes
-if [ $? -ne 0 ]; then
-    echo "dotnet format failed. Please fix the issues and try again."
-    exit 1
-fi
-
-# Re-stage the formatted files
-echo "Re-staging formatted files..."
-echo "$STAGED_FILES" | xargs git add
-
-echo "dotnet format completed successfully."
-exit 0
+echo dotnet format completed successfully.
+exit /b 0
+BATCH_SCRIPT
