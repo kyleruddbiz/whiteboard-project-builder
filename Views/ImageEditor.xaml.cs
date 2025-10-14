@@ -206,7 +206,6 @@ public sealed partial class ImageEditor : UserControl
                 double absDeltaX = Math.Abs(deltaX);
                 double absDeltaY = Math.Abs(deltaY);
 
-                // Calculate distance from drag origin
                 double distanceFromOriginX = Math.Abs(currentPoint.X - dragOrigin.X);
                 double distanceFromOriginY = Math.Abs(currentPoint.Y - dragOrigin.Y);
                 double maxDistanceFromOrigin = Math.Max(distanceFromOriginX, distanceFromOriginY);

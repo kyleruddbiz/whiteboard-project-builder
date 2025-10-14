@@ -71,7 +71,6 @@ public partial class MainPage : Page
 
     private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        // Exit edit mode on currently editing item before changing selection
         if (ViewModel.SelectedProject?.IsEditing == true)
         {
             ViewModel.SelectedProject.IsEditing = false;
@@ -80,7 +79,6 @@ public partial class MainPage : Page
         var gridView = (GridView)sender;
         if (gridView.SelectedItem is GridItemWrapper wrapper)
         {
-            // Only set SelectedProject if it's an actual project (not the Add button)
             ViewModel.SelectedProject = wrapper.IsAddButton ? null : wrapper.ProjectItem;
         }
         else
@@ -91,16 +89,13 @@ public partial class MainPage : Page
 
     private async void PasteAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
-        // Check if clipboard contains an image
         var dataPackageView = Clipboard.GetContent();
         if (!dataPackageView.Contains(StandardDataFormats.Bitmap))
         {
-            // No image in clipboard, allow default paste behavior
             args.Handled = false;
             return;
         }
 
-        // Image found, handle paste
         args.Handled = true;
         await ViewModel.PasteImageFromClipboardAsync(XamlRoot);
     }

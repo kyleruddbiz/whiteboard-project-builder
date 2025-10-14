@@ -21,7 +21,6 @@ public class ImageTransformService
         double imageWidth,
         double imageHeight)
     {
-        // Debug output
         Debug.WriteLine($"Image dimensions: {imageWidth}x{imageHeight}");
         Debug.WriteLine($"Viewport dimensions: {ViewportWidth}x{ViewportHeight}");
 

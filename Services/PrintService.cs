@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Printing;
 using WhiteboardProjectBuilder.ViewModels;
 using Windows.Foundation;
 using Windows.Graphics.Printing;
+using WinRT.Interop;
 
 namespace WhiteboardProjectBuilder.Services;
 
@@ -31,7 +32,6 @@ public class PrintService
 
         try
         {
-            // Create PrintDocument early
             printDocument = new PrintDocument();
             printDocumentSource = printDocument.DocumentSource;
 
@@ -39,7 +39,7 @@ public class PrintService
             printDocument.GetPreviewPage += PrintDocument_GetPreviewPage;
             printDocument.AddPages += PrintDocument_AddPages;
 
-            nint hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+            nint hWnd = WindowNative.GetWindowHandle(window);
             printManager = PrintManagerInterop.GetForWindow(hWnd);
             printManager.PrintTaskRequested += PrintManager_PrintTaskRequested;
         }
@@ -109,7 +109,7 @@ public class PrintService
 
         try
         {
-            nint hWnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            nint hWnd = WindowNative.GetWindowHandle(App.MainWindow);
             await PrintManagerInterop.ShowPrintUIForWindowAsync(hWnd);
         }
         catch (Exception ex)

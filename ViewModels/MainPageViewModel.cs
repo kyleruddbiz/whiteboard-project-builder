@@ -5,10 +5,11 @@ using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
-using Windows.Storage.Pickers;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
+using Windows.Storage.Pickers;
+using WinRT.Interop;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
@@ -266,6 +267,7 @@ public partial class MainPageViewModel : ObservableObject
         }
         catch (TaskCanceledException)
         {
+            // Expected on debounce
         }
     }
 
@@ -293,7 +295,6 @@ public partial class MainPageViewModel : ObservableObject
             dispatcherQueue.TryEnqueue(() =>
             {
                 IsSaving = false;
-                // TODO: Show error message to user
                 Debug.WriteLine($"Save failed: {ex.Message}");
             });
         }
@@ -344,6 +345,7 @@ public partial class MainPageViewModel : ObservableObject
         }
         catch (TaskCanceledException)
         {
+            // Expected on debounce
         }
     }
 
@@ -532,8 +534,8 @@ public partial class MainPageViewModel : ObservableObject
             picker.FileTypeFilter.Add(".png");
             picker.FileTypeFilter.Add(".bmp");
 
-            nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            nint hwnd = WindowNative.GetWindowHandle(App.MainWindow);
+            InitializeWithWindow.Initialize(picker, hwnd);
 
             var file = await picker.PickSingleFileAsync();
 

@@ -71,13 +71,11 @@ public class ImageStorageService
         // Try to get PNG format first (preserves transparency better)
         if (dataPackageView.AvailableFormats.Contains("PNG"))
         {
-            var pngData = await dataPackageView.GetDataAsync("PNG") as IRandomAccessStream;
-            if (pngData != null)
+            if (await dataPackageView.GetDataAsync("PNG") is IRandomAccessStream pngData)
             {
                 using (var fileStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite))
                 {
-                    // Decode to get dimensions
-                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(pngData);
+                    var decoder = await BitmapDecoder.CreateAsync(pngData);
                     width = (int)decoder.PixelWidth;
                     height = (int)decoder.PixelHeight;
 
@@ -115,15 +113,14 @@ public class ImageStorageService
         using (var imageStream = await imageReference.OpenReadAsync())
         using (var fileStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite))
         {
-            // Decode the bitmap
-            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(imageStream);
+            var decoder = await BitmapDecoder.CreateAsync(imageStream);
 
             // Capture dimensions before decoder goes out of scope
             width = (int)decoder.PixelWidth;
             height = (int)decoder.PixelHeight;
 
             // Encode as PNG
-            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(
+            var encoder = await BitmapEncoder.CreateAsync(
                 BitmapEncoder.PngEncoderId,
                 fileStream
             );
@@ -190,17 +187,14 @@ public class ImageStorageService
     /// <returns>Sanitized filename safe for file system</returns>
     private string SanitizeFileName(string fileName)
     {
-        // Remove invalid filename characters
         char[] invalidChars = Path.GetInvalidFileNameChars();
-        string sanitized = new string(fileName.Where(ch => !invalidChars.Contains(ch)).ToArray());
+        string sanitized = new([.. fileName.Where(ch => !invalidChars.Contains(ch))]);
 
         // Replace multiple spaces/dashes with single dash
         sanitized = Regex.Replace(sanitized, @"[\s\-]+", "-");
 
-        // Remove leading/trailing dashes
         sanitized = sanitized.Trim('-');
 
-        // If empty after sanitization, use timestamp
         if (string.IsNullOrWhiteSpace(sanitized))
         {
             sanitized = $"clipboard-image-{DateTime.Now:yyyy-MM-dd-HHmmss}";

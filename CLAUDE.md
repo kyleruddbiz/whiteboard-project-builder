@@ -136,6 +136,7 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 - Keep comments clear and concise
 - Only add comments when the code's intent is not obvious
 - Do not add comments to describe basic or obvious functionality
+- Do add a comment to empty catch or if blocks explaining why
 
 ### XAML Guidelines
 - Prefer `x:Bind` over `Binding` whenever possible for better performance and compile-time checking
