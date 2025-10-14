@@ -18,7 +18,6 @@ public partial class App : Application
     /// </summary>
     public App()
     {
-        // Test comment for git hook
         InitializeComponent();
     }
 
