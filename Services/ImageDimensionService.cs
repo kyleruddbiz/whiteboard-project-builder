@@ -25,7 +25,7 @@ public class ImageDimensionService
                 // Handle URIs (ms-appx://, ms-appdata://)
                 file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(imageUri));
             }
-            else if (System.IO.Path.IsPathRooted(imageUri))
+            else if (Path.IsPathRooted(imageUri))
             {
                 // Handle absolute file paths
                 file = await StorageFile.GetFileFromPathAsync(imageUri);

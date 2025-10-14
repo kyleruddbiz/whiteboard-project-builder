@@ -2,6 +2,7 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Input;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Services;
+using Windows.Foundation;
 using Windows.System;
 using Windows.UI.Core;
 
@@ -17,8 +18,8 @@ public sealed partial class ImageEditor : UserControl
     private const double ArrowKeyStepSize = 1.0;
 
     private bool isDragging = false;
-    private Windows.Foundation.Point startPoint;
-    private Windows.Foundation.Point dragOrigin;
+    private Point startPoint;
+    private Point dragOrigin;
     private double startOffsetX;
     private double startOffsetY;
     private double startZoomFactor;

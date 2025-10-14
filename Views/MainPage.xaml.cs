@@ -69,7 +69,7 @@ public partial class MainPage : Page
         Unloaded -= MainPage_Unloaded;
     }
 
-    private void GridView_SelectionChanged(object sender, Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs e)
+    private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         // Exit edit mode on currently editing item before changing selection
         if (ViewModel.SelectedProject?.IsEditing == true)

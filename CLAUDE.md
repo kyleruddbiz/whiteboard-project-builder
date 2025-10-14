@@ -98,7 +98,7 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 
 ### Code Style
 - Write clear and concise code
-- Use using directives instead of fully qualified names
+- Use using directives instead of fully qualified names (unless there is a naming conflict)
 - Follow the MVVM (Model-View-ViewModel) pattern
 - Use nullable reference types throughout the codebase
 - Extension methods for enums should be defined in the same file as the enum

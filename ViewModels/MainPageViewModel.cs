@@ -1,7 +1,11 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
+using Windows.Storage.Pickers;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
@@ -74,7 +78,7 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    private void OnSettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SettingsViewModel.IsDeveloperMode))
         {
@@ -95,11 +99,11 @@ public partial class MainPageViewModel : ObservableObject
         try
         {
             string folderPath = await ImageStorageService.GetImagesFolderPathAsync();
-            System.Diagnostics.Process.Start("explorer.exe", folderPath);
+            Process.Start("explorer.exe", folderPath);
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to open images folder: {ex.Message}");
+            Debug.WriteLine($"Failed to open images folder: {ex.Message}");
         }
     }
 
@@ -166,7 +170,7 @@ public partial class MainPageViewModel : ObservableObject
         _ = TriggerAutoSaveAsync();
     }
 
-    private void OnProjectPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ProjectItemViewModel.IsArchived) && sender is ProjectItemViewModel project)
         {
@@ -270,7 +274,7 @@ public partial class MainPageViewModel : ObservableObject
     /// </summary>
     private async Task SaveDataAsync()
     {
-        var dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
         dispatcherQueue.TryEnqueue(() => IsSaving = true);
 
@@ -290,7 +294,7 @@ public partial class MainPageViewModel : ObservableObject
             {
                 IsSaving = false;
                 // TODO: Show error message to user
-                System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
+                Debug.WriteLine($"Save failed: {ex.Message}");
             });
         }
     }
@@ -316,7 +320,7 @@ public partial class MainPageViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Load failed: {ex.Message}");
+            Debug.WriteLine($"Load failed: {ex.Message}");
         }
     }
 
@@ -354,7 +358,7 @@ public partial class MainPageViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Settings save failed: {ex.Message}");
+            Debug.WriteLine($"Settings save failed: {ex.Message}");
         }
     }
 
@@ -457,7 +461,7 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    public async Task PasteImageFromClipboardAsync(Microsoft.UI.Xaml.XamlRoot xamlRoot)
+    public async Task PasteImageFromClipboardAsync(XamlRoot xamlRoot)
     {
         try
         {
@@ -496,7 +500,7 @@ public partial class MainPageViewModel : ObservableObject
                 SelectedProject.Image = imageUri;
             }
 
-            System.Diagnostics.Debug.WriteLine($"Image saved successfully: {imageUri}");
+            Debug.WriteLine($"Image saved successfully: {imageUri}");
         }
         catch (InvalidOperationException ex)
         {
@@ -517,10 +521,10 @@ public partial class MainPageViewModel : ObservableObject
 
         try
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker
+            var picker = new FileOpenPicker
             {
-                ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail,
-                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.PicturesLibrary
             };
 
             picker.FileTypeFilter.Add(".jpg");
@@ -545,7 +549,7 @@ public partial class MainPageViewModel : ObservableObject
                 SelectedProject.Subtitle
             );
 
-            string imageUri = await imageStorageService.SaveImageAsync(file.Path, fileName + System.IO.Path.GetExtension(file.Path));
+            string imageUri = await imageStorageService.SaveImageAsync(file.Path, fileName + Path.GetExtension(file.Path));
 
             var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
@@ -554,7 +558,7 @@ public partial class MainPageViewModel : ObservableObject
             SelectedProject.ImageOffsetY = offsetY;
             SelectedProject.Image = imageUri;
 
-            System.Diagnostics.Debug.WriteLine($"Image replaced successfully: {imageUri}");
+            Debug.WriteLine($"Image replaced successfully: {imageUri}");
         }
         catch (Exception ex)
         {
@@ -592,7 +596,7 @@ public partial class MainPageViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
+            Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
         }
     }
 
@@ -624,12 +628,12 @@ public partial class MainPageViewModel : ObservableObject
 
             if (exampleImagePaths.Count == 0)
             {
-                System.Diagnostics.Debug.WriteLine($"Warning: No example images found in Assets/Backgrounds/{folderName}");
+                Debug.WriteLine($"Warning: No example images found in Assets/Backgrounds/{folderName}");
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to load example image paths: {ex.Message}");
+            Debug.WriteLine($"Failed to load example image paths: {ex.Message}");
         }
     }
 }

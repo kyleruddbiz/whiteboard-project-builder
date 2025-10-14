@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using Microsoft.UI.Xaml.Printing;
 using WhiteboardProjectBuilder.ViewModels;
+using Windows.Foundation;
 using Windows.Graphics.Printing;
 
 namespace WhiteboardProjectBuilder.Services;
@@ -43,7 +45,7 @@ public class PrintService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to register for printing: {ex.Message}");
+            Debug.WriteLine($"Failed to register for printing: {ex.Message}");
         }
     }
 
@@ -87,13 +89,13 @@ public class PrintService
     {
         if (App.MainWindow == null)
         {
-            System.Diagnostics.Debug.WriteLine("MainWindow is null, cannot show print UI");
+            Debug.WriteLine("MainWindow is null, cannot show print UI");
             return;
         }
 
         if (!PrintManager.IsSupported())
         {
-            System.Diagnostics.Debug.WriteLine("Printing is not supported on this device");
+            Debug.WriteLine("Printing is not supported on this device");
             return;
         }
 
@@ -101,7 +103,7 @@ public class PrintService
 
         if (itemsToPrint.Count == 0)
         {
-            System.Diagnostics.Debug.WriteLine("No items to print");
+            Debug.WriteLine("No items to print");
             return;
         }
 
@@ -112,7 +114,7 @@ public class PrintService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to show print UI: {ex.Message}");
+            Debug.WriteLine($"Failed to show print UI: {ex.Message}");
         }
     }
 
@@ -159,8 +161,8 @@ public class PrintService
             printCanvas?.Children.Add(printPageView);
 
             // Force layout pass for proper rendering
-            printPageView.Measure(new Windows.Foundation.Size(pageDescription.PageSize.Width, pageDescription.PageSize.Height));
-            printPageView.Arrange(new Windows.Foundation.Rect(0, 0, pageDescription.PageSize.Width, pageDescription.PageSize.Height));
+            printPageView.Measure(new Size(pageDescription.PageSize.Width, pageDescription.PageSize.Height));
+            printPageView.Arrange(new Rect(0, 0, pageDescription.PageSize.Width, pageDescription.PageSize.Height));
             printPageView.UpdateLayout();
 
             printPages.Add(printPageView);

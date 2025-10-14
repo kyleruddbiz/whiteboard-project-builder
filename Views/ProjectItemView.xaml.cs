@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using WhiteboardProjectBuilder.ViewModels;
 
@@ -37,7 +38,7 @@ public sealed partial class ProjectItemView : UserControl
 
     public bool Not(bool value) => !value;
 
-    private void Overlay_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void Overlay_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
@@ -54,7 +55,7 @@ public sealed partial class ProjectItemView : UserControl
         }
     }
 
-    private void Overlay_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void Overlay_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
@@ -71,7 +72,7 @@ public sealed partial class ProjectItemView : UserControl
         }
     }
 
-    private void Overlay_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    private void Overlay_Tapped(object sender, TappedRoutedEventArgs e)
     {
         if (ViewModel != null)
         {
@@ -84,7 +85,7 @@ public sealed partial class ProjectItemView : UserControl
         ImageReplaceRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    private void ReactivateOverlay_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void ReactivateOverlay_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
@@ -101,7 +102,7 @@ public sealed partial class ProjectItemView : UserControl
         }
     }
 
-    private void ReactivateOverlay_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void ReactivateOverlay_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
@@ -118,7 +119,7 @@ public sealed partial class ProjectItemView : UserControl
         }
     }
 
-    private void ReactivateOverlay_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    private void ReactivateOverlay_Tapped(object sender, TappedRoutedEventArgs e)
     {
         if (ViewModel != null)
         {

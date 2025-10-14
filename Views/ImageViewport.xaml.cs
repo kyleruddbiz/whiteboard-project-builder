@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Media;
+using Windows.Foundation;
 
 namespace WhiteboardProjectBuilder.Views;
 
@@ -79,7 +80,7 @@ public sealed partial class ImageViewport : UserControl
         {
             ClipContainer.Clip = new RectangleGeometry
             {
-                Rect = new Windows.Foundation.Rect(0, 0, ClipContainer.ActualWidth, ClipContainer.ActualHeight)
+                Rect = new Rect(0, 0, ClipContainer.ActualWidth, ClipContainer.ActualHeight)
             };
         }
     }

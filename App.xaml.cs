@@ -1,3 +1,4 @@
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace WhiteboardProjectBuilder;
@@ -39,7 +40,7 @@ public partial class App : Application
 
         _ = rootFrame.Navigate(typeof(MainPage), e.Arguments);
 
-        var presenter = window.AppWindow.Presenter as Microsoft.UI.Windowing.OverlappedPresenter;
+        var presenter = window.AppWindow.Presenter as OverlappedPresenter;
         if (presenter != null)
         {
             presenter.Maximize();

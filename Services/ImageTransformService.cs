@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace WhiteboardProjectBuilder.Services;
 
 /// <summary>
@@ -20,8 +22,8 @@ public class ImageTransformService
         double imageHeight)
     {
         // Debug output
-        System.Diagnostics.Debug.WriteLine($"Image dimensions: {imageWidth}x{imageHeight}");
-        System.Diagnostics.Debug.WriteLine($"Viewport dimensions: {ViewportWidth}x{ViewportHeight}");
+        Debug.WriteLine($"Image dimensions: {imageWidth}x{imageHeight}");
+        Debug.WriteLine($"Viewport dimensions: {ViewportWidth}x{ViewportHeight}");
 
         // Calculate how the image is rendered with Stretch="Uniform"
         // Uniform scales to fit INSIDE the viewport, maintaining aspect ratio
@@ -29,7 +31,7 @@ public class ImageTransformService
         double uniformWidth = imageWidth * uniformScale;
         double uniformHeight = imageHeight * uniformScale;
 
-        System.Diagnostics.Debug.WriteLine($"After Stretch=Uniform: {uniformWidth}x{uniformHeight}, scale={uniformScale}");
+        Debug.WriteLine($"After Stretch=Uniform: {uniformWidth}x{uniformHeight}, scale={uniformScale}");
 
         // Now calculate additional scale needed to fill viewport (UniformToFill behavior)
         // We need to scale FROM the Uniform size TO fill the viewport
@@ -38,7 +40,7 @@ public class ImageTransformService
             ViewportHeight / uniformHeight
         );
 
-        System.Diagnostics.Debug.WriteLine($"Additional scale needed: {additionalScale}");
+        Debug.WriteLine($"Additional scale needed: {additionalScale}");
 
         double finalScale = additionalScale; // This is applied to the already-Uniform-scaled image
 
@@ -46,7 +48,7 @@ public class ImageTransformService
         double finalWidth = uniformWidth * additionalScale;
         double finalHeight = uniformHeight * additionalScale;
 
-        System.Diagnostics.Debug.WriteLine($"Final dimensions: {finalWidth}x{finalHeight}");
+        Debug.WriteLine($"Final dimensions: {finalWidth}x{finalHeight}");
 
         // For center-based transforms (RenderTransformOrigin="0.5,0.5"), position image at top-left
         // The viewport's center is at (0,0) in this coordinate system
@@ -56,7 +58,7 @@ public class ImageTransformService
         double offsetX = (-ViewportWidth / 2) - (-finalWidth / 2);
         double offsetY = (-ViewportHeight / 2) - (-finalHeight / 2);
 
-        System.Diagnostics.Debug.WriteLine($"Final transform: scale={finalScale}, offsetX={offsetX}, offsetY={offsetY}");
+        Debug.WriteLine($"Final transform: scale={finalScale}, offsetX={offsetX}, offsetY={offsetY}");
 
         return (finalScale, offsetX, offsetY);
     }
