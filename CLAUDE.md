@@ -62,13 +62,21 @@ git log --graph --oneline --all
 This repository uses a pre-commit hook to automatically format C# code before commits.
 
 **Pre-commit Hook**:
-- Located at `.git/hooks/pre-commit`
+- Source file stored at `hooks/pre-commit` (version controlled)
+- Must be installed to `.git/hooks/pre-commit` to be active
 - Automatically runs `dotnet format` on staged C# files
 - Formats code according to .editorconfig rules
 - Re-stages formatted files automatically
 - Ensures all committed code follows consistent formatting standards
 
-**Note**: The pre-commit hook is local to your repository and not committed to version control. New contributors should set up the hook by copying it from `.git/hooks/pre-commit` or recreating it.
+**Setup Instructions**:
+To install the pre-commit hook after cloning the repository:
+```bash
+cp hooks/pre-commit .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+On Windows using Git Bash or WSL, the `chmod` command may not be necessary as the file permissions are typically handled automatically.
 
 ## Architecture
 
