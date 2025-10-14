@@ -41,10 +41,6 @@ public sealed partial class ProjectItemEditView : UserControl
         {
             TitleTextBox.Focus(FocusState.Programmatic);
         }
-        else if (string.IsNullOrEmpty(ViewModel?.Subtitle))
-        {
-            SubtitleTextBox.Focus(FocusState.Programmatic);
-        }
         else
         {
             MainImageEditor.SetFocus();
