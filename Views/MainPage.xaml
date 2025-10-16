@@ -51,7 +51,7 @@
                         Height="800"
                         Margin="10"
                         Padding="0"
-                        Background="Transparent"
+                        Background="#FBFCFD"
                         BorderBrush="Black"
                         BorderThickness="2"
                         Command="{Binding ViewModel.AddProjectCommand, ElementName=PageRoot}">
@@ -62,7 +62,7 @@
         </selectors:GridItemTemplateSelector>
     </Page.Resources>
     <Page.Content>
-        <Grid>
+        <Grid Background="#E9EEF3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
