@@ -62,7 +62,7 @@
         </selectors:GridItemTemplateSelector>
     </Page.Resources>
     <Page.Content>
-        <Grid Background="#E9EEF3">
+        <Grid Background="#F3EFEA">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
