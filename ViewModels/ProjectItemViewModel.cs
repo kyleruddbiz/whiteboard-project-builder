@@ -51,8 +51,8 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase
     public bool IsUsingTemporaryImage => Image.StartsWith("Assets/Backgrounds/Examples");
     public bool HasError => string.IsNullOrWhiteSpace(Title) || IsUsingTemporaryImage;
 
-    public List<ProjectSize> SizeOptions { get; } = Enum.GetValues(typeof(ProjectSize)).Cast<ProjectSize>().ToList();
-    public List<ProjectValue> ValueOptions { get; } = Enum.GetValues(typeof(ProjectValue)).Cast<ProjectValue>().ToList();
+    public List<ProjectSize> SizeOptions { get; } = [.. Enum.GetValues<ProjectSize>().Cast<ProjectSize>()];
+    public List<ProjectValue> ValueOptions { get; } = [.. Enum.GetValues<ProjectValue>().Cast<ProjectValue>()];
 
     public List<IconOption<ProjectSize>> SizeIconOptions { get; } = IconOption<ProjectSize>.Create(s => s.ToIcon());
     public List<IconOption<ProjectValue>> ValueIconOptions { get; } = IconOption<ProjectValue>.Create(v => v.ToIcon());
