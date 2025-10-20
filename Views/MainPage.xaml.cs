@@ -77,9 +77,9 @@ public partial class MainPage : Page
         }
 
         var gridView = (GridView)sender;
-        if (gridView.SelectedItem is GridItemWrapper wrapper)
+        if (gridView.SelectedItem is GridItemWrapper wrapper && wrapper.ProjectItem != null)
         {
-            ViewModel.SelectedProject = wrapper.IsAddButton ? null : wrapper.ProjectItem;
+            ViewModel.SelectedProject = wrapper.ProjectItem;
         }
         else
         {

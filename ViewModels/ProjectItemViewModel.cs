@@ -6,7 +6,7 @@ using WhiteboardProjectBuilder.Models;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class ProjectItemViewModel : ObservableObject
+public partial class ProjectItemViewModel : WhiteboardItemViewModelBase
 {
     [ObservableProperty]
     private string title = string.Empty;
@@ -35,14 +35,6 @@ public partial class ProjectItemViewModel : ObservableObject
     [ObservableProperty]
     private DateTime? dueDate;
 
-    [ObservableProperty]
-    private bool isEditing;
-
-    [ObservableProperty]
-    private bool isArchived;
-
-    public DateTime CreatedDate { get; private set; } = DateTime.Today;
-
     public string SizeIcon => Size.ToIcon();
     public string ValueIcon => Value.ToIcon();
     public Brush SizeValueBorderBrush
@@ -66,68 +58,58 @@ public partial class ProjectItemViewModel : ObservableObject
     public List<IconOption<ProjectSize>> SizeIconOptions { get; } = IconOption<ProjectSize>.Create(s => s.ToIcon());
     public List<IconOption<ProjectValue>> ValueIconOptions { get; } = IconOption<ProjectValue>.Create(v => v.ToIcon());
 
-    /// <summary>
-    /// Raised when any property changes to trigger autosave.
-    /// </summary>
-    public event EventHandler? DataChanged;
-
     partial void OnTitleChanged(string value)
     {
-        DataChanged?.Invoke(this, EventArgs.Empty);
+        RaiseDataChanged();
         OnPropertyChanged(nameof(HasError));
     }
 
     partial void OnSubtitleChanged(string? value)
     {
-        DataChanged?.Invoke(this, EventArgs.Empty);
+        RaiseDataChanged();
     }
 
     partial void OnImageChanged(string value)
     {
-        DataChanged?.Invoke(this, EventArgs.Empty);
+        RaiseDataChanged();
         OnPropertyChanged(nameof(IsUsingTemporaryImage));
         OnPropertyChanged(nameof(HasError));
     }
 
     partial void OnImageOffsetXChanged(double value)
     {
-        DataChanged?.Invoke(this, EventArgs.Empty);
+        RaiseDataChanged();
     }
 
     partial void OnImageOffsetYChanged(double value)
     {
-        DataChanged?.Invoke(this, EventArgs.Empty);
+        RaiseDataChanged();
     }
 
     partial void OnImageZoomFactorChanged(double value)
     {
-        DataChanged?.Invoke(this, EventArgs.Empty);
+        RaiseDataChanged();
     }
 
     partial void OnSizeChanged(ProjectSize value)
     {
-        DataChanged?.Invoke(this, EventArgs.Empty);
+        RaiseDataChanged();
         OnPropertyChanged(nameof(SizeIcon));
         OnPropertyChanged(nameof(SizeValueBorderBrush));
     }
 
     partial void OnValueChanged(ProjectValue value)
     {
-        DataChanged?.Invoke(this, EventArgs.Empty);
+        RaiseDataChanged();
         OnPropertyChanged(nameof(ValueIcon));
         OnPropertyChanged(nameof(SizeValueBorderBrush));
     }
 
     partial void OnDueDateChanged(DateTime? value)
     {
-        DataChanged?.Invoke(this, EventArgs.Empty);
+        RaiseDataChanged();
         OnPropertyChanged(nameof(DateDisplay));
         OnPropertyChanged(nameof(DatePrefix));
-    }
-
-    partial void OnIsArchivedChanged(bool value)
-    {
-        DataChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

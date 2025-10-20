@@ -56,7 +56,12 @@ public partial class MainPageViewModel : ObservableObject
         Projects = [];
         GridItems = [];
 
-        GridItems.Add(new GridItemWrapper { IsAddButton = true });
+        GridItems.Add(new GridItemWrapper
+        {
+            GridItemType = GridItemType.AddButton,
+            WhiteboardItemType = null,
+            Content = null
+        });
 
         Projects.CollectionChanged += Projects_CollectionChanged;
         Projects.CollectionChanged += OnProjectsCollectionChanged;
@@ -205,16 +210,21 @@ public partial class MainPageViewModel : ObservableObject
 
         if (Settings.IsSortDescending)
         {
-            insertIndex = GridItems.Count > 0 && GridItems[0].IsAddButton ? 1 : 0;
+            insertIndex = GridItems.Count > 0 && GridItems[0].GridItemType == GridItemType.AddButton ? 1 : 0;
         }
         else
         {
-            insertIndex = GridItems.Count > 0 && GridItems[^1].IsAddButton
+            insertIndex = GridItems.Count > 0 && GridItems[^1].GridItemType == GridItemType.AddButton
                 ? GridItems.Count - 1
                 : GridItems.Count;
         }
 
-        GridItems.Insert(insertIndex, new GridItemWrapper { ProjectItem = project });
+        GridItems.Insert(insertIndex, new GridItemWrapper
+        {
+            GridItemType = GridItemType.WhiteboardItem,
+            WhiteboardItemType = WhiteboardItemType.Project,
+            Content = project
+        });
     }
 
     private void RemoveGridItem(ProjectItemViewModel project)
@@ -232,7 +242,12 @@ public partial class MainPageViewModel : ObservableObject
 
         if (Settings.IsSortDescending)
         {
-            GridItems.Add(new GridItemWrapper { IsAddButton = true });
+            GridItems.Add(new GridItemWrapper
+            {
+                GridItemType = GridItemType.AddButton,
+                WhiteboardItemType = null,
+                Content = null
+            });
         }
 
         var projectsToDisplay = Projects.Where(p => Settings.ShowArchived || !p.IsArchived);
@@ -243,12 +258,22 @@ public partial class MainPageViewModel : ObservableObject
 
         foreach (var project in sortedProjects)
         {
-            GridItems.Add(new GridItemWrapper { ProjectItem = project });
+            GridItems.Add(new GridItemWrapper
+            {
+                GridItemType = GridItemType.WhiteboardItem,
+                WhiteboardItemType = WhiteboardItemType.Project,
+                Content = project
+            });
         }
 
         if (!Settings.IsSortDescending)
         {
-            GridItems.Add(new GridItemWrapper { IsAddButton = true });
+            GridItems.Add(new GridItemWrapper
+            {
+                GridItemType = GridItemType.AddButton,
+                WhiteboardItemType = null,
+                Content = null
+            });
         }
     }
 
@@ -375,10 +400,68 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task AddProjectAsync()
+    private void AddItem()
     {
         ExitEditMode();
 
+        var selectorViewModel = new WhiteboardItemSelectorViewModel();
+
+        selectorViewModel.ItemTypeSelected += OnSelectorItemTypeSelected;
+        selectorViewModel.CancelRequested += OnSelectorCancelRequested;
+
+        int insertIndex = Settings.IsSortDescending
+            ? (GridItems.Count > 0 && GridItems[0].GridItemType == GridItemType.AddButton ? 1 : 0)
+            : (GridItems.Count > 0 && GridItems[^1].GridItemType == GridItemType.AddButton ? GridItems.Count - 1 : GridItems.Count);
+
+        GridItems.Insert(insertIndex, new GridItemWrapper
+        {
+            GridItemType = GridItemType.Selector,
+            WhiteboardItemType = null,
+            Content = selectorViewModel
+        });
+    }
+
+    private void OnSelectorItemTypeSelected(object? sender, WhiteboardItemType itemType)
+    {
+        if (sender is WhiteboardItemSelectorViewModel selectorViewModel)
+        {
+            _ = CreateWhiteboardItemCommand.ExecuteAsync((selectorViewModel, itemType));
+        }
+    }
+
+    private void OnSelectorCancelRequested(object? sender, EventArgs e)
+    {
+        if (sender is WhiteboardItemSelectorViewModel selectorViewModel)
+        {
+            CancelSelectorCommand.Execute(selectorViewModel);
+        }
+    }
+
+    [RelayCommand]
+    private async Task CreateWhiteboardItemAsync((WhiteboardItemSelectorViewModel Selector, WhiteboardItemType ItemType) parameters)
+    {
+        var wrapper = GridItems.FirstOrDefault(w => w.Selector == parameters.Selector);
+        if (wrapper == null)
+        {
+            throw new InvalidOperationException($"GridItemWrapper not found for selector {parameters.Selector.Id}. The selector may have been removed before the item could be created.");
+        }
+
+        switch (parameters.ItemType)
+        {
+            case WhiteboardItemType.Project:
+                await CreateProjectItemAsync(wrapper);
+                break;
+            case WhiteboardItemType.Goal:
+                // Future implementation
+                break;
+            case WhiteboardItemType.Inspiration:
+                // Future implementation
+                break;
+        }
+    }
+
+    private async Task CreateProjectItemAsync(GridItemWrapper wrapper)
+    {
         if (exampleImagePaths.Count == 0)
         {
             throw new InvalidOperationException("No example images available. Failed to load images from Assets/Backgrounds/Examples directory.");
@@ -398,8 +481,33 @@ public partial class MainPageViewModel : ObservableObject
 
         await ApplyUniformToFillTransformAsync(newProject, imagePath);
 
+        if (wrapper.Selector != null)
+        {
+            UnsubscribeFromSelector(wrapper.Selector);
+        }
+
+        GridItems.Remove(wrapper);
+
         Projects.Add(newProject);
+
         EnterEditMode(newProject);
+    }
+
+    [RelayCommand]
+    private void CancelSelector(WhiteboardItemSelectorViewModel selector)
+    {
+        var wrapper = GridItems.FirstOrDefault(w => w.Selector == selector);
+        if (wrapper != null)
+        {
+            UnsubscribeFromSelector(selector);
+            GridItems.Remove(wrapper);
+        }
+    }
+
+    private void UnsubscribeFromSelector(WhiteboardItemSelectorViewModel selector)
+    {
+        selector.ItemTypeSelected -= OnSelectorItemTypeSelected;
+        selector.CancelRequested -= OnSelectorCancelRequested;
     }
 
     [RelayCommand]
@@ -417,20 +525,24 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void RemoveProject(ProjectItemViewModel project)
+    private void RemoveWhiteboardItem(WhiteboardItemViewModelBase item)
     {
-        if (SelectedProject == project)
+        if (SelectedProject == item)
         {
             ExitEditMode();
         }
 
-        if (project.IsArchived)
+        if (item.IsArchived)
         {
-            Projects.Remove(project);
+            // Permanently delete - for now only support ProjectItemViewModel
+            if (item is ProjectItemViewModel project)
+            {
+                Projects.Remove(project);
+            }
         }
         else
         {
-            project.IsArchived = true;
+            item.IsArchived = true;
         }
     }
 
