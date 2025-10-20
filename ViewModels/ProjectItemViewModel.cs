@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
@@ -49,7 +48,7 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase
     public string DateDisplay => DueDate?.ToShortDateString() ?? string.Empty;
     public string DatePrefix => DueDate?.Date == DateTime.Now.Date ? "TODAY: " : string.Empty;
     public string CreatedDateDisplay => CreatedDate.ToShortDateString();
-    public bool IsUsingTemporaryImage => Image.StartsWith("Assets/Backgrounds/Examples/");
+    public bool IsUsingTemporaryImage => Image.StartsWith("Assets/Backgrounds/Examples");
     public bool HasError => string.IsNullOrWhiteSpace(Title) || IsUsingTemporaryImage;
 
     public List<ProjectSize> SizeOptions { get; } = Enum.GetValues(typeof(ProjectSize)).Cast<ProjectSize>().ToList();
