@@ -20,8 +20,8 @@ public sealed partial class SomedayMaybeEditView : UserControl
 
     public SomedayMaybeEditView()
     {
-        this.InitializeComponent();
-        this.DataContext = this;
+        InitializeComponent();
+        DataContext = this;
     }
 
     private void ImageEditor_ImageReplaceRequested(object sender, EventArgs e)

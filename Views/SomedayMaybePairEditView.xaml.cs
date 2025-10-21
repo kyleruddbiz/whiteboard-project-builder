@@ -21,8 +21,8 @@ public sealed partial class SomedayMaybePairEditView : UserControl
 
     public SomedayMaybePairEditView()
     {
-        this.InitializeComponent();
-        this.DataContext = this;
+        InitializeComponent();
+        DataContext = this;
     }
 
     private void TopItemEditor_ImageReplaceRequested(object sender, EventArgs e)

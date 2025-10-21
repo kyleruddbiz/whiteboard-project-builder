@@ -18,7 +18,7 @@ public sealed partial class SomedayMaybeItemView : UserControl
 
     public SomedayMaybeItemView()
     {
-        this.InitializeComponent();
-        this.DataContext = this;
+        InitializeComponent();
+        DataContext = this;
     }
 }

@@ -23,8 +23,8 @@ public sealed partial class SomedayMaybePairView : UserControl
 
     public SomedayMaybePairView()
     {
-        this.InitializeComponent();
-        this.DataContext = this;
+        InitializeComponent();
+        DataContext = this;
     }
 
     private void Overlay_PointerEntered(object sender, PointerRoutedEventArgs e)
