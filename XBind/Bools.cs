@@ -1,5 +1,5 @@
-namespace WhiteboardProjectBuilder.Helpers;
-public static class XBindHelper
+namespace WhiteboardProjectBuilder.XBind;
+public static class Bools
 {
     public static bool Not(bool value)
     {
