@@ -44,7 +44,7 @@ public sealed partial class SomedayMaybePairView : UserControl
 
     private void ReactivateOverlay_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        ReactivateHoverIndicator.Opacity = 0.8;
+        ReactivateHoverIndicator.Opacity = 0.3;
     }
 
     private void ReactivateOverlay_PointerExited(object sender, PointerRoutedEventArgs e)
