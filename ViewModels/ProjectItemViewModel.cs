@@ -112,9 +112,19 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase
     }
 
     /// <summary>
+    /// Gets the type of this whiteboard item.
+    /// </summary>
+    public override WhiteboardItemType GetItemType() => WhiteboardItemType.Project;
+
+    /// <summary>
     /// Converts this ViewModel to a Model for serialization.
     /// </summary>
-    public ProjectItem ToModel()
+    public override IWhiteboardItem ToModel() => ToProjectItemModel();
+
+    /// <summary>
+    /// Converts this ViewModel to a ProjectItem Model for serialization.
+    /// </summary>
+    public ProjectItem ToProjectItemModel()
     {
         ImageTransform? transform = null;
         if (ImageOffsetX != 0 || ImageOffsetY != 0 || ImageZoomFactor != 1.0)
@@ -144,7 +154,20 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase
     /// <summary>
     /// Creates a ViewModel from a Model.
     /// </summary>
-    public static ProjectItemViewModel FromModel(ProjectItem model)
+    public static ProjectItemViewModel FromModel(IWhiteboardItem item)
+    {
+        if (item is not ProjectItem model)
+        {
+            throw new ArgumentException($"Expected ProjectItem but got {item.GetType().Name}", nameof(item));
+        }
+
+        return FromProjectItemModel(model);
+    }
+
+    /// <summary>
+    /// Creates a ViewModel from a ProjectItem Model.
+    /// </summary>
+    public static ProjectItemViewModel FromProjectItemModel(ProjectItem model)
     {
         return new ProjectItemViewModel
         {

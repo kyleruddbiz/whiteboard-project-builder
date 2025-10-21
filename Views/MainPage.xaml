@@ -63,6 +63,30 @@
                     </Grid>
                 </DataTemplate>
             </selectors:GridItemTemplateSelector.ProjectTemplate>
+            <selectors:GridItemTemplateSelector.SomedayMaybeTemplate>
+                <DataTemplate x:DataType="models:GridItemWrapper">
+                    <Grid>
+                        <local:SomedayMaybePairView
+                            Margin="10"
+                            ViewModel="{x:Bind SomedayMaybePair}"
+                            EditRequested="SomedayMaybePairView_EditRequested"
+                            ImageReplaceRequested="SomedayMaybePairView_ImageReplaceRequested"
+                            ReactivateRequested="SomedayMaybePairView_ReactivateRequested" />
+                        <Button
+                            Width="50"
+                            Height="50"
+                            Margin="0 12 12 0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Command="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
+                            CommandParameter="{x:Bind SomedayMaybePair}">
+                            <FontIcon FontSize="20" Glyph="&#xE106;" />
+                        </Button>
+                    </Grid>
+                </DataTemplate>
+            </selectors:GridItemTemplateSelector.SomedayMaybeTemplate>
         </selectors:GridItemTemplateSelector>
     </Page.Resources>
     <Page.Content>
@@ -88,7 +112,7 @@
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     Spacing="10">
-                    <Button Command="{x:Bind ViewModel.PrintProjectsCommand}" Content="Print Projects" />
+                    <Button Command="{x:Bind ViewModel.PrintWhiteboardItemsCommand}" Content="Print Items" />
                     <Button
                         x:Name="OpenImagesFolderButton"
                         x:Load="{x:Bind ViewModel.Settings.IsDeveloperMode, Mode=OneWay}"

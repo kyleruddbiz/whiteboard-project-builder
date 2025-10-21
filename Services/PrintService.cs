@@ -8,8 +8,8 @@ using WinRT.Interop;
 namespace WhiteboardProjectBuilder.Services;
 
 /// <summary>
-/// Service for printing whiteboard project items using the Windows print system.
-/// Supports printing multiple ProjectItemViewModel instances with up to 4 items per page in a 2x2 grid layout.
+/// Service for printing whiteboard items using the Windows print system.
+/// Supports printing multiple WhiteboardItemViewModelBase instances with up to 4 items per page in a 2x2 grid layout.
 /// </summary>
 public class PrintService
 {
@@ -17,7 +17,7 @@ public class PrintService
     private IPrintDocumentSource? printDocumentSource;
     private PrintManager? printManager;
     private readonly List<UIElement> printPages = new();
-    private List<ProjectItemViewModel> itemsToPrint = new();
+    private List<WhiteboardItemViewModelBase> itemsToPrint = new();
     private Canvas? printCanvas;
 
     /// <summary>
@@ -82,10 +82,10 @@ public class PrintService
     }
 
     /// <summary>
-    /// Displays the Windows print dialog for the specified project items.
+    /// Displays the Windows print dialog for the specified whiteboard items.
     /// </summary>
-    /// <param name="items">Collection of ProjectItemViewModel instances to print</param>
-    public async Task ShowPrintUIAsync(IEnumerable<ProjectItemViewModel> items)
+    /// <param name="items">Collection of WhiteboardItemViewModelBase instances to print</param>
+    public async Task ShowPrintUIAsync(IEnumerable<WhiteboardItemViewModelBase> items)
     {
         if (App.MainWindow == null)
         {

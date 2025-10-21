@@ -34,7 +34,7 @@ public partial class MainPage : Page
 
     private void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
-        if (ViewModel.SelectedProject?.IsEditing != true)
+        if (ViewModel.SelectedItem?.IsEditing != true)
             return;
 
         var point = e.GetCurrentPoint(this);
@@ -71,19 +71,19 @@ public partial class MainPage : Page
 
     private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (ViewModel.SelectedProject?.IsEditing == true)
+        if (ViewModel.SelectedItem?.IsEditing == true)
         {
-            ViewModel.SelectedProject.IsEditing = false;
+            ViewModel.SelectedItem.IsEditing = false;
         }
 
         var gridView = (GridView)sender;
-        if (gridView.SelectedItem is GridItemWrapper wrapper && wrapper.ProjectItem != null)
+        if (gridView.SelectedItem is GridItemWrapper wrapper && wrapper.WhiteboardItem != null)
         {
-            ViewModel.SelectedProject = wrapper.ProjectItem;
+            ViewModel.SelectedItem = wrapper.WhiteboardItem;
         }
         else
         {
-            ViewModel.SelectedProject = null;
+            ViewModel.SelectedItem = null;
         }
     }
 
@@ -107,11 +107,34 @@ public partial class MainPage : Page
 
     private async void ProjectItemView_ImageReplaceRequested(object? sender, EventArgs e)
     {
+        ViewModel.ActiveSomedayMaybeItemIndex = null;
         await ViewModel.ReplaceImageAsync(XamlRoot);
     }
 
     private void ProjectItemView_ReactivateRequested(object? sender, ProjectItemViewModel e)
     {
-        ViewModel.ReactivateProjectCommand.Execute(e);
+        ViewModel.ReactivateItemCommand.Execute(e);
+    }
+
+    private void SomedayMaybePairView_EditRequested(object? sender, EventArgs e)
+    {
+        if (sender is SomedayMaybePairView view && view.ViewModel != null)
+        {
+            ViewModel.EnterEditModeCommand.Execute(view.ViewModel);
+        }
+    }
+
+    private async void SomedayMaybePairView_ImageReplaceRequested(object? sender, int itemIndex)
+    {
+        ViewModel.ActiveSomedayMaybeItemIndex = itemIndex;
+        await ViewModel.ReplaceImageAsync(XamlRoot);
+    }
+
+    private void SomedayMaybePairView_ReactivateRequested(object? sender, EventArgs e)
+    {
+        if (sender is SomedayMaybePairView view && view.ViewModel != null)
+        {
+            ViewModel.ReactivateItemCommand.Execute(view.ViewModel);
+        }
     }
 }

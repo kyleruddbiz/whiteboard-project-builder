@@ -36,8 +36,6 @@ public sealed partial class ProjectItemView : UserControl
         };
     }
 
-    public bool Not(bool value) => !value;
-
     private void Overlay_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         if (sender is Border overlay && overlay.Child is Border indicator)

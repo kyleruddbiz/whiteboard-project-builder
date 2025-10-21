@@ -63,7 +63,7 @@
                         </StackPanel>
                     </Button>
 
-                    <!--  Goal Item Button (Disabled)  -->
+                    <!--  Someday Maybe Button  -->
                     <Button
                         Grid.Row="0"
                         Grid.Column="1"
@@ -71,15 +71,15 @@
                         Padding="20"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
-                        IsEnabled="False">
+                        Command="{x:Bind ViewModel.SelectSomedayMaybeItemCommand, Mode=OneWay}">
                         <StackPanel
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Spacing="10">
-                            <FontIcon FontSize="48" Glyph="&#xE734;" />
+                            <FontIcon FontSize="48" Glyph="&#xE81C;" />
                             <TextBlock
                                 FontSize="18"
-                                Text="Goal Item"
+                                Text="Someday Maybe"
                                 TextAlignment="Center" />
                         </StackPanel>
                     </Button>

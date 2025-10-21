@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using WhiteboardProjectBuilder.Enums;
+using WhiteboardProjectBuilder.Models;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
@@ -26,5 +28,12 @@ public partial class GoalItemViewModel : WhiteboardItemViewModelBase
     partial void OnImageChanged(string value)
     {
         RaiseDataChanged();
+    }
+
+    public override WhiteboardItemType GetItemType() => WhiteboardItemType.Goal;
+
+    public override IWhiteboardItem ToModel()
+    {
+        throw new NotImplementedException("Goal items are not yet implemented");
     }
 }

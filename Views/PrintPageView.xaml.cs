@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.ViewModels;
 
@@ -9,13 +8,13 @@ public sealed partial class PrintPageView : UserControl
     public static readonly DependencyProperty ItemsProperty =
         DependencyProperty.Register(
             nameof(Items),
-            typeof(List<ProjectItemViewModel>),
+            typeof(List<WhiteboardItemViewModelBase>),
             typeof(PrintPageView),
             new PropertyMetadata(null, OnItemsChanged));
 
-    public List<ProjectItemViewModel>? Items
+    public List<WhiteboardItemViewModelBase>? Items
     {
-        get => (List<ProjectItemViewModel>?)GetValue(ItemsProperty);
+        get => (List<WhiteboardItemViewModelBase>?)GetValue(ItemsProperty);
         set => SetValue(ItemsProperty, value);
     }
 
@@ -49,17 +48,19 @@ public sealed partial class PrintPageView : UserControl
             int row = i / 2;
             int col = i % 2;
 
-            //int leftMargin = (col == 1) ? -1 : 0;
             int topMargin = (row == 1) ? -4 : 0;
-
             int leftMargin = 0;
-            //int topMargin = 0;
 
             viewbox.Margin = new Thickness(leftMargin, topMargin, 0, 0);
-            viewbox.Child = new ProjectItemView
+
+            UserControl itemView = Items[i] switch
             {
-                ViewModel = Items[i]
+                ProjectItemViewModel projectVm => new ProjectItemView { ViewModel = projectVm },
+                SomedayMaybePairViewModel pairVm => new SomedayMaybePairView { ViewModel = pairVm },
+                _ => throw new NotSupportedException($"Unsupported item type for printing: {Items[i].GetType().Name}")
             };
+
+            viewbox.Child = itemView;
 
             Grid.SetRow(viewbox, row);
             Grid.SetColumn(viewbox, col);

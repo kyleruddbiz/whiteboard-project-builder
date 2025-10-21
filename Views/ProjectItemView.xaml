@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:WhiteboardProjectBuilder.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:WhiteboardProjectBuilder.Helpers"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
@@ -12,7 +13,7 @@
 
     <Grid>
         <!--  Readonly View  -->
-        <Grid x:Name="ReadonlyView" x:Load="{x:Bind Not(ViewModel.IsEditing), Mode=OneWay}">
+        <Grid x:Name="ReadonlyView" x:Load="{x:Bind helpers:XBindHelper.Not(ViewModel.IsEditing), Mode=OneWay}">
             <Border
                 Width="502"
                 Height="800"
@@ -102,7 +103,7 @@
             <!--  Hover Overlay (Not Archived - Edit)  -->
             <Border
                 x:Name="EditOverlay"
-                x:Load="{x:Bind Not(ViewModel.IsArchived), Mode=OneWay}"
+                x:Load="{x:Bind helpers:XBindHelper.Not(ViewModel.IsArchived), Mode=OneWay}"
                 Background="Transparent"
                 PointerEntered="Overlay_PointerEntered"
                 PointerExited="Overlay_PointerExited"

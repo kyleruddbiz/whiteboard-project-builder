@@ -34,12 +34,15 @@ public partial class MainPageViewModel : ObservableObject
     private DateTime? lastSaved;
 
     [ObservableProperty]
-    private ProjectItemViewModel? selectedProject;
+    private WhiteboardItemViewModelBase? selectedItem;
+
+    [ObservableProperty]
+    private int? activeSomedayMaybeItemIndex;
 
     [ObservableProperty]
     private SettingsViewModel settings = null!;
 
-    public ObservableCollection<ProjectItemViewModel> Projects { get; }
+    public ObservableCollection<WhiteboardItemViewModelBase> WhiteboardItems { get; }
     public ObservableCollection<GridItemWrapper> GridItems { get; }
 
     public MainPageViewModel(PrintService printService, DataPersistenceService dataPersistenceService, SettingsService settingsService)
@@ -53,7 +56,7 @@ public partial class MainPageViewModel : ObservableObject
 
         Settings = new SettingsViewModel();
 
-        Projects = [];
+        WhiteboardItems = [];
         GridItems = [];
 
         GridItems.Add(new GridItemWrapper
@@ -63,8 +66,8 @@ public partial class MainPageViewModel : ObservableObject
             Content = null
         });
 
-        Projects.CollectionChanged += Projects_CollectionChanged;
-        Projects.CollectionChanged += OnProjectsCollectionChanged;
+        WhiteboardItems.CollectionChanged += WhiteboardItems_CollectionChanged;
+        WhiteboardItems.CollectionChanged += OnWhiteboardItemsCollectionChanged;
 
         _ = LoadDataAsync();
     }
@@ -93,10 +96,10 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task PrintProjectsAsync()
+    private async Task PrintWhiteboardItemsAsync()
     {
-        var activeProjects = Projects.Where(p => !p.IsArchived);
-        await printService.ShowPrintUIAsync(activeProjects);
+        var activeItems = WhiteboardItems.Where(i => !i.IsArchived);
+        await printService.ShowPrintUIAsync(activeItems);
     }
 
     [RelayCommand]
@@ -113,14 +116,14 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    private void Projects_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void WhiteboardItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
                 if (e.NewItems != null)
                 {
-                    foreach (ProjectItemViewModel item in e.NewItems)
+                    foreach (WhiteboardItemViewModelBase item in e.NewItems)
                     {
                         AddGridItem(item);
                     }
@@ -130,7 +133,7 @@ public partial class MainPageViewModel : ObservableObject
             case NotifyCollectionChangedAction.Remove:
                 if (e.OldItems != null)
                 {
-                    foreach (ProjectItemViewModel item in e.OldItems)
+                    foreach (WhiteboardItemViewModelBase item in e.OldItems)
                     {
                         RemoveGridItem(item);
                     }
@@ -148,60 +151,60 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    private void OnProjectsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnWhiteboardItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems != null)
         {
-            foreach (ProjectItemViewModel item in e.NewItems)
+            foreach (WhiteboardItemViewModelBase item in e.NewItems)
             {
-                item.DataChanged += OnProjectDataChanged;
-                item.PropertyChanged += OnProjectPropertyChanged;
+                item.DataChanged += OnWhiteboardItemDataChanged;
+                item.PropertyChanged += OnWhiteboardItemPropertyChanged;
             }
         }
 
         if (e.OldItems != null)
         {
-            foreach (ProjectItemViewModel item in e.OldItems)
+            foreach (WhiteboardItemViewModelBase item in e.OldItems)
             {
-                item.DataChanged -= OnProjectDataChanged;
-                item.PropertyChanged -= OnProjectPropertyChanged;
+                item.DataChanged -= OnWhiteboardItemDataChanged;
+                item.PropertyChanged -= OnWhiteboardItemPropertyChanged;
             }
         }
 
         _ = TriggerAutoSaveAsync();
     }
 
-    private void OnProjectDataChanged(object? sender, EventArgs e)
+    private void OnWhiteboardItemDataChanged(object? sender, EventArgs e)
     {
         _ = TriggerAutoSaveAsync();
     }
 
-    private void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnWhiteboardItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ProjectItemViewModel.IsArchived) && sender is ProjectItemViewModel project)
+        if (e.PropertyName == nameof(WhiteboardItemViewModelBase.IsArchived) && sender is WhiteboardItemViewModelBase item)
         {
             if (!Settings.ShowArchived)
             {
-                if (project.IsArchived)
+                if (item.IsArchived)
                 {
-                    RemoveGridItem(project);
+                    RemoveGridItem(item);
                 }
                 else
                 {
-                    AddGridItem(project);
+                    AddGridItem(item);
                 }
             }
         }
     }
 
-    private void AddGridItem(ProjectItemViewModel project)
+    private void AddGridItem(WhiteboardItemViewModelBase item)
     {
-        if (!Settings.ShowArchived && project.IsArchived)
+        if (!Settings.ShowArchived && item.IsArchived)
         {
             return;
         }
 
-        if (GridItems.Any(w => w.ProjectItem == project))
+        if (GridItems.Any(w => w.WhiteboardItem == item))
         {
             return;
         }
@@ -222,14 +225,14 @@ public partial class MainPageViewModel : ObservableObject
         GridItems.Insert(insertIndex, new GridItemWrapper
         {
             GridItemType = GridItemType.WhiteboardItem,
-            WhiteboardItemType = WhiteboardItemType.Project,
-            Content = project
+            WhiteboardItemType = item.GetItemType(),
+            Content = item
         });
     }
 
-    private void RemoveGridItem(ProjectItemViewModel project)
+    private void RemoveGridItem(WhiteboardItemViewModelBase item)
     {
-        var wrapper = GridItems.FirstOrDefault(w => w.ProjectItem == project);
+        var wrapper = GridItems.FirstOrDefault(w => w.WhiteboardItem == item);
         if (wrapper != null)
         {
             GridItems.Remove(wrapper);
@@ -250,19 +253,19 @@ public partial class MainPageViewModel : ObservableObject
             });
         }
 
-        var projectsToDisplay = Projects.Where(p => Settings.ShowArchived || !p.IsArchived);
+        var itemsToDisplay = WhiteboardItems.Where(i => Settings.ShowArchived || !i.IsArchived);
 
-        var sortedProjects = Settings.IsSortDescending
-            ? projectsToDisplay.Reverse()
-            : projectsToDisplay;
+        var sortedItems = Settings.IsSortDescending
+            ? itemsToDisplay.Reverse()
+            : itemsToDisplay;
 
-        foreach (var project in sortedProjects)
+        foreach (var item in sortedItems)
         {
             GridItems.Add(new GridItemWrapper
             {
                 GridItemType = GridItemType.WhiteboardItem,
-                WhiteboardItemType = WhiteboardItemType.Project,
-                Content = project
+                WhiteboardItemType = item.GetItemType(),
+                Content = item
             });
         }
 
@@ -297,7 +300,7 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Saves projects to JSON file.
+    /// Saves whiteboard items to JSON file.
     /// </summary>
     private async Task SaveDataAsync()
     {
@@ -307,7 +310,7 @@ public partial class MainPageViewModel : ObservableObject
 
         try
         {
-            await dataPersistenceService.SaveProjectsAsync(Projects);
+            await dataPersistenceService.SaveWhiteboardItemsAsync(WhiteboardItems);
 
             dispatcherQueue.TryEnqueue(() =>
             {
@@ -326,7 +329,7 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Loads projects and settings from JSON files on startup.
+    /// Loads whiteboard items and settings from JSON files on startup.
     /// </summary>
     private async Task LoadDataAsync()
     {
@@ -337,11 +340,11 @@ public partial class MainPageViewModel : ObservableObject
 
             LoadExampleImagePaths();
 
-            var loadedProjects = await dataPersistenceService.LoadProjectsAsync();
+            var loadedItems = await dataPersistenceService.LoadWhiteboardItemsAsync();
 
-            foreach (var project in loadedProjects)
+            foreach (var item in loadedItems)
             {
-                Projects.Add(project);
+                WhiteboardItems.Add(item);
             }
         }
         catch (Exception ex)
@@ -451,6 +454,9 @@ public partial class MainPageViewModel : ObservableObject
             case WhiteboardItemType.Project:
                 await CreateProjectItemAsync(wrapper);
                 break;
+            case WhiteboardItemType.SomedayMaybe:
+                await CreateSomedayMaybePairAsync(wrapper);
+                break;
             case WhiteboardItemType.Goal:
                 // Future implementation
                 break;
@@ -488,9 +494,46 @@ public partial class MainPageViewModel : ObservableObject
 
         GridItems.Remove(wrapper);
 
-        Projects.Add(newProject);
+        WhiteboardItems.Add(newProject);
 
         EnterEditMode(newProject);
+    }
+
+    private async Task CreateSomedayMaybePairAsync(GridItemWrapper wrapper)
+    {
+        if (exampleImagePaths.Count == 0)
+        {
+            throw new InvalidOperationException("No example images available. Failed to load images from Assets/Backgrounds/Examples directory.");
+        }
+
+        var random = new Random();
+        int topIndex = random.Next(exampleImagePaths.Count);
+        string topImagePath = exampleImagePaths[topIndex];
+
+        var topItem = new SomedayMaybeViewModel
+        {
+            Image = topImagePath,
+            CreatedDate = DateTime.Today
+        };
+
+        await ApplyUniformToFillTransformAsync(topItem, topImagePath);
+
+        var newPair = new SomedayMaybePairViewModel
+        {
+            TopItem = topItem,
+            BottomItem = null
+        };
+
+        if (wrapper.Selector != null)
+        {
+            UnsubscribeFromSelector(wrapper.Selector);
+        }
+
+        GridItems.Remove(wrapper);
+
+        WhiteboardItems.Add(newPair);
+
+        EnterEditMode(newPair);
     }
 
     [RelayCommand]
@@ -527,18 +570,15 @@ public partial class MainPageViewModel : ObservableObject
     [RelayCommand]
     private void RemoveWhiteboardItem(WhiteboardItemViewModelBase item)
     {
-        if (SelectedProject == item)
+        if (SelectedItem == item)
         {
             ExitEditMode();
         }
 
         if (item.IsArchived)
         {
-            // Permanently delete - for now only support ProjectItemViewModel
-            if (item is ProjectItemViewModel project)
-            {
-                Projects.Remove(project);
-            }
+            // Permanently delete
+            WhiteboardItems.Remove(item);
         }
         else
         {
@@ -547,42 +587,56 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ReactivateProject(ProjectItemViewModel project)
+    private void ReactivateItem(WhiteboardItemViewModelBase item)
     {
-        project.IsArchived = false;
+        item.IsArchived = false;
         ExitEditMode();
     }
 
     [RelayCommand]
-    private void EnterEditMode(ProjectItemViewModel item)
+    private void EnterEditMode(WhiteboardItemViewModelBase item)
     {
-        if (SelectedProject != null && SelectedProject != item)
+        if (SelectedItem != null && SelectedItem != item)
         {
-            SelectedProject.IsEditing = false;
+            SelectedItem.IsEditing = false;
         }
 
-        SelectedProject = item;
+        SelectedItem = item;
         item.IsEditing = true;
+        ActiveSomedayMaybeItemIndex = null; // Reset when entering edit mode
     }
 
     [RelayCommand]
     private void ExitEditMode()
     {
-        if (SelectedProject != null)
+        if (SelectedItem != null)
         {
-            SelectedProject.IsEditing = false;
-            SelectedProject = null;
+            SelectedItem.IsEditing = false;
+            SelectedItem = null;
         }
+        ActiveSomedayMaybeItemIndex = null;
     }
 
     public async Task PasteImageFromClipboardAsync(XamlRoot xamlRoot)
     {
         try
         {
-            string defaultFileName = imageStorageService.GenerateFileName(
-                SelectedProject?.Title,
-                SelectedProject?.Subtitle
-            );
+            string? title = null;
+            string? subtitle = null;
+
+            if (SelectedItem is ProjectItemViewModel project)
+            {
+                title = project.Title;
+                subtitle = project.Subtitle;
+            }
+            else if (SelectedItem is SomedayMaybePairViewModel pair)
+            {
+                var targetItem = ActiveSomedayMaybeItemIndex == 1 ? pair.BottomItem : pair.TopItem;
+                title = targetItem?.Title;
+                subtitle = targetItem?.Subtitle;
+            }
+
+            string defaultFileName = imageStorageService.GenerateFileName(title, subtitle);
 
             var dialog = new SaveImageDialog(defaultFileName)
             {
@@ -603,15 +657,25 @@ public partial class MainPageViewModel : ObservableObject
             }
 
             var (imageUri, width, height) = await imageStorageService.SaveBitmapFromClipboardAsync(dialog.FileName);
+            var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
-            if (SelectedProject != null)
+            if (SelectedItem is ProjectItemViewModel projectItem)
             {
-                var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
-
-                SelectedProject.ImageZoomFactor = scale;
-                SelectedProject.ImageOffsetX = offsetX;
-                SelectedProject.ImageOffsetY = offsetY;
-                SelectedProject.Image = imageUri;
+                projectItem.ImageZoomFactor = scale;
+                projectItem.ImageOffsetX = offsetX;
+                projectItem.ImageOffsetY = offsetY;
+                projectItem.Image = imageUri;
+            }
+            else if (SelectedItem is SomedayMaybePairViewModel pairItem)
+            {
+                var targetItem = ActiveSomedayMaybeItemIndex == 1 ? pairItem.BottomItem : pairItem.TopItem;
+                if (targetItem != null)
+                {
+                    targetItem.ImageZoomFactor = scale;
+                    targetItem.ImageOffsetX = offsetX;
+                    targetItem.ImageOffsetY = offsetY;
+                    targetItem.Image = imageUri;
+                }
             }
 
             Debug.WriteLine($"Image saved successfully: {imageUri}");
@@ -628,7 +692,7 @@ public partial class MainPageViewModel : ObservableObject
 
     public async Task ReplaceImageAsync(XamlRoot xamlRoot)
     {
-        if (SelectedProject == null)
+        if (SelectedItem == null)
         {
             return;
         }
@@ -658,19 +722,44 @@ public partial class MainPageViewModel : ObservableObject
 
             var (width, height) = await imageDimensionService.GetImageDimensionsAsync(file.Path);
 
-            string fileName = imageStorageService.GenerateFileName(
-                SelectedProject.Title,
-                SelectedProject.Subtitle
-            );
+            string? title = null;
+            string? subtitle = null;
 
+            if (SelectedItem is ProjectItemViewModel project)
+            {
+                title = project.Title;
+                subtitle = project.Subtitle;
+            }
+            else if (SelectedItem is SomedayMaybePairViewModel pair)
+            {
+                var targetItem = ActiveSomedayMaybeItemIndex == 1 ? pair.BottomItem : pair.TopItem;
+                title = targetItem?.Title;
+                subtitle = targetItem?.Subtitle;
+            }
+
+            string fileName = imageStorageService.GenerateFileName(title, subtitle);
             string imageUri = await imageStorageService.SaveImageAsync(file.Path, fileName + Path.GetExtension(file.Path));
 
             var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
-            SelectedProject.ImageZoomFactor = scale;
-            SelectedProject.ImageOffsetX = offsetX;
-            SelectedProject.ImageOffsetY = offsetY;
-            SelectedProject.Image = imageUri;
+            if (SelectedItem is ProjectItemViewModel projectItem)
+            {
+                projectItem.ImageZoomFactor = scale;
+                projectItem.ImageOffsetX = offsetX;
+                projectItem.ImageOffsetY = offsetY;
+                projectItem.Image = imageUri;
+            }
+            else if (SelectedItem is SomedayMaybePairViewModel pairItem)
+            {
+                var targetItem = ActiveSomedayMaybeItemIndex == 1 ? pairItem.BottomItem : pairItem.TopItem;
+                if (targetItem != null)
+                {
+                    targetItem.ImageZoomFactor = scale;
+                    targetItem.ImageOffsetX = offsetX;
+                    targetItem.ImageOffsetY = offsetY;
+                    targetItem.Image = imageUri;
+                }
+            }
 
             Debug.WriteLine($"Image replaced successfully: {imageUri}");
         }
@@ -707,6 +796,27 @@ public partial class MainPageViewModel : ObservableObject
             project.ImageZoomFactor = scale;
             project.ImageOffsetX = offsetX;
             project.ImageOffsetY = offsetY;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Applies UniformToFill transform to a someday maybe item based on its image URI.
+    /// Used for default background images loaded from ms-appx:// URIs.
+    /// </summary>
+    private async Task ApplyUniformToFillTransformAsync(SomedayMaybeViewModel item, string imageUri)
+    {
+        try
+        {
+            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
+            var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
+
+            item.ImageZoomFactor = scale;
+            item.ImageOffsetX = offsetX;
+            item.ImageOffsetY = offsetY;
         }
         catch (Exception ex)
         {

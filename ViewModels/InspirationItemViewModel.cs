@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using WhiteboardProjectBuilder.Enums;
+using WhiteboardProjectBuilder.Models;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
@@ -18,5 +20,12 @@ public partial class InspirationItemViewModel : WhiteboardItemViewModelBase
     partial void OnImageChanged(string value)
     {
         RaiseDataChanged();
+    }
+
+    public override WhiteboardItemType GetItemType() => WhiteboardItemType.Inspiration;
+
+    public override IWhiteboardItem ToModel()
+    {
+        throw new NotImplementedException("Inspiration items are not yet implemented");
     }
 }

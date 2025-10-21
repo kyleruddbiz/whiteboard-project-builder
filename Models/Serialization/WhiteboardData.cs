@@ -6,5 +6,5 @@ namespace WhiteboardProjectBuilder.Models.Serialization;
 public class WhiteboardData
 {
     public int Version { get; set; } = 1;
-    public List<ProjectItem> Projects { get; set; } = [];
+    public List<IWhiteboardItem> Items { get; set; } = [];
 }

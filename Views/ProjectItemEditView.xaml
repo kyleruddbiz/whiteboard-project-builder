@@ -19,8 +19,7 @@
         Height="800"
         BorderBrush="#005FBA"
         BorderThickness="4">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Padding="16" Spacing="12">
+        <StackPanel Padding="16" Spacing="12">
                 <TextBox
                     x:Name="TitleTextBox"
                     Header="Title"
@@ -65,7 +64,6 @@
                     Date="{x:Bind ViewModel.DueDate, Mode=TwoWay, Converter={StaticResource NullableDateTimeToDateTimeOffsetConverter}}"
                     Header="Due Date"
                     PlaceholderText="Select a date" />
-            </StackPanel>
-        </ScrollViewer>
+        </StackPanel>
     </Border>
 </UserControl>

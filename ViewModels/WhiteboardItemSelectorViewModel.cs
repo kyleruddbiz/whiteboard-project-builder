@@ -18,6 +18,12 @@ public partial class WhiteboardItemSelectorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void SelectSomedayMaybeItem()
+    {
+        ItemTypeSelected?.Invoke(this, WhiteboardItemType.SomedayMaybe);
+    }
+
+    [RelayCommand]
     private void Cancel()
     {
         CancelRequested?.Invoke(this, EventArgs.Empty);

@@ -20,7 +20,7 @@ public class DataPersistenceService
         Converters = { new JsonStringEnumConverter() }
     };
 
-    private const string DataFileName = "project-items.json";
+    private const string DataFileName = "whiteboard-items.json";
 
     /// <summary>
     /// Saves data to JSON file in LocalFolder.
@@ -76,31 +76,45 @@ public class DataPersistenceService
     }
 
     /// <summary>
-    /// Saves projects to JSON file in LocalFolder.
+    /// Saves whiteboard items to JSON file in LocalFolder.
     /// </summary>
-    public async Task SaveProjectsAsync(IEnumerable<ProjectItemViewModel> projects)
+    public async Task SaveWhiteboardItemsAsync(IEnumerable<WhiteboardItemViewModelBase> items)
     {
         var data = new WhiteboardData
         {
             Version = 1,
-            Projects = projects.Select(vm => vm.ToModel()).ToList()
+            Items = items.Select(vm => vm.ToModel()).ToList()
         };
 
         await SaveAsync(data, DataFileName);
     }
 
     /// <summary>
-    /// Loads projects from JSON file. Returns empty collection if no file exists.
+    /// Loads whiteboard items from JSON file. Returns empty collection if no file exists.
     /// </summary>
-    public async Task<IEnumerable<ProjectItemViewModel>> LoadProjectsAsync()
+    public async Task<IEnumerable<WhiteboardItemViewModelBase>> LoadWhiteboardItemsAsync()
     {
         var data = await LoadAsync<WhiteboardData>(DataFileName);
 
-        if (data?.Projects == null)
+        if (data?.Items == null)
         {
             return [];
         }
 
-        return data.Projects.Select(m => ProjectItemViewModel.FromModel(m)).ToList();
+        var viewModels = new List<WhiteboardItemViewModelBase>();
+
+        foreach (var item in data.Items)
+        {
+            WhiteboardItemViewModelBase viewModel = item switch
+            {
+                ProjectItem project => ProjectItemViewModel.FromModel(project),
+                SomedayMaybePair pair => SomedayMaybePairViewModel.FromModel(pair),
+                _ => throw new NotSupportedException($"Unsupported whiteboard item type: {item.GetType().Name}")
+            };
+
+            viewModels.Add(viewModel);
+        }
+
+        return viewModels;
     }
 }

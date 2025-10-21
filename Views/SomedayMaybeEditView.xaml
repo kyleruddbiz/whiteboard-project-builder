@@ -1,0 +1,35 @@
+<UserControl
+    x:Class="WhiteboardProjectBuilder.Views.SomedayMaybeEditView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:WhiteboardProjectBuilder.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:SomedayMaybeViewModel}"
+    mc:Ignorable="d">
+
+    <StackPanel Padding="16" Spacing="12">
+        <TextBox
+            Header="Title"
+            PlaceholderText="Someday Maybe"
+            Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBox
+            Header="Subtitle"
+            PlaceholderText="Add Details"
+            Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <StackPanel Spacing="8">
+            <TextBlock FontWeight="SemiBold" Text="Image" />
+            <local:ImageEditor
+                Width="420"
+                Height="240"
+                ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
+                ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
+                OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
+                OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=TwoWay}"
+                ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=TwoWay}" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>
