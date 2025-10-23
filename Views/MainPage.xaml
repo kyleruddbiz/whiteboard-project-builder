@@ -15,7 +15,8 @@
     <Page.KeyboardAccelerators>
         <KeyboardAccelerator
             Key="V"
-            Invoked="PasteAccelerator_Invoked"
+            behaviors:KeyboardAcceleratorCommandBehavior.Command="{x:Bind ViewModel.PasteImageCommand}"
+            behaviors:KeyboardAcceleratorCommandBehavior.CommandParameter="{x:Bind XamlRoot}"
             Modifiers="Control" />
         <KeyboardAccelerator
             Key="P"

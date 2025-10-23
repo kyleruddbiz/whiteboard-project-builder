@@ -12,11 +12,24 @@ public static class KeyboardAcceleratorCommandBehavior
             typeof(KeyboardAcceleratorCommandBehavior),
             new PropertyMetadata(null, OnCommandChanged));
 
+    public static readonly DependencyProperty CommandParameterProperty =
+        DependencyProperty.RegisterAttached(
+            "CommandParameter",
+            typeof(object),
+            typeof(KeyboardAcceleratorCommandBehavior),
+            new PropertyMetadata(null));
+
     public static void SetCommand(DependencyObject dependencyObject, ICommand value)
         => dependencyObject.SetValue(CommandProperty, value);
 
     public static ICommand GetCommand(DependencyObject dependencyObject)
         => (ICommand)dependencyObject.GetValue(CommandProperty);
+
+    public static void SetCommandParameter(DependencyObject dependencyObject, object? value)
+        => dependencyObject.SetValue(CommandParameterProperty, value);
+
+    public static object? GetCommandParameter(DependencyObject dependencyObject)
+        => dependencyObject.GetValue(CommandParameterProperty);
 
     private static void OnCommandChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
     {
@@ -34,9 +47,10 @@ public static class KeyboardAcceleratorCommandBehavior
     private static void OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         var command = GetCommand(sender);
-        if (command?.CanExecute(null) == true)
+        var parameter = GetCommandParameter(sender);
+        if (command?.CanExecute(parameter) == true)
         {
-            command.Execute(null);
+            command.Execute(parameter);
             args.Handled = true;
         }
     }

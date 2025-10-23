@@ -8,6 +8,7 @@ using Microsoft.UI.Dispatching;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 
@@ -114,6 +115,18 @@ public partial class MainPageViewModel : ObservableObject
         {
             Debug.WriteLine($"Failed to open images folder: {ex.Message}");
         }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanPasteImage))]
+    private async Task PasteImageAsync(XamlRoot xamlRoot)
+    {
+        await PasteImageFromClipboardAsync(xamlRoot);
+    }
+
+    private bool CanPasteImage(XamlRoot? xamlRoot)
+    {
+        var dataPackageView = Clipboard.GetContent();
+        return dataPackageView.Contains(StandardDataFormats.Bitmap);
     }
 
     private void WhiteboardItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

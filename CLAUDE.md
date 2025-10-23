@@ -156,6 +156,7 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 - Use spaces (not commas) to separate values in Margin and Padding attributes (e.g., `Margin="10 20 10 20"` not `Margin="10,20,10,20"`)
 - **Image binding in WinUI 3** - Always use `StringToImageSourceConverter` when binding string paths to Image.Source properties. WinUI 3 requires proper `ms-appx:///` URI scheme for packaged assets. Example: `Source="{x:Bind ViewModel.ImagePath, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"`
 - **Conditional visibility** - Always use `x:Load` instead of `Visibility` for conditional element rendering. Elements using `x:Load` MUST have an `x:Name` attribute. Example: `<Button x:Name="MyButton" x:Load="{x:Bind ViewModel.IsVisible, Mode=OneWay}" />`
+- **Keyboard accelerators** - Always use `KeyboardAcceleratorCommandBehavior` instead of `Invoked` event handlers. This follows the MVVM pattern by binding commands from ViewModels. The behavior supports both `Command` and optional `CommandParameter` properties. Example: `<KeyboardAccelerator Key="V" Modifiers="Control" behaviors:KeyboardAcceleratorCommandBehavior.Command="{x:Bind ViewModel.PasteImageCommand}" behaviors:KeyboardAcceleratorCommandBehavior.CommandParameter="{x:Bind XamlRoot}" />`
 
 ### Development Workflow
 - Always run `dotnet build` after implementation to verify changes

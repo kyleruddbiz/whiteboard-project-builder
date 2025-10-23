@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
 using WhiteboardProjectBuilder.ViewModels;
-using Windows.ApplicationModel.DataTransfer;
 
 namespace WhiteboardProjectBuilder.Views;
 
@@ -85,19 +84,6 @@ public partial class MainPage : Page
         {
             ViewModel.SelectedItem = null;
         }
-    }
-
-    private async void PasteAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
-    {
-        var dataPackageView = Clipboard.GetContent();
-        if (!dataPackageView.Contains(StandardDataFormats.Bitmap))
-        {
-            args.Handled = false;
-            return;
-        }
-
-        args.Handled = true;
-        await ViewModel.PasteImageFromClipboardAsync(XamlRoot);
     }
 
     private void ProjectItemView_EditRequested(object? sender, ProjectItemViewModel e)
