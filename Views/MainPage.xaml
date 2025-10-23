@@ -26,9 +26,7 @@
                         Height="800"
                         Margin="10"
                         Padding="0"
-                        Background="#FBFCFD"
-                        BorderBrush="Black"
-                        BorderThickness="2"
+                        Background="#FDFCFB"
                         Command="{Binding ViewModel.AddItemCommand, ElementName=PageRoot}">
                         <FontIcon FontSize="120" Glyph="&#xE710;" />
                     </Button>
@@ -68,10 +66,10 @@
                     <Grid>
                         <local:SomedayMaybePairView
                             Margin="10"
-                            ViewModel="{x:Bind SomedayMaybePair}"
                             EditRequested="SomedayMaybePairView_EditRequested"
                             ImageReplaceRequested="SomedayMaybePairView_ImageReplaceRequested"
-                            ReactivateRequested="SomedayMaybePairView_ReactivateRequested" />
+                            ReactivateRequested="SomedayMaybePairView_ReactivateRequested"
+                            ViewModel="{x:Bind SomedayMaybePair}" />
                         <Button
                             Width="50"
                             Height="50"
