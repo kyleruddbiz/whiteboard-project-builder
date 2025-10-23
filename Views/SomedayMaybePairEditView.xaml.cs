@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml.Input;
 using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;
@@ -33,14 +32,5 @@ public sealed partial class SomedayMaybePairEditView : UserControl
     private void BottomItemEditor_ImageReplaceRequested(object sender, EventArgs e)
     {
         ImageReplaceRequested?.Invoke(this, 1); // 1 = Bottom item
-    }
-
-    private void EscapeAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
-    {
-        if (ViewModel != null)
-        {
-            ViewModel.IsEditing = false;
-        }
-        args.Handled = true;
     }
 }

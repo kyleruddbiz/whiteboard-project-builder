@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 
@@ -27,6 +28,15 @@ public abstract partial class WhiteboardItemViewModelBase : ObservableObject
     partial void OnIsArchivedChanged(bool value)
     {
         RaiseDataChanged();
+    }
+
+    [RelayCommand]
+    private void CancelEditing()
+    {
+        if (IsEditing)
+        {
+            IsEditing = false;
+        }
     }
 
     /// <summary>

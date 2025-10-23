@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml.Input;
 using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;
@@ -44,15 +43,6 @@ public sealed partial class ProjectItemEditView : UserControl
         else
         {
             MainImageEditor.SetFocus();
-        }
-    }
-
-    private void EscapeAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
-    {
-        if (ViewModel?.IsEditing == true)
-        {
-            ViewModel.IsEditing = false;
-            args.Handled = true;
         }
     }
 
