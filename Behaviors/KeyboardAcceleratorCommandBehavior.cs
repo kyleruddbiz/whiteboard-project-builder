@@ -47,7 +47,7 @@ public static class KeyboardAcceleratorCommandBehavior
     private static void OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         var command = GetCommand(sender);
-        var parameter = GetCommandParameter(sender);
+        object? parameter = GetCommandParameter(sender);
         if (command?.CanExecute(parameter) == true)
         {
             command.Execute(parameter);
