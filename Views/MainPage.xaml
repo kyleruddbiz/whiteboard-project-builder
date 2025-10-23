@@ -26,7 +26,7 @@
                         Height="800"
                         Margin="10"
                         Padding="0"
-                        Background="#FDFCFB"
+                        Background="{StaticResource OffWhiteBrush}"
                         Command="{Binding ViewModel.AddItemCommand, ElementName=PageRoot}">
                         <FontIcon FontSize="120" Glyph="&#xE710;" />
                     </Button>

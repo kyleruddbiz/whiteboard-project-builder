@@ -22,9 +22,11 @@
 
             <Color x:Key="Primary">#512BD4</Color>
             <Color x:Key="MainAccentColor">#00B0F0</Color>
+            <Color x:Key="OffWhiteColor">#FDFCFB</Color>
 
             <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}" />
             <SolidColorBrush x:Key="MainAccentBrush" Color="{StaticResource MainAccentColor}" />
+            <SolidColorBrush x:Key="OffWhiteBrush" Color="{StaticResource OffWhiteColor}" />
             <SolidColorBrush x:Key="WhiteBrush" Color="White" />
             <SolidColorBrush x:Key="BlackBrush" Color="Black" />
 
