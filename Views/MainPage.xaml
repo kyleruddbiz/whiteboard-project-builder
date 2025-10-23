@@ -2,6 +2,7 @@
     x:Class="WhiteboardProjectBuilder.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:WhiteboardProjectBuilder.Behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,6 +16,10 @@
         <KeyboardAccelerator
             Key="V"
             Invoked="PasteAccelerator_Invoked"
+            Modifiers="Control" />
+        <KeyboardAccelerator
+            Key="P"
+            behaviors:KeyboardAcceleratorCommandBehavior.Command="{x:Bind ViewModel.PrintWhiteboardItemsCommand}"
             Modifiers="Control" />
     </Page.KeyboardAccelerators>
     <Page.Resources>
