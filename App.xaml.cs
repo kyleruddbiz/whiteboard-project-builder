@@ -1,5 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Navigation;
+using WhiteboardProjectBuilder.Services;
+using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder;
 
@@ -13,12 +16,49 @@ public partial class App : Application
     public static Window? MainWindow { get; private set; }
 
     /// <summary>
+    /// Gets the service provider for dependency injection.
+    /// </summary>
+    public static IServiceProvider Services { get; private set; } = null!;
+
+    /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
     /// </summary>
     public App()
     {
+        Services = ConfigureServices();
         InitializeComponent();
+    }
+
+    /// <summary>
+    /// Configures and builds the service provider for dependency injection.
+    /// </summary>
+    private static IServiceProvider ConfigureServices()
+    {
+        var services = new ServiceCollection();
+
+        // Stateless services (no dependencies)
+        services.AddSingleton<DataPersistenceService>();
+        services.AddSingleton<ImageTransformService>();
+        services.AddSingleton<ImageDimensionService>();
+
+        // Services with dependencies
+        services.AddSingleton<SettingsService>();
+        services.AddSingleton<ImageStorageService>();
+        services.AddSingleton<WhiteboardItemRepository>();
+        services.AddSingleton<PrintService>();
+
+        // ViewModels - Singleton
+        services.AddSingleton<MainPageViewModel>();
+
+        // ViewModels - Transient (created on demand)
+        services.AddTransient<WhiteboardItemSelectorViewModel>();
+        services.AddTransient<ProjectItemViewModel>();
+        services.AddTransient<SomedayMaybePairViewModel>();
+        services.AddTransient<SomedayMaybeViewModel>();
+        services.AddTransient<SettingsViewModel>();
+
+        return services.BuildServiceProvider();
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
@@ -30,28 +31,8 @@ public partial class MainPage : Page
 
     public MainPage()
     {
-        printService = new PrintService();
-
-        var imageTransformService = new ImageTransformService();
-        var imageDimensionService = new ImageDimensionService();
-        var dataPersistenceService = new DataPersistenceService();
-
-        var settingsService = new SettingsService(dataPersistenceService);
-        var imageStorageService = new ImageStorageService(settingsService);
-
-        var whiteboardItemRepository = new WhiteboardItemRepository(
-            dataPersistenceService,
-            imageStorageService,
-            imageTransformService,
-            imageDimensionService);
-
-        ViewModel = new MainPageViewModel(
-            printService,
-            whiteboardItemRepository,
-            settingsService,
-            imageStorageService,
-            imageTransformService,
-            imageDimensionService);
+        ViewModel = App.Services.GetRequiredService<MainPageViewModel>();
+        printService = App.Services.GetRequiredService<PrintService>();
 
         InitializeComponent();
 

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
@@ -22,6 +23,7 @@ public partial class MainPageViewModel : ObservableObject
     private readonly ImageStorageService imageStorageService;
     private readonly ImageTransformService imageTransformService;
     private readonly ImageDimensionService imageDimensionService;
+    private readonly IServiceProvider serviceProvider;
     private CancellationTokenSource? saveCts;
     private CancellationTokenSource? settingsSaveCts;
     private bool archivedItemsLoaded;
@@ -49,7 +51,7 @@ public partial class MainPageViewModel : ObservableObject
     public ObservableCollection<WhiteboardItemViewModelBase> WhiteboardItems { get; }
     public ObservableCollection<GridItemWrapper> GridItems { get; }
 
-    public MainPageViewModel(PrintService printService, WhiteboardItemRepository whiteboardItemRepository, SettingsService settingsService, ImageStorageService imageStorageService, ImageTransformService imageTransformService, ImageDimensionService imageDimensionService)
+    public MainPageViewModel(PrintService printService, WhiteboardItemRepository whiteboardItemRepository, SettingsService settingsService, ImageStorageService imageStorageService, ImageTransformService imageTransformService, ImageDimensionService imageDimensionService, IServiceProvider serviceProvider)
     {
         this.printService = printService;
         this.whiteboardItemRepository = whiteboardItemRepository;
@@ -57,8 +59,9 @@ public partial class MainPageViewModel : ObservableObject
         this.imageStorageService = imageStorageService;
         this.imageTransformService = imageTransformService;
         this.imageDimensionService = imageDimensionService;
+        this.serviceProvider = serviceProvider;
 
-        Settings = new SettingsViewModel();
+        Settings = serviceProvider.GetRequiredService<SettingsViewModel>();
 
         WhiteboardItems = [];
         GridItems = [];
@@ -412,7 +415,7 @@ public partial class MainPageViewModel : ObservableObject
     {
         ExitEditMode();
 
-        var selectorViewModel = new WhiteboardItemSelectorViewModel();
+        var selectorViewModel = serviceProvider.GetRequiredService<WhiteboardItemSelectorViewModel>();
 
         selectorViewModel.ItemTypeSelected += OnSelectorItemTypeSelected;
         selectorViewModel.CancelRequested += OnSelectorCancelRequested;
@@ -475,13 +478,11 @@ public partial class MainPageViewModel : ObservableObject
     {
         string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
-        var newProject = new ProjectItemViewModel
-        {
-            Image = imagePath,
-            Size = ProjectSize.Medium,
-            Value = ProjectValue.Good,
-            DueDate = null
-        };
+        var newProject = serviceProvider.GetRequiredService<ProjectItemViewModel>();
+        newProject.Image = imagePath;
+        newProject.Size = ProjectSize.Medium;
+        newProject.Value = ProjectValue.Good;
+        newProject.DueDate = null;
 
         await ApplyUniformToFillTransformAsync(newProject, imagePath);
 
@@ -501,19 +502,15 @@ public partial class MainPageViewModel : ObservableObject
     {
         string topImagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
-        var topItem = new SomedayMaybeViewModel
-        {
-            Image = topImagePath,
-            CreatedDate = DateTime.Today
-        };
+        var topItem = serviceProvider.GetRequiredService<SomedayMaybeViewModel>();
+        topItem.Image = topImagePath;
+        topItem.CreatedDate = DateTime.Today;
 
         await ApplyUniformToFillTransformAsync(topItem, topImagePath);
 
-        var newPair = new SomedayMaybePairViewModel(imageStorageService, imageTransformService, imageDimensionService)
-        {
-            TopItem = topItem,
-            BottomItem = null
-        };
+        var newPair = serviceProvider.GetRequiredService<SomedayMaybePairViewModel>();
+        newPair.TopItem = topItem;
+        newPair.BottomItem = null;
 
         if (wrapper.Selector != null)
         {

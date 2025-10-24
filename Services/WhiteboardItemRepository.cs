@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Models.Serialization;
 using WhiteboardProjectBuilder.ViewModels;
@@ -11,20 +12,14 @@ public class WhiteboardItemRepository
 {
     private const string DataFileName = "whiteboard-items.json";
     private readonly DataPersistenceService dataPersistenceService;
-    private readonly ImageStorageService imageStorageService;
-    private readonly ImageTransformService imageTransformService;
-    private readonly ImageDimensionService imageDimensionService;
+    private readonly IServiceProvider serviceProvider;
 
     public WhiteboardItemRepository(
         DataPersistenceService dataPersistenceService,
-        ImageStorageService imageStorageService,
-        ImageTransformService imageTransformService,
-        ImageDimensionService imageDimensionService)
+        IServiceProvider serviceProvider)
     {
         this.dataPersistenceService = dataPersistenceService;
-        this.imageStorageService = imageStorageService;
-        this.imageTransformService = imageTransformService;
-        this.imageDimensionService = imageDimensionService;
+        this.serviceProvider = serviceProvider;
     }
 
     public async Task SaveWhiteboardItemsAsync(IEnumerable<WhiteboardItemViewModelBase> items)
@@ -66,7 +61,7 @@ public class WhiteboardItemRepository
 
     private SomedayMaybePairViewModel CreateSomedayMaybePairViewModel(SomedayMaybePair model)
     {
-        var viewModel = new SomedayMaybePairViewModel(imageStorageService, imageTransformService, imageDimensionService);
+        var viewModel = serviceProvider.GetRequiredService<SomedayMaybePairViewModel>();
         viewModel.LoadFromModel(model);
         return viewModel;
     }
