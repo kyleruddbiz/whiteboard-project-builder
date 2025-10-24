@@ -2,16 +2,28 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
+using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
 public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
 {
+    private readonly ImageStorageService imageStorageService;
+    private readonly ImageTransformService imageTransformService;
+    private readonly ImageDimensionService imageDimensionService;
+
     [ObservableProperty]
     private SomedayMaybeViewModel topItem = null!;
 
     [ObservableProperty]
     private SomedayMaybeViewModel? bottomItem;
+
+    public SomedayMaybePairViewModel(ImageStorageService imageStorageService, ImageTransformService imageTransformService, ImageDimensionService imageDimensionService)
+    {
+        this.imageStorageService = imageStorageService;
+        this.imageTransformService = imageTransformService;
+        this.imageDimensionService = imageDimensionService;
+    }
 
     public bool HasBottomItem => BottomItem != null;
     public bool ShowAddBottomButton => !HasBottomItem && IsEditing;
@@ -56,14 +68,19 @@ public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
     }
 
     [RelayCommand]
-    private void AddBottomItem()
+    private async Task AddBottomItemAsync()
     {
         if (BottomItem == null)
         {
+            string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
+
             BottomItem = new SomedayMaybeViewModel
             {
+                Image = imagePath,
                 CreatedDate = DateTime.Today
             };
+
+            await ApplyUniformToFillTransformAsync(BottomItem, imagePath);
         }
     }
 
@@ -71,6 +88,27 @@ public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
     private void RemoveBottomItem()
     {
         BottomItem = null;
+    }
+
+    /// <summary>
+    /// Applies UniformToFill transform to a someday maybe item based on its image URI.
+    /// Used for default background images loaded from ms-appx:// URIs.
+    /// </summary>
+    private async Task ApplyUniformToFillTransformAsync(SomedayMaybeViewModel item, string imageUri)
+    {
+        try
+        {
+            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
+            var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
+
+            item.ImageZoomFactor = scale;
+            item.ImageOffsetX = offsetX;
+            item.ImageOffsetY = offsetY;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -93,23 +131,13 @@ public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
     }
 
     /// <summary>
-    /// Creates a ViewModel from a Model.
+    /// Populates this ViewModel from a Model.
     /// </summary>
-    public static SomedayMaybePairViewModel FromModel(IWhiteboardItem item)
+    public void LoadFromModel(SomedayMaybePair model)
     {
-        if (item is not SomedayMaybePair model)
-        {
-            throw new ArgumentException($"Expected SomedayMaybePair but got {item.GetType().Name}", nameof(item));
-        }
-
-        var viewModel = new SomedayMaybePairViewModel
-        {
-            TopItem = SomedayMaybeViewModel.FromModel(model.TopItem),
-            BottomItem = model.BottomItem != null ? SomedayMaybeViewModel.FromModel(model.BottomItem) : null,
-            CreatedDate = model.CreatedDate,
-            IsArchived = model.IsArchived
-        };
-
-        return viewModel;
+        TopItem = SomedayMaybeViewModel.FromModel(model.TopItem);
+        BottomItem = model.BottomItem != null ? SomedayMaybeViewModel.FromModel(model.BottomItem) : null;
+        CreatedDate = model.CreatedDate;
+        IsArchived = model.IsArchived;
     }
 }

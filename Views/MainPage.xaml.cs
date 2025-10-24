@@ -9,17 +9,34 @@ namespace WhiteboardProjectBuilder.Views;
 public partial class MainPage : Page
 {
     private readonly PrintService printService;
-    private readonly DataPersistenceService dataPersistenceService;
-    private readonly SettingsService settingsService;
 
     public MainPageViewModel ViewModel { get; }
 
     public MainPage()
     {
         printService = new PrintService();
-        dataPersistenceService = new DataPersistenceService();
-        settingsService = new SettingsService(dataPersistenceService);
-        ViewModel = new MainPageViewModel(printService, dataPersistenceService, settingsService);
+
+        var imageTransformService = new ImageTransformService();
+        var imageDimensionService = new ImageDimensionService();
+        var dataPersistenceService = new DataPersistenceService();
+
+        var settingsService = new SettingsService(dataPersistenceService);
+        var imageStorageService = new ImageStorageService(settingsService);
+
+        var whiteboardItemRepository = new WhiteboardItemRepository(
+            dataPersistenceService,
+            imageStorageService,
+            imageTransformService,
+            imageDimensionService);
+
+        ViewModel = new MainPageViewModel(
+            printService,
+            whiteboardItemRepository,
+            settingsService,
+            imageStorageService,
+            imageTransformService,
+            imageDimensionService);
+
         InitializeComponent();
 
         if (App.MainWindow != null)

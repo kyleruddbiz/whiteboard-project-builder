@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
@@ -7,11 +8,18 @@ using Windows.Storage.Streams;
 namespace WhiteboardProjectBuilder.Services;
 
 /// <summary>
-/// Manages storage of user-selected images in LocalFolder.
+/// Manages storage of user-selected images in LocalFolder and provides default example images.
 /// </summary>
 public class ImageStorageService
 {
     private const string ImagesFolderName = "Images";
+    private readonly SettingsService settingsService;
+    private List<string>? exampleImagePaths;
+
+    public ImageStorageService(SettingsService settingsService)
+    {
+        this.settingsService = settingsService;
+    }
 
     /// <summary>
     /// Ensures the images folder exists in LocalFolder.
@@ -211,5 +219,72 @@ public class ImageStorageService
         await EnsureImagesFolderExistsAsync();
         var imagesFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(ImagesFolderName);
         return imagesFolder.Path;
+    }
+
+    /// <summary>
+    /// Gets a random default image path from the example images collection.
+    /// </summary>
+    /// <returns>Relative path to a random example image</returns>
+    /// <exception cref="InvalidOperationException">Thrown when no example images are available</exception>
+    public async Task<string> GetRandomDefaultImagePathAsync()
+    {
+        exampleImagePaths ??= await LoadExampleImagePathsAsync();
+
+        if (exampleImagePaths.Count == 0)
+        {
+            throw new InvalidOperationException("No example images available for default image selection.");
+        }
+
+        var random = new Random();
+        int randomIndex = random.Next(exampleImagePaths.Count);
+        return exampleImagePaths[randomIndex];
+    }
+
+    /// <summary>
+    /// Reloads example image paths from disk. Call this when developer mode setting changes.
+    /// </summary>
+    public void ReloadExampleImagePaths()
+    {
+        exampleImagePaths = null;
+    }
+
+    /// <summary>
+    /// Loads example image paths from the appropriate folder based on developer mode setting.
+    /// </summary>
+    private async Task<List<string>> LoadExampleImagePathsAsync()
+    {
+        var paths = new List<string>();
+
+        try
+        {
+            var settings = await settingsService.LoadSettingsAsync();
+            string folderName = settings.IsDeveloperMode ? "ExamplesAlt" : "Examples";
+            string examplesPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Backgrounds", folderName);
+
+            if (Directory.Exists(examplesPath))
+            {
+                var imageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png" };
+
+                foreach (string filePath in Directory.GetFiles(examplesPath))
+                {
+                    if (imageExtensions.Contains(Path.GetExtension(filePath)))
+                    {
+                        string relativePath = $"Assets/Backgrounds/{folderName}/{Path.GetFileName(filePath)}";
+                        paths.Add(relativePath);
+                    }
+                }
+            }
+
+            if (paths.Count == 0)
+            {
+                Debug.WriteLine($"Warning: No example images found in Assets/Backgrounds/{folderName}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to load example image paths: {ex.Message}");
+        }
+
+        return paths;
     }
 }

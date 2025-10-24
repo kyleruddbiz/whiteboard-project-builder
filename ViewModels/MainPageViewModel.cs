@@ -17,7 +17,7 @@ namespace WhiteboardProjectBuilder.ViewModels;
 public partial class MainPageViewModel : ObservableObject
 {
     private readonly PrintService printService;
-    private readonly DataPersistenceService dataPersistenceService;
+    private readonly WhiteboardItemRepository whiteboardItemRepository;
     private readonly SettingsService settingsService;
     private readonly ImageStorageService imageStorageService;
     private readonly ImageTransformService imageTransformService;
@@ -26,7 +26,6 @@ public partial class MainPageViewModel : ObservableObject
     private CancellationTokenSource? settingsSaveCts;
 
     private const int AutoSaveDelayMs = 2000;
-    private readonly List<string> exampleImagePaths = [];
 
     [ObservableProperty]
     private bool isSaving;
@@ -46,14 +45,14 @@ public partial class MainPageViewModel : ObservableObject
     public ObservableCollection<WhiteboardItemViewModelBase> WhiteboardItems { get; }
     public ObservableCollection<GridItemWrapper> GridItems { get; }
 
-    public MainPageViewModel(PrintService printService, DataPersistenceService dataPersistenceService, SettingsService settingsService)
+    public MainPageViewModel(PrintService printService, WhiteboardItemRepository whiteboardItemRepository, SettingsService settingsService, ImageStorageService imageStorageService, ImageTransformService imageTransformService, ImageDimensionService imageDimensionService)
     {
         this.printService = printService;
-        this.dataPersistenceService = dataPersistenceService;
+        this.whiteboardItemRepository = whiteboardItemRepository;
         this.settingsService = settingsService;
-        imageStorageService = new ImageStorageService();
-        imageTransformService = new ImageTransformService();
-        imageDimensionService = new ImageDimensionService();
+        this.imageStorageService = imageStorageService;
+        this.imageTransformService = imageTransformService;
+        this.imageDimensionService = imageDimensionService;
 
         Settings = new SettingsViewModel();
 
@@ -92,7 +91,7 @@ public partial class MainPageViewModel : ObservableObject
     {
         if (e.PropertyName == nameof(SettingsViewModel.IsDeveloperMode))
         {
-            LoadExampleImagePaths();
+            imageStorageService.ReloadExampleImagePaths();
         }
     }
 
@@ -323,7 +322,7 @@ public partial class MainPageViewModel : ObservableObject
 
         try
         {
-            await dataPersistenceService.SaveWhiteboardItemsAsync(WhiteboardItems);
+            await whiteboardItemRepository.SaveWhiteboardItemsAsync(WhiteboardItems);
 
             dispatcherQueue.TryEnqueue(() =>
             {
@@ -351,9 +350,7 @@ public partial class MainPageViewModel : ObservableObject
             var loadedSettings = await settingsService.LoadSettingsAsync();
             Settings = SettingsViewModel.FromModel(loadedSettings);
 
-            LoadExampleImagePaths();
-
-            var loadedItems = await dataPersistenceService.LoadWhiteboardItemsAsync();
+            var loadedItems = await whiteboardItemRepository.LoadWhiteboardItemsAsync();
 
             foreach (var item in loadedItems)
             {
@@ -481,14 +478,7 @@ public partial class MainPageViewModel : ObservableObject
 
     private async Task CreateProjectItemAsync(GridItemWrapper wrapper)
     {
-        if (exampleImagePaths.Count == 0)
-        {
-            throw new InvalidOperationException("No example images available. Failed to load images from Assets/Backgrounds/Examples directory.");
-        }
-
-        var random = new Random();
-        int randomIndex = random.Next(exampleImagePaths.Count);
-        string imagePath = exampleImagePaths[randomIndex];
+        string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
         var newProject = new ProjectItemViewModel
         {
@@ -514,14 +504,7 @@ public partial class MainPageViewModel : ObservableObject
 
     private async Task CreateSomedayMaybePairAsync(GridItemWrapper wrapper)
     {
-        if (exampleImagePaths.Count == 0)
-        {
-            throw new InvalidOperationException("No example images available. Failed to load images from Assets/Backgrounds/Examples directory.");
-        }
-
-        var random = new Random();
-        int topIndex = random.Next(exampleImagePaths.Count);
-        string topImagePath = exampleImagePaths[topIndex];
+        string topImagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
         var topItem = new SomedayMaybeViewModel
         {
@@ -531,7 +514,7 @@ public partial class MainPageViewModel : ObservableObject
 
         await ApplyUniformToFillTransformAsync(topItem, topImagePath);
 
-        var newPair = new SomedayMaybePairViewModel
+        var newPair = new SomedayMaybePairViewModel(imageStorageService, imageTransformService, imageDimensionService)
         {
             TopItem = topItem,
             BottomItem = null
@@ -837,40 +820,4 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Loads all example background image paths from the Assets/Backgrounds/Examples or ExamplesAlt directory.
-    /// </summary>
-    private void LoadExampleImagePaths()
-    {
-        try
-        {
-            string folderName = Settings.IsDeveloperMode ? "ExamplesAlt" : "Examples";
-            string examplesPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Backgrounds", folderName);
-
-            exampleImagePaths.Clear();
-
-            if (Directory.Exists(examplesPath))
-            {
-                var imageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png" };
-
-                foreach (string filePath in Directory.GetFiles(examplesPath))
-                {
-                    if (imageExtensions.Contains(Path.GetExtension(filePath)))
-                    {
-                        string relativePath = $"Assets/Backgrounds/{folderName}/{Path.GetFileName(filePath)}";
-                        exampleImagePaths.Add(relativePath);
-                    }
-                }
-            }
-
-            if (exampleImagePaths.Count == 0)
-            {
-                Debug.WriteLine($"Warning: No example images found in Assets/Backgrounds/{folderName}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Failed to load example image paths: {ex.Message}");
-        }
-    }
 }
