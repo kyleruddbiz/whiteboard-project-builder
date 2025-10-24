@@ -139,6 +139,16 @@
                     SelectionMode="Single" />
             </ScrollViewer>
 
+            <ProgressRing
+                x:Name="LoadingIndicator"
+                x:Load="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                Grid.Row="1"
+                Width="60"
+                Height="60"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsActive="True" />
+
             <Canvas
                 x:Name="PrintCanvas"
                 Margin="-2000 0 0 0"

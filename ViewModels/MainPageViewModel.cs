@@ -24,11 +24,15 @@ public partial class MainPageViewModel : ObservableObject
     private readonly ImageDimensionService imageDimensionService;
     private CancellationTokenSource? saveCts;
     private CancellationTokenSource? settingsSaveCts;
+    private bool archivedItemsLoaded;
 
     private const int AutoSaveDelayMs = 2000;
 
     [ObservableProperty]
     private bool isSaving;
+
+    [ObservableProperty]
+    private bool isLoading;
 
     [ObservableProperty]
     private DateTime? lastSaved;
@@ -292,9 +296,6 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Debounced autosave - waits for user to stop making changes before saving.
-    /// </summary>
     private async Task TriggerAutoSaveAsync()
     {
         saveCts?.Cancel();
@@ -307,13 +308,9 @@ public partial class MainPageViewModel : ObservableObject
         }
         catch (TaskCanceledException)
         {
-            // Expected on debounce
         }
     }
 
-    /// <summary>
-    /// Saves whiteboard items to JSON file.
-    /// </summary>
     private async Task SaveDataAsync()
     {
         var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
@@ -340,11 +337,10 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Loads whiteboard items and settings from JSON files on startup.
-    /// </summary>
     private async Task LoadDataAsync()
     {
+        IsLoading = true;
+
         try
         {
             var loadedSettings = await settingsService.LoadSettingsAsync();
@@ -354,12 +350,21 @@ public partial class MainPageViewModel : ObservableObject
 
             foreach (var item in loadedItems)
             {
-                WhiteboardItems.Add(item);
+                if (Settings.ShowArchived || !item.IsArchived)
+                {
+                    WhiteboardItems.Add(item);
+                }
             }
+
+            archivedItemsLoaded = Settings.ShowArchived;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Load failed: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
 
@@ -368,9 +373,6 @@ public partial class MainPageViewModel : ObservableObject
         _ = TriggerSettingsAutoSaveAsync();
     }
 
-    /// <summary>
-    /// Debounced autosave for settings - waits for user to stop making changes before saving.
-    /// </summary>
     private async Task TriggerSettingsAutoSaveAsync()
     {
         settingsSaveCts?.Cancel();
@@ -383,13 +385,9 @@ public partial class MainPageViewModel : ObservableObject
         }
         catch (TaskCanceledException)
         {
-            // Expected on debounce
         }
     }
 
-    /// <summary>
-    /// Saves settings to JSON file.
-    /// </summary>
     private async Task SaveSettingsAsync()
     {
         try
@@ -402,9 +400,6 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Forces immediate save, bypassing debounce. Used on app suspend.
-    /// </summary>
     public async Task ForceSaveAsync()
     {
         saveCts?.Cancel();
@@ -550,10 +545,52 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ToggleShowArchived()
+    private async Task ToggleShowArchivedAsync()
     {
         Settings.ShowArchived = !Settings.ShowArchived;
+
+        if (Settings.ShowArchived && !archivedItemsLoaded)
+        {
+            await LoadArchivedItemsAsync();
+        }
+
         RebuildGridItems();
+    }
+
+    private async Task LoadArchivedItemsAsync()
+    {
+        IsLoading = true;
+
+        try
+        {
+            var loadedItems = await whiteboardItemRepository.LoadWhiteboardItemsAsync();
+            var allItems = loadedItems.ToList();
+
+            int currentCount = WhiteboardItems.Count;
+            int loadedCount = allItems.Count;
+
+            if (currentCount >= loadedCount)
+            {
+                return;
+            }
+
+            var archivedItems = allItems.Where(i => i.IsArchived);
+
+            foreach (var item in archivedItems)
+            {
+                WhiteboardItems.Add(item);
+            }
+
+            archivedItemsLoaded = true;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to load archived items: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     [RelayCommand]
@@ -573,7 +610,6 @@ public partial class MainPageViewModel : ObservableObject
 
         if (item.IsArchived)
         {
-            // Permanently delete
             WhiteboardItems.Remove(item);
         }
         else
@@ -610,7 +646,7 @@ public partial class MainPageViewModel : ObservableObject
 
         SelectedItem = item;
         item.IsEditing = true;
-        ActiveSomedayMaybeItemIndex = null; // Reset when entering edit mode
+        ActiveSomedayMaybeItemIndex = null;
     }
 
     [RelayCommand]
@@ -789,10 +825,6 @@ public partial class MainPageViewModel : ObservableObject
         await errorDialog.ShowAsync();
     }
 
-    /// <summary>
-    /// Applies UniformToFill transform to a project item based on its image URI.
-    /// Used for default background images loaded from ms-appx:// URIs.
-    /// </summary>
     private async Task ApplyUniformToFillTransformAsync(ProjectItemViewModel project, string imageUri)
     {
         try
@@ -810,10 +842,6 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Applies UniformToFill transform to a someday maybe item based on its image URI.
-    /// Used for default background images loaded from ms-appx:// URIs.
-    /// </summary>
     private async Task ApplyUniformToFillTransformAsync(SomedayMaybeViewModel item, string imageUri)
     {
         try
