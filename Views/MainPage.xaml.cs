@@ -13,19 +13,19 @@ public partial class MainPage : Page
 {
     private readonly PrintService printService;
 
-    public static readonly DependencyProperty IsCtrlPressedProperty =
+    public static readonly DependencyProperty IsShiftPressedProperty =
         DependencyProperty.Register(
-            nameof(IsCtrlPressed),
+            nameof(IsShiftPressed),
             typeof(bool),
             typeof(MainPage),
             new PropertyMetadata(false));
 
     public MainPageViewModel ViewModel { get; }
 
-    public bool IsCtrlPressed
+    public bool IsShiftPressed
     {
-        get => (bool)GetValue(IsCtrlPressedProperty);
-        set => SetValue(IsCtrlPressedProperty, value);
+        get => (bool)GetValue(IsShiftPressedProperty);
+        set => SetValue(IsShiftPressedProperty, value);
     }
 
     public MainPage()
@@ -69,32 +69,32 @@ public partial class MainPage : Page
     {
         if (e.WindowActivationState == Microsoft.UI.Xaml.WindowActivationState.Deactivated)
         {
-            IsCtrlPressed = false;
+            IsShiftPressed = false;
         }
         else if (e.WindowActivationState == Microsoft.UI.Xaml.WindowActivationState.CodeActivated ||
                  e.WindowActivationState == Microsoft.UI.Xaml.WindowActivationState.PointerActivated)
         {
-            bool isCtrlDown = InputKeyboardSource
-                .GetKeyStateForCurrentThread(VirtualKey.Control)
+            bool isShiftDown = InputKeyboardSource
+                .GetKeyStateForCurrentThread(VirtualKey.Shift)
                 .HasFlag(CoreVirtualKeyStates.Down);
 
-            IsCtrlPressed = isCtrlDown;
+            IsShiftPressed = isShiftDown;
         }
     }
 
     private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Control)
+        if (e.Key == VirtualKey.Shift)
         {
-            IsCtrlPressed = true;
+            IsShiftPressed = true;
         }
     }
 
     private void Page_KeyUp(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Control)
+        if (e.Key == VirtualKey.Shift)
         {
-            IsCtrlPressed = false;
+            IsShiftPressed = false;
         }
     }
 

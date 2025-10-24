@@ -59,7 +59,7 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
+                            IsShiftKeyPressed="{Binding IsShiftPressed, ElementName=PageRoot, Mode=OneWay}"
                             RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
                             WhiteboardItem="{x:Bind ProjectItem}" />
                     </Grid>
@@ -79,7 +79,7 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
+                            IsShiftKeyPressed="{Binding IsShiftPressed, ElementName=PageRoot, Mode=OneWay}"
                             RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
                             WhiteboardItem="{x:Bind SomedayMaybePair}" />
                     </Grid>
