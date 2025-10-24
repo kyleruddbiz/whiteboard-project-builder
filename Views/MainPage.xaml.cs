@@ -13,19 +13,19 @@ public partial class MainPage : Page
 {
     private readonly PrintService printService;
 
-    public static readonly DependencyProperty IsShiftPressedProperty =
+    public static readonly DependencyProperty IsCtrlPressedProperty =
         DependencyProperty.Register(
-            nameof(IsShiftPressed),
+            nameof(IsCtrlPressed),
             typeof(bool),
             typeof(MainPage),
             new PropertyMetadata(false));
 
     public MainPageViewModel ViewModel { get; }
 
-    public bool IsShiftPressed
+    public bool IsCtrlPressed
     {
-        get => (bool)GetValue(IsShiftPressedProperty);
-        set => SetValue(IsShiftPressedProperty, value);
+        get => (bool)GetValue(IsCtrlPressedProperty);
+        set => SetValue(IsCtrlPressedProperty, value);
     }
 
     public MainPage()
@@ -61,40 +61,73 @@ public partial class MainPage : Page
             App.MainWindow.Activated += MainWindow_Activated;
         }
 
+        Loaded += MainPage_Loaded;
         Unloaded += MainPage_Unloaded;
         PointerPressed += MainPage_PointerPressed;
+
+        // Use AddHandler to listen to keyboard events even when handled by child elements
+        AddHandler(KeyDownEvent, new KeyEventHandler(Page_KeyDown_Handler), true);
+        AddHandler(KeyUpEvent, new KeyEventHandler(Page_KeyUp_Handler), true);
+    }
+
+    private void MainPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Focus the root grid so it receives keyboard events
+        RootGrid.Focus(FocusState.Programmatic);
+    }
+
+    private void RootGrid_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        // When user taps anywhere on the grid (empty areas), focus it to enable keyboard events
+        RootGrid.Focus(FocusState.Programmatic);
     }
 
     private void MainWindow_Activated(object sender, Microsoft.UI.Xaml.WindowActivatedEventArgs e)
     {
         if (e.WindowActivationState == Microsoft.UI.Xaml.WindowActivationState.Deactivated)
         {
-            IsShiftPressed = false;
+            IsCtrlPressed = false;
         }
         else if (e.WindowActivationState == Microsoft.UI.Xaml.WindowActivationState.CodeActivated ||
                  e.WindowActivationState == Microsoft.UI.Xaml.WindowActivationState.PointerActivated)
         {
-            bool isShiftDown = InputKeyboardSource
-                .GetKeyStateForCurrentThread(VirtualKey.Shift)
+            bool isCtrlDown = InputKeyboardSource
+                .GetKeyStateForCurrentThread(VirtualKey.Control)
                 .HasFlag(CoreVirtualKeyStates.Down);
 
-            IsShiftPressed = isShiftDown;
+            IsCtrlPressed = isCtrlDown;
         }
     }
 
     private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Shift)
+        if (e.Key == VirtualKey.Control)
         {
-            IsShiftPressed = true;
+            IsCtrlPressed = true;
         }
     }
 
     private void Page_KeyUp(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Shift)
+        if (e.Key == VirtualKey.Control)
         {
-            IsShiftPressed = false;
+            IsCtrlPressed = false;
+        }
+    }
+
+    private void Page_KeyDown_Handler(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Control)
+        {
+            IsCtrlPressed = true;
+        }
+    }
+
+    private void Page_KeyUp_Handler(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Control)
+        {
+            IsCtrlPressed = false;
         }
     }
 
@@ -113,6 +146,9 @@ public partial class MainPage : Page
         if (!clickedInsideEditView)
         {
             ViewModel.ExitEditModeCommand.Execute(null);
+
+            // Focus the root grid to keep keyboard events working
+            RootGrid.Focus(FocusState.Programmatic);
         }
     }
 

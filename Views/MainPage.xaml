@@ -10,6 +10,7 @@
     xmlns:selectors="using:WhiteboardProjectBuilder.Selectors"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     x:Name="PageRoot"
+    IsTabStop="True"
     KeyDown="Page_KeyDown"
     KeyUp="Page_KeyUp"
     KeyboardAcceleratorPlacementMode="Hidden"
@@ -59,7 +60,7 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            IsShiftKeyPressed="{Binding IsShiftPressed, ElementName=PageRoot, Mode=OneWay}"
+                            IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
                             RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
                             WhiteboardItem="{x:Bind ProjectItem}" />
                     </Grid>
@@ -79,7 +80,7 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            IsShiftKeyPressed="{Binding IsShiftPressed, ElementName=PageRoot, Mode=OneWay}"
+                            IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
                             RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
                             WhiteboardItem="{x:Bind SomedayMaybePair}" />
                     </Grid>
@@ -88,7 +89,13 @@
         </selectors:GridItemTemplateSelector>
     </Page.Resources>
     <Page.Content>
-        <Grid Background="#F3EFEA">
+        <Grid
+            x:Name="RootGrid"
+            Background="#F3EFEA"
+            IsTabStop="True"
+            KeyDown="Page_KeyDown"
+            KeyUp="Page_KeyUp"
+            Tapped="RootGrid_Tapped">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -123,7 +130,9 @@
 
             <ScrollViewer Grid.Row="1" Margin="0 20 0 0">
                 <GridView
+                    x:Name="WhiteboardItemsGridView"
                     HorizontalAlignment="Center"
+                    IsTabStop="True"
                     ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
                     ItemsSource="{x:Bind ViewModel.GridItems, Mode=OneWay}"
                     SelectionChanged="GridView_SelectionChanged"

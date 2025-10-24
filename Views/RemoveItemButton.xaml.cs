@@ -13,7 +13,7 @@ namespace WhiteboardProjectBuilder.Views;
 
 /// <summary>
 /// Shared remove button for whiteboard items.
-/// Supports normal click (archive) and Shift+Click (force delete).
+/// Supports normal click (archive) and Ctrl+Click (force delete).
 /// </summary>
 public sealed partial class RemoveItemButton : UserControl, INotifyPropertyChanged
 {
@@ -24,8 +24,8 @@ public sealed partial class RemoveItemButton : UserControl, INotifyPropertyChang
 
     public enum DeleteIconState
     {
-        Normal,    // Black X - active item, no SHIFT
-        Forced,    // Red trash can - active item, SHIFT pressed
+        Normal,    // Black X - active item, no CTRL
+        Forced,    // Red trash can - active item, CTRL pressed
         Archived   // Red trash can - archived item
     }
 
@@ -73,12 +73,12 @@ public sealed partial class RemoveItemButton : UserControl, INotifyPropertyChang
             typeof(RemoveItemButton),
             new PropertyMetadata(null));
 
-    public static readonly DependencyProperty IsShiftKeyPressedProperty =
+    public static readonly DependencyProperty IsCtrlKeyPressedProperty =
         DependencyProperty.Register(
-            nameof(IsShiftKeyPressed),
+            nameof(IsCtrlKeyPressed),
             typeof(bool),
             typeof(RemoveItemButton),
-            new PropertyMetadata(false, OnIsShiftKeyPressedChanged));
+            new PropertyMetadata(false, OnIsCtrlKeyPressedChanged));
 
     public WhiteboardItemViewModelBase? WhiteboardItem
     {
@@ -98,10 +98,10 @@ public sealed partial class RemoveItemButton : UserControl, INotifyPropertyChang
         set => SetValue(ForceRemoveCommandProperty, value);
     }
 
-    public bool IsShiftKeyPressed
+    public bool IsCtrlKeyPressed
     {
-        get => (bool)GetValue(IsShiftKeyPressedProperty);
-        set => SetValue(IsShiftKeyPressedProperty, value);
+        get => (bool)GetValue(IsCtrlKeyPressedProperty);
+        set => SetValue(IsCtrlKeyPressedProperty, value);
     }
 
     public RemoveItemButton()
@@ -122,7 +122,7 @@ public sealed partial class RemoveItemButton : UserControl, INotifyPropertyChang
         }
     }
 
-    private static void OnIsShiftKeyPressedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnIsCtrlKeyPressedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is RemoveItemButton button)
         {
@@ -137,12 +137,12 @@ public sealed partial class RemoveItemButton : UserControl, INotifyPropertyChang
             return;
         }
 
-        bool isShiftPressed = InputKeyboardSource
-            .GetKeyStateForCurrentThread(VirtualKey.Shift)
+        bool isCtrlPressed = InputKeyboardSource
+            .GetKeyStateForCurrentThread(VirtualKey.Control)
             .HasFlag(CoreVirtualKeyStates.Down);
 
         ICommand? command;
-        if (isShiftPressed && !WhiteboardItem.IsArchived)
+        if (isCtrlPressed && !WhiteboardItem.IsArchived)
         {
             command = ForceRemoveCommand;
         }
@@ -163,7 +163,7 @@ public sealed partial class RemoveItemButton : UserControl, INotifyPropertyChang
         {
             CurrentDeleteIconState = DeleteIconState.Archived;
         }
-        else if (IsShiftKeyPressed)
+        else if (IsCtrlKeyPressed)
         {
             CurrentDeleteIconState = DeleteIconState.Forced;
         }
