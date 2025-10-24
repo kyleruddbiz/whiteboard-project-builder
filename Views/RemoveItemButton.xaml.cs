@@ -107,6 +107,36 @@ public sealed partial class RemoveItemButton : UserControl, INotifyPropertyChang
     public RemoveItemButton()
     {
         InitializeComponent();
+        Unloaded += RemoveItemButton_Unloaded;
+    }
+
+    private void RemoveItemButton_Unloaded(object sender, RoutedEventArgs e)
+    {
+        UnsubscribeFromWhiteboardItem();
+    }
+
+    private void SubscribeToWhiteboardItem()
+    {
+        if (WhiteboardItem != null)
+        {
+            WhiteboardItem.PropertyChanged += WhiteboardItem_PropertyChanged;
+        }
+    }
+
+    private void UnsubscribeFromWhiteboardItem()
+    {
+        if (WhiteboardItem != null)
+        {
+            WhiteboardItem.PropertyChanged -= WhiteboardItem_PropertyChanged;
+        }
+    }
+
+    private void WhiteboardItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(WhiteboardItemViewModelBase.IsArchived))
+        {
+            UpdateIconState();
+        }
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -118,6 +148,14 @@ public sealed partial class RemoveItemButton : UserControl, INotifyPropertyChang
     {
         if (d is RemoveItemButton button)
         {
+            // Unsubscribe from old item
+            if (e.OldValue is WhiteboardItemViewModelBase oldItem)
+            {
+                oldItem.PropertyChanged -= button.WhiteboardItem_PropertyChanged;
+            }
+
+            // Subscribe to new item
+            button.SubscribeToWhiteboardItem();
             button.UpdateIconState();
         }
     }
