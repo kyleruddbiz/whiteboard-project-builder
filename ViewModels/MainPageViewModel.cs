@@ -10,6 +10,7 @@ using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 
@@ -737,6 +738,8 @@ public partial class MainPageViewModel : ObservableObject
             return;
         }
 
+        StorageFile? file = null;
+
         try
         {
             var picker = new FileOpenPicker
@@ -753,14 +756,14 @@ public partial class MainPageViewModel : ObservableObject
             nint hwnd = WindowNative.GetWindowHandle(App.MainWindow);
             InitializeWithWindow.Initialize(picker, hwnd);
 
-            var file = await picker.PickSingleFileAsync();
+            file = await picker.PickSingleFileAsync();
 
             if (file == null)
             {
                 return;
             }
 
-            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(file.Path);
+            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(file);
 
             string? title = null;
             string? subtitle = null;
@@ -803,9 +806,38 @@ public partial class MainPageViewModel : ObservableObject
 
             Debug.WriteLine($"Image replaced successfully: {imageUri}");
         }
+        catch (InvalidOperationException ex)
+        {
+            // Specific error from image dimension or storage service
+            await ShowErrorDialogAsync(xamlRoot, "Image Processing Error", ex.Message);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            await ShowErrorDialogAsync(xamlRoot, "Access Denied", "The app does not have permission to access the selected file. Please try selecting a file from a different location, such as your Pictures folder.");
+        }
+        catch (FileNotFoundException ex)
+        {
+            await ShowErrorDialogAsync(xamlRoot, "File Not Found", $"The selected image file could not be found:\n{ex.Message}");
+        }
+        catch (System.Runtime.InteropServices.COMException ex)
+        {
+            string errorDetails = $"Type: {ex.GetType().Name}\nHResult: 0x{ex.HResult:X8} ({ex.HResult})\nMessage: {(string.IsNullOrEmpty(ex.Message) ? "(no message)" : ex.Message)}";
+
+            // Common COM error codes
+            string suggestion = ex.HResult switch
+            {
+                unchecked((int)0x80070005) => "\n\nThis is an access denied error. The file may be locked or you don't have permission to access it.",
+                unchecked((int)0x80004005) => "\n\nThis is a general failure error. The file may be corrupted or in an unsupported format.",
+                unchecked((int)0x800700B7) => "\n\nA file with this name already exists. Try deleting the old file from the Images folder first.",
+                unchecked((int)0x80270003) => "\n\nThis is a WIC codec error (WINCODEC_ERR_COMPONENTNOTFOUND). The image file appears to be corrupted or uses an unsupported format.\n\nSuggestions:\n• Try opening the image in Paint and re-saving it\n• Convert the image to a standard PNG or JPG format\n• The file may be corrupted and need to be recreated",
+                _ => $"\n\nFile path: {file?.Path ?? "unknown"}"
+            };
+
+            await ShowErrorDialogAsync(xamlRoot, "Error Replacing Image", errorDetails + suggestion);
+        }
         catch (Exception ex)
         {
-            await ShowErrorDialogAsync(xamlRoot, "Error Replacing Image", $"An unexpected error occurred: {ex.Message}");
+            await ShowErrorDialogAsync(xamlRoot, "Error Replacing Image", $"An unexpected error occurred:\n\nType: {ex.GetType().Name}\nMessage: {ex.Message}");
         }
     }
 
