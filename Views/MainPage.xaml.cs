@@ -1,8 +1,11 @@
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
 using WhiteboardProjectBuilder.ViewModels;
+using Windows.System;
+using Windows.UI.Core;
 
 namespace WhiteboardProjectBuilder.Views;
 
@@ -10,7 +13,20 @@ public partial class MainPage : Page
 {
     private readonly PrintService printService;
 
+    public static readonly DependencyProperty IsCtrlPressedProperty =
+        DependencyProperty.Register(
+            nameof(IsCtrlPressed),
+            typeof(bool),
+            typeof(MainPage),
+            new PropertyMetadata(false));
+
     public MainPageViewModel ViewModel { get; }
+
+    public bool IsCtrlPressed
+    {
+        get => (bool)GetValue(IsCtrlPressedProperty);
+        set => SetValue(IsCtrlPressedProperty, value);
+    }
 
     public MainPage()
     {
@@ -42,10 +58,44 @@ public partial class MainPage : Page
         if (App.MainWindow != null)
         {
             printService.RegisterForPrinting(App.MainWindow, PrintCanvas);
+            App.MainWindow.Activated += MainWindow_Activated;
         }
 
         Unloaded += MainPage_Unloaded;
         PointerPressed += MainPage_PointerPressed;
+    }
+
+    private void MainWindow_Activated(object sender, Microsoft.UI.Xaml.WindowActivatedEventArgs e)
+    {
+        if (e.WindowActivationState == Microsoft.UI.Xaml.WindowActivationState.Deactivated)
+        {
+            IsCtrlPressed = false;
+        }
+        else if (e.WindowActivationState == Microsoft.UI.Xaml.WindowActivationState.CodeActivated ||
+                 e.WindowActivationState == Microsoft.UI.Xaml.WindowActivationState.PointerActivated)
+        {
+            bool isCtrlDown = InputKeyboardSource
+                .GetKeyStateForCurrentThread(VirtualKey.Control)
+                .HasFlag(CoreVirtualKeyStates.Down);
+
+            IsCtrlPressed = isCtrlDown;
+        }
+    }
+
+    private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Control)
+        {
+            IsCtrlPressed = true;
+        }
+    }
+
+    private void Page_KeyUp(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Control)
+        {
+            IsCtrlPressed = false;
+        }
     }
 
     private void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -82,6 +132,12 @@ public partial class MainPage : Page
         await ViewModel.ForceSaveAsync();
 
         printService.UnregisterForPrinting();
+
+        if (App.MainWindow != null)
+        {
+            App.MainWindow.Activated -= MainWindow_Activated;
+        }
+
         Unloaded -= MainPage_Unloaded;
     }
 

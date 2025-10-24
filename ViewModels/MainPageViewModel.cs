@@ -583,6 +583,17 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void ForceRemoveWhiteboardItem(WhiteboardItemViewModelBase item)
+    {
+        if (SelectedItem == item)
+        {
+            ExitEditMode();
+        }
+
+        WhiteboardItems.Remove(item);
+    }
+
+    [RelayCommand]
     private void ReactivateItem(WhiteboardItemViewModelBase item)
     {
         item.IsArchived = false;

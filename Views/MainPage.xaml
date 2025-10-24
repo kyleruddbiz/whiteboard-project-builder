@@ -10,6 +10,8 @@
     xmlns:selectors="using:WhiteboardProjectBuilder.Selectors"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     x:Name="PageRoot"
+    KeyDown="Page_KeyDown"
+    KeyUp="Page_KeyUp"
     KeyboardAcceleratorPlacementMode="Hidden"
     mc:Ignorable="d">
     <Page.KeyboardAccelerators>
@@ -52,18 +54,14 @@
                             EditRequested="ProjectItemView_EditRequested"
                             ImageReplaceRequested="ProjectItemView_ImageReplaceRequested"
                             ReactivateRequested="ProjectItemView_ReactivateRequested" />
-                        <Button
-                            Width="50"
-                            Height="50"
+                        <local:RemoveItemButton
                             Margin="0 12 12 0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Command="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            CommandParameter="{x:Bind ProjectItem}">
-                            <FontIcon FontSize="20" Glyph="&#xE106;" />
-                        </Button>
+                            ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
+                            IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
+                            RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
+                            WhiteboardItem="{x:Bind ProjectItem}" />
                     </Grid>
                 </DataTemplate>
             </selectors:GridItemTemplateSelector.ProjectTemplate>
@@ -76,18 +74,14 @@
                             ImageReplaceRequested="SomedayMaybePairView_ImageReplaceRequested"
                             ReactivateRequested="SomedayMaybePairView_ReactivateRequested"
                             ViewModel="{x:Bind SomedayMaybePair}" />
-                        <Button
-                            Width="50"
-                            Height="50"
+                        <local:RemoveItemButton
                             Margin="0 12 12 0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Command="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            CommandParameter="{x:Bind SomedayMaybePair}">
-                            <FontIcon FontSize="20" Glyph="&#xE106;" />
-                        </Button>
+                            ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
+                            IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
+                            RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
+                            WhiteboardItem="{x:Bind SomedayMaybePair}" />
                     </Grid>
                 </DataTemplate>
             </selectors:GridItemTemplateSelector.SomedayMaybeTemplate>
