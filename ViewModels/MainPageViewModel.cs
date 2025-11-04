@@ -6,9 +6,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml.Controls;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
+using WhiteboardProjectBuilder.Views;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -672,6 +674,30 @@ public partial class MainPageViewModel : ObservableObject
             }
             else if (SelectedItem is SomedayMaybePairViewModel pair)
             {
+                // If both items exist, show selection dialog
+                if (pair.HasBottomItem)
+                {
+                    var selectionDialog = new PasteSelectionDialog
+                    {
+                        XamlRoot = xamlRoot
+                    };
+
+                    var selectionResult = await selectionDialog.ShowAsync();
+                    var selection = selectionResult.ToPasteTargetSelection();
+
+                    if (selection == PasteTargetSelection.Cancel)
+                    {
+                        return;
+                    }
+
+                    ActiveSomedayMaybeItemIndex = selection == PasteTargetSelection.Top ? 0 : 1;
+                }
+                else
+                {
+                    // Only top item exists, skip dialog
+                    ActiveSomedayMaybeItemIndex = 0;
+                }
+
                 var targetItem = ActiveSomedayMaybeItemIndex == 1 ? pair.BottomItem : pair.TopItem;
                 title = targetItem?.Title;
                 subtitle = targetItem?.Subtitle;
