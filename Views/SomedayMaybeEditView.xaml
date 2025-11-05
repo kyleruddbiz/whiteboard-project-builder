@@ -11,6 +11,7 @@
 
     <StackPanel Padding="16" Spacing="12">
         <TextBox
+            x:Name="TitleTextBox"
             Header="Title"
             PlaceholderText="Someday Maybe"
             Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -23,6 +24,7 @@
         <StackPanel Spacing="8">
             <TextBlock FontWeight="SemiBold" Text="Image" />
             <local:ImageEditor
+                x:Name="MainImageEditor"
                 Width="420"
                 Height="240"
                 ImageReplaceRequested="ImageEditor_ImageReplaceRequested"

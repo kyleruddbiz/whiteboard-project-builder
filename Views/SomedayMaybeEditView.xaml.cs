@@ -24,6 +24,18 @@ public sealed partial class SomedayMaybeEditView : UserControl
         DataContext = this;
     }
 
+    public void SetFocus()
+    {
+        if (string.IsNullOrEmpty(ViewModel?.Title))
+        {
+            TitleTextBox.Focus(FocusState.Programmatic);
+        }
+        else
+        {
+            MainImageEditor.SetFocus();
+        }
+    }
+
     private void ImageEditor_ImageReplaceRequested(object sender, EventArgs e)
     {
         ImageReplaceRequested?.Invoke(this, EventArgs.Empty);

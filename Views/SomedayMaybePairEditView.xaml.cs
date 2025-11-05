@@ -22,6 +22,12 @@ public sealed partial class SomedayMaybePairEditView : UserControl
     {
         InitializeComponent();
         DataContext = this;
+        Loaded += SomedayMaybePairEditView_Loaded;
+    }
+
+    private void SomedayMaybePairEditView_Loaded(object sender, RoutedEventArgs e)
+    {
+        TopItemEditor.SetFocus();
     }
 
     private void TopItemEditor_ImageReplaceRequested(object sender, EventArgs e)
