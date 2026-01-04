@@ -1,68 +1,154 @@
-# Implementation Plan: Remove Title and Inspiration Button from Selector View
+# Implementation Plan: Modify WhiteboardItemSelectorView for 4 Evenly-Spaced Buttons
 
-**Summary**: Remove the "Select Item Type" title text and the disabled Inspiration button from the WhiteboardItemSelectorView, simplifying the UI to show only Project Item and Someday Maybe buttons.
+**Summary**: Update the WhiteboardItemSelectorView to display 4 buttons (2 rows x 2 columns) that evenly fill the available vertical space within the 800px tall container.
 
 **Objectives**:
-- Remove the "Select Item Type" header text from the selector view
-- Remove the Inspiration button from the selector view
-- Adjust the layout to accommodate the simplified UI (change from 2x2 grid to single row with two buttons)
+- Add a 2x2 grid layout to accommodate 4 buttons
+- Make all 4 buttons evenly distribute across the available vertical space
+- Maintain the current width behavior (buttons stretch horizontally within their columns)
+- Add placeholder buttons for Goal and Inspiration item types (existing enum values)
 
 **Constraints & Considerations**:
-- The ViewModel does not have any Inspiration-related commands, so no ViewModel changes are required
-- The layout should remain visually balanced after removing elements
-- Follow existing XAML conventions (spaces in Margin/Padding values)
+- The container is a fixed 502x800 Border with 40px margin on the inner Grid
+- Current buttons are in a single-row, 2-column layout
+- The inner Grid has VerticalAlignment="Center" which must be changed to "Stretch" for even distribution
+- Must use RowDefinitions with `Height="*"` for equal vertical distribution
+- The enum `WhiteboardItemType` already has Goal and Inspiration values
+- Must follow MVVM pattern and project XAML guidelines
 
 ## Steps
 
-### Step 1: Remove the Title TextBlock and Update Layout
-- **What**: Remove the "Select Item Type" TextBlock header and simplify the Grid row definitions since the header row is no longer needed
+### Step 1: Update WhiteboardItemSelectorView.xaml Grid Layout
+- **What**: Modify the inner Grid to use a 2x2 layout with equal row heights
 - **Files**:
   - `C:\Users\TheTr\Code\Personal\whiteboard-project-builder\Views\WhiteboardItemSelectorView.xaml`
 - **Details**:
-  - Remove the TextBlock element on lines 25-32 that displays "Select Item Type"
-  - Remove the first RowDefinition (Height="Auto") from the outer Grid since no header exists
-  - Update the inner button Grid to use Grid.Row="0" instead of Grid.Row="1" (or remove the Grid.Row attribute entirely)
-  - Adjust the outer Grid margin as needed for visual balance
-- **Validation**: Build the project and visually verify the title is no longer displayed
+  - Change the inner Grid's `VerticalAlignment` from `Center` to `Stretch` (or remove it entirely since Stretch is default)
+  - Add two RowDefinitions with `Height="*"` each for equal vertical distribution
+  - Keep the existing two ColumnDefinitions with `Width="*"`
+  - Move the "Project Item" button to `Grid.Row="0" Grid.Column="0"`
+  - Move the "Someday Maybe" button to `Grid.Row="0" Grid.Column="1"`
+  - Add a "Goal" button at `Grid.Row="1" Grid.Column="0"`
+  - Add an "Inspiration" button at `Grid.Row="1" Grid.Column="1"`
+- **Validation**: Run `dotnet build` to verify XAML compiles correctly
 
-### Step 2: Remove the Inspiration Button and Simplify Button Grid
-- **What**: Remove the disabled Inspiration button and restructure the button grid from 2x2 to a simpler layout with two buttons
+### Step 2: Add Goal Button Content
+- **What**: Create the Goal button with appropriate icon and label
 - **Files**:
   - `C:\Users\TheTr\Code\Personal\whiteboard-project-builder\Views\WhiteboardItemSelectorView.xaml`
 - **Details**:
-  - Remove the entire Inspiration button element (lines 87-106 in current file)
-  - Remove the comment about "Empty cell for future expansion" (line 108)
-  - Change the button Grid from 2x2 to a single row with two columns:
-    - Remove the second RowDefinition from the button Grid
-    - Keep both ColumnDefinitions
-  - Update button Grid.Row attributes:
-    - Project Item button: Keep at Grid.Row="0", Grid.Column="0"
-    - Someday Maybe button: Keep at Grid.Row="0", Grid.Column="1"
-  - Consider adjusting vertical alignment of the button grid to center the buttons in the available space
-- **Validation**: Build the project and visually verify only two buttons appear side by side
+  - Follow the existing button pattern with StackPanel containing FontIcon and TextBlock
+  - Use an appropriate goal-related icon (e.g., `&#xE734;` - Target/Bullseye, or `&#xE8FB;` - Flag)
+  - Set Text="Goal" on the TextBlock
+  - Match existing button styling: `Margin="10"`, `Padding="20"`, `HorizontalAlignment="Stretch"`, `VerticalAlignment="Stretch"`
+  - Bind Command to `ViewModel.SelectGoalItemCommand` (to be added in next step)
+- **Validation**: XAML structure matches existing buttons
 
-### Step 3: Verify Build and Test
-- **What**: Ensure the application builds successfully and the selector view functions correctly
+### Step 3: Add Inspiration Button Content
+- **What**: Create the Inspiration button with appropriate icon and label
 - **Files**:
-  - None (verification only)
+  - `C:\Users\TheTr\Code\Personal\whiteboard-project-builder\Views\WhiteboardItemSelectorView.xaml`
 - **Details**:
-  - Run `dotnet build` to verify no compilation errors
-  - Launch the application and test that:
-    - The selector view appears without the title
-    - Only Project Item and Someday Maybe buttons are visible
-    - Both buttons are clickable and function correctly
-    - The Cancel (X) button still works
-- **Validation**: Application builds and runs without errors; selector view displays correctly with only two buttons
+  - Follow the existing button pattern with StackPanel containing FontIcon and TextBlock
+  - Use an appropriate inspiration-related icon (e.g., `&#xE7B5;` - Lightbulb, or `&#xE945;` - Idea)
+  - Set Text="Inspiration" on the TextBlock
+  - Match existing button styling: `Margin="10"`, `Padding="20"`, `HorizontalAlignment="Stretch"`, `VerticalAlignment="Stretch"`
+  - Bind Command to `ViewModel.SelectInspirationItemCommand` (to be added in next step)
+- **Validation**: XAML structure matches existing buttons
+
+### Step 4: Add SelectGoalItem Command to ViewModel
+- **What**: Add the RelayCommand for selecting Goal item type
+- **Files**:
+  - `C:\Users\TheTr\Code\Personal\whiteboard-project-builder\ViewModels\WhiteboardItemSelectorViewModel.cs`
+- **Details**:
+  - Add a new `[RelayCommand]` attributed method named `SelectGoalItem`
+  - Method should invoke `ItemTypeSelected?.Invoke(this, WhiteboardItemType.Goal);`
+  - Follow the existing pattern used by `SelectProjectItem` and `SelectSomedayMaybeItem` methods
+- **Validation**: Run `dotnet build` to verify the command is generated correctly
+
+### Step 5: Add SelectInspirationItem Command to ViewModel
+- **What**: Add the RelayCommand for selecting Inspiration item type
+- **Files**:
+  - `C:\Users\TheTr\Code\Personal\whiteboard-project-builder\ViewModels\WhiteboardItemSelectorViewModel.cs`
+- **Details**:
+  - Add a new `[RelayCommand]` attributed method named `SelectInspirationItem`
+  - Method should invoke `ItemTypeSelected?.Invoke(this, WhiteboardItemType.Inspiration);`
+  - Follow the existing pattern used by `SelectProjectItem` and `SelectSomedayMaybeItem` methods
+- **Validation**: Run `dotnet build` to verify the command is generated correctly
 
 ## Testing & Verification
-- Run `dotnet build` to confirm successful compilation
-- Launch the application and trigger the selector view
-- Verify the "Select Item Type" title is no longer visible
-- Verify only the Project Item and Someday Maybe buttons are displayed
-- Verify both buttons function correctly when clicked
-- Verify the Cancel button (X) in top-right corner still works
+1. Run `dotnet build` to ensure no compilation errors
+2. Run the application with `dotnet run`
+3. Click the "+" add item button to open the WhiteboardItemSelectorView
+4. Verify that:
+   - All 4 buttons are visible in a 2x2 grid layout
+   - Buttons evenly distribute vertically (each row takes ~50% of available height minus margins)
+   - Buttons stretch horizontally within their respective columns
+   - Each button has an appropriate icon and label
+   - Clicking the X button still closes the selector
+5. Note: The Goal and Inspiration buttons will raise events but may not have handlers in MainPage yet - this is expected for this implementation
 
 ## Notes
-- The WhiteboardItemSelectorViewModel (`C:\Users\TheTr\Code\Personal\whiteboard-project-builder\ViewModels\WhiteboardItemSelectorViewModel.cs`) does not need any changes since it never had an Inspiration-related command
-- The Inspiration button was already disabled (IsEnabled="False") and had no associated command
-- This is a view-only change with no impact on application logic
+- The `WhiteboardItemType` enum already contains `Goal` and `Inspiration` values, so no changes needed there
+- The event handlers in the consuming code (MainPage) may need to be updated separately to handle the new item types, but that is outside the scope of this task
+- The fixed dimensions of the container (502x800) with 40px margin leaves approximately 720px of vertical space for the buttons to share
+- With the 2x2 grid using `Height="*"` rows, each row will get approximately 360px of height, and with 10px margin on each button, the actual button height will be approximately 340px per button
+
+## Current Code Reference
+
+### Current XAML Structure (WhiteboardItemSelectorView.xaml):
+```xml
+<Grid Margin="40" VerticalAlignment="Center">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!--  Project Item Button  -->
+    <Button Grid.Column="0" ... />
+
+    <!--  Someday Maybe Button  -->
+    <Button Grid.Column="1" ... />
+</Grid>
+```
+
+### Target XAML Structure:
+```xml
+<Grid Margin="40">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!--  Project Item Button  -->
+    <Button Grid.Row="0" Grid.Column="0" ... />
+
+    <!--  Someday Maybe Button  -->
+    <Button Grid.Row="0" Grid.Column="1" ... />
+
+    <!--  Goal Button  -->
+    <Button Grid.Row="1" Grid.Column="0" ... />
+
+    <!--  Inspiration Button  -->
+    <Button Grid.Row="1" Grid.Column="1" ... />
+</Grid>
+```
+
+### Current ViewModel Commands (WhiteboardItemSelectorViewModel.cs):
+```csharp
+[RelayCommand]
+private void SelectProjectItem()
+{
+    ItemTypeSelected?.Invoke(this, WhiteboardItemType.Project);
+}
+
+[RelayCommand]
+private void SelectSomedayMaybeItem()
+{
+    ItemTypeSelected?.Invoke(this, WhiteboardItemType.SomedayMaybe);
+}
+```
