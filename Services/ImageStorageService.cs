@@ -258,7 +258,7 @@ public class ImageStorageService
         try
         {
             var settings = await settingsService.LoadSettingsAsync();
-            string folderName = settings.IsDeveloperMode ? "ExamplesAlt" : "Examples";
+            string folderName = "Examples";
             string examplesPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Backgrounds", folderName);
 
             if (Directory.Exists(examplesPath))
