@@ -2,23 +2,23 @@ using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;
 
-public sealed partial class SomedayMaybeEditView : UserControl
+public sealed partial class TaskItemEditView : UserControl
 {
     public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
         nameof(ViewModel),
-        typeof(SomedayMaybeViewModel),
-        typeof(SomedayMaybeEditView),
+        typeof(TaskItemViewModel),
+        typeof(TaskItemEditView),
         new PropertyMetadata(null));
 
-    public SomedayMaybeViewModel? ViewModel
+    public TaskItemViewModel? ViewModel
     {
-        get => (SomedayMaybeViewModel?)GetValue(ViewModelProperty);
+        get => (TaskItemViewModel?)GetValue(ViewModelProperty);
         set => SetValue(ViewModelProperty, value);
     }
 
     public event EventHandler? ImageReplaceRequested;
 
-    public SomedayMaybeEditView()
+    public TaskItemEditView()
     {
         InitializeComponent();
         DataContext = this;

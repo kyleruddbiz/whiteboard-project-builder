@@ -1,9 +1,9 @@
 namespace WhiteboardProjectBuilder.Models;
 
-public class SomedayMaybePair : IWhiteboardItem
+public class TaskItemPair : IWhiteboardItem
 {
-    public required SomedayMaybe TopItem { get; set; }
-    public SomedayMaybe? BottomItem { get; set; }
+    public required TaskItem TopItem { get; set; }
+    public TaskItem? BottomItem { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.Today;
     public bool IsArchived { get; set; }
 }

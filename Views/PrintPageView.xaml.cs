@@ -56,7 +56,7 @@ public sealed partial class PrintPageView : UserControl
             UserControl itemView = Items[i] switch
             {
                 ProjectItemViewModel projectVm => new ProjectItemView { ViewModel = projectVm },
-                SomedayMaybePairViewModel pairVm => new SomedayMaybePairView { ViewModel = pairVm },
+                TaskItemPairViewModel pairVm => new TaskItemPairView { ViewModel = pairVm },
                 _ => throw new NotSupportedException($"Unsupported item type for printing: {Items[i].GetType().Name}")
             };
 

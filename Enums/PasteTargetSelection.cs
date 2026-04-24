@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 namespace WhiteboardProjectBuilder.Enums;
 
 /// <summary>
-/// Represents the user's selection for which SomedayMaybe item should receive a pasted image.
+/// Represents the user's selection for which task item should receive a pasted image.
 /// </summary>
 public enum PasteTargetSelection
 {

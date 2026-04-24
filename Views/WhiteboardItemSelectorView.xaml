@@ -41,12 +41,12 @@
                         <FontIcon FontSize="48" Glyph="&#xE7C3;" />
                         <TextBlock
                             FontSize="18"
-                            Text="Project Item"
+                            Text="Projects"
                             TextAlignment="Center" />
                     </StackPanel>
                 </Button>
 
-                <!--  Someday Maybe Button  -->
+                <!--  Task Button  -->
                 <Button
                     Grid.Row="0"
                     Grid.Column="1"
@@ -54,7 +54,7 @@
                     Padding="20"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
-                    Command="{x:Bind ViewModel.SelectSomedayMaybeItemCommand, Mode=OneWay}">
+                    Command="{x:Bind ViewModel.SelectTaskItemCommand, Mode=OneWay}">
                     <StackPanel
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
@@ -62,7 +62,7 @@
                         <FontIcon FontSize="48" Glyph="&#xE81C;" />
                         <TextBlock
                             FontSize="18"
-                            Text="Someday Maybe"
+                            Text="Task"
                             TextAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -73,7 +73,7 @@
         <Button
             Width="50"
             Height="50"
-            Margin="0 12 12 0"
+            Margin="0,12,12,0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
             Background="Transparent"

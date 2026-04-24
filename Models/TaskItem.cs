@@ -1,6 +1,6 @@
 namespace WhiteboardProjectBuilder.Models;
 
-public class SomedayMaybe
+public class TaskItem
 {
     public required string Title { get; set; }
     public string? Subtitle { get; set; }

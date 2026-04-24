@@ -3,7 +3,7 @@ namespace WhiteboardProjectBuilder.Enums;
 public enum WhiteboardItemType
 {
     Project,
-    SomedayMaybe,
+    TaskItem,
     Goal,
     Inspiration
 }

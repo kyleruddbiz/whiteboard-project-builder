@@ -183,7 +183,7 @@ public partial class MainPage : Page
 
     private async void ProjectItemView_ImageReplaceRequested(object? sender, EventArgs e)
     {
-        ViewModel.ActiveSomedayMaybeItemIndex = null;
+        ViewModel.ActiveTaskItemIndex = null;
         await ViewModel.ReplaceImageAsync(XamlRoot);
     }
 
@@ -192,23 +192,23 @@ public partial class MainPage : Page
         ViewModel.ReactivateItemCommand.Execute(e);
     }
 
-    private void SomedayMaybePairView_EditRequested(object? sender, EventArgs e)
+    private void TaskItemPairView_EditRequested(object? sender, EventArgs e)
     {
-        if (sender is SomedayMaybePairView view && view.ViewModel != null)
+        if (sender is TaskItemPairView view && view.ViewModel != null)
         {
             ViewModel.EnterEditModeCommand.Execute(view.ViewModel);
         }
     }
 
-    private async void SomedayMaybePairView_ImageReplaceRequested(object? sender, int itemIndex)
+    private async void TaskItemPairView_ImageReplaceRequested(object? sender, int itemIndex)
     {
-        ViewModel.ActiveSomedayMaybeItemIndex = itemIndex;
+        ViewModel.ActiveTaskItemIndex = itemIndex;
         await ViewModel.ReplaceImageAsync(XamlRoot);
     }
 
-    private void SomedayMaybePairView_ReactivateRequested(object? sender, EventArgs e)
+    private void TaskItemPairView_ReactivateRequested(object? sender, EventArgs e)
     {
-        if (sender is SomedayMaybePairView view && view.ViewModel != null)
+        if (sender is TaskItemPairView view && view.ViewModel != null)
         {
             ViewModel.ReactivateItemCommand.Execute(view.ViewModel);
         }

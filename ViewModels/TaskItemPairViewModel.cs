@@ -6,19 +6,19 @@ using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
+public partial class TaskItemPairViewModel : WhiteboardItemViewModelBase
 {
     private readonly ImageStorageService imageStorageService;
     private readonly ImageTransformService imageTransformService;
     private readonly ImageDimensionService imageDimensionService;
 
     [ObservableProperty]
-    private SomedayMaybeViewModel topItem = null!;
+    private TaskItemViewModel topItem = null!;
 
     [ObservableProperty]
-    private SomedayMaybeViewModel? bottomItem;
+    private TaskItemViewModel? bottomItem;
 
-    public SomedayMaybePairViewModel(ImageStorageService imageStorageService, ImageTransformService imageTransformService, ImageDimensionService imageDimensionService)
+    public TaskItemPairViewModel(ImageStorageService imageStorageService, ImageTransformService imageTransformService, ImageDimensionService imageDimensionService)
     {
         this.imageStorageService = imageStorageService;
         this.imageTransformService = imageTransformService;
@@ -28,7 +28,7 @@ public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
     public bool HasBottomItem => BottomItem != null;
     public bool ShowAddBottomButton => !HasBottomItem && IsEditing;
 
-    partial void OnTopItemChanged(SomedayMaybeViewModel? oldValue, SomedayMaybeViewModel newValue)
+    partial void OnTopItemChanged(TaskItemViewModel? oldValue, TaskItemViewModel newValue)
     {
         if (oldValue != null)
         {
@@ -45,7 +45,7 @@ public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
         RaiseDataChanged();
     }
 
-    partial void OnBottomItemChanged(SomedayMaybeViewModel? oldValue, SomedayMaybeViewModel? newValue)
+    partial void OnBottomItemChanged(TaskItemViewModel? oldValue, TaskItemViewModel? newValue)
     {
         if (oldValue != null)
         {
@@ -74,7 +74,7 @@ public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
         {
             string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
-            BottomItem = new SomedayMaybeViewModel
+            BottomItem = new TaskItemViewModel
             {
                 Image = imagePath,
                 CreatedDate = DateTime.Today
@@ -91,10 +91,10 @@ public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
     }
 
     /// <summary>
-    /// Applies UniformToFill transform to a someday maybe item based on its image URI.
+    /// Applies UniformToFill transform to a task item based on its image URI.
     /// Used for default background images loaded from ms-appx:// URIs.
     /// </summary>
-    private async Task ApplyUniformToFillTransformAsync(SomedayMaybeViewModel item, string imageUri)
+    private async Task ApplyUniformToFillTransformAsync(TaskItemViewModel item, string imageUri)
     {
         try
         {
@@ -114,14 +114,14 @@ public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
     /// <summary>
     /// Gets the type of this whiteboard item.
     /// </summary>
-    public override WhiteboardItemType GetItemType() => WhiteboardItemType.SomedayMaybe;
+    public override WhiteboardItemType GetItemType() => WhiteboardItemType.TaskItem;
 
     /// <summary>
     /// Converts this ViewModel to a Model for serialization.
     /// </summary>
     public override IWhiteboardItem ToModel()
     {
-        return new SomedayMaybePair
+        return new TaskItemPair
         {
             TopItem = TopItem.ToModel(),
             BottomItem = BottomItem?.ToModel(),
@@ -133,10 +133,10 @@ public partial class SomedayMaybePairViewModel : WhiteboardItemViewModelBase
     /// <summary>
     /// Populates this ViewModel from a Model.
     /// </summary>
-    public void LoadFromModel(SomedayMaybePair model)
+    public void LoadFromModel(TaskItemPair model)
     {
-        TopItem = SomedayMaybeViewModel.FromModel(model.TopItem);
-        BottomItem = model.BottomItem != null ? SomedayMaybeViewModel.FromModel(model.BottomItem) : null;
+        TopItem = TaskItemViewModel.FromModel(model.TopItem);
+        BottomItem = model.BottomItem != null ? TaskItemViewModel.FromModel(model.BottomItem) : null;
         CreatedDate = model.CreatedDate;
         IsArchived = model.IsArchived;
     }

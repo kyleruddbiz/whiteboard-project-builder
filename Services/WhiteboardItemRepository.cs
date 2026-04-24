@@ -49,7 +49,7 @@ public class WhiteboardItemRepository
             WhiteboardItemViewModelBase viewModel = item switch
             {
                 ProjectItem project => ProjectItemViewModel.FromModel(project),
-                SomedayMaybePair pair => CreateSomedayMaybePairViewModel(pair),
+                TaskItemPair pair => CreateTaskItemPairViewModel(pair),
                 _ => throw new NotSupportedException($"Unsupported whiteboard item type: {item.GetType().Name}")
             };
 
@@ -59,9 +59,9 @@ public class WhiteboardItemRepository
         return viewModels;
     }
 
-    private SomedayMaybePairViewModel CreateSomedayMaybePairViewModel(SomedayMaybePair model)
+    private TaskItemPairViewModel CreateTaskItemPairViewModel(TaskItemPair model)
     {
-        var viewModel = serviceProvider.GetRequiredService<SomedayMaybePairViewModel>();
+        var viewModel = serviceProvider.GetRequiredService<TaskItemPairViewModel>();
         viewModel.LoadFromModel(model);
         return viewModel;
     }

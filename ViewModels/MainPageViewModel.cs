@@ -46,7 +46,7 @@ public partial class MainPageViewModel : ObservableObject
     private WhiteboardItemViewModelBase? selectedItem;
 
     [ObservableProperty]
-    private int? activeSomedayMaybeItemIndex;
+    private int? activeTaskItemIndex;
 
     [ObservableProperty]
     private SettingsViewModel settings = null!;
@@ -465,8 +465,8 @@ public partial class MainPageViewModel : ObservableObject
             case WhiteboardItemType.Project:
                 await CreateProjectItemAsync(wrapper);
                 break;
-            case WhiteboardItemType.SomedayMaybe:
-                await CreateSomedayMaybePairAsync(wrapper);
+            case WhiteboardItemType.TaskItem:
+                await CreateTaskItemPairAsync(wrapper);
                 break;
             case WhiteboardItemType.Goal:
                 // Future implementation
@@ -501,17 +501,17 @@ public partial class MainPageViewModel : ObservableObject
         EnterEditMode(newProject);
     }
 
-    private async Task CreateSomedayMaybePairAsync(GridItemWrapper wrapper)
+    private async Task CreateTaskItemPairAsync(GridItemWrapper wrapper)
     {
         string topImagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
-        var topItem = serviceProvider.GetRequiredService<SomedayMaybeViewModel>();
+        var topItem = serviceProvider.GetRequiredService<TaskItemViewModel>();
         topItem.Image = topImagePath;
         topItem.CreatedDate = DateTime.Today;
 
         await ApplyUniformToFillTransformAsync(topItem, topImagePath);
 
-        var newPair = serviceProvider.GetRequiredService<SomedayMaybePairViewModel>();
+        var newPair = serviceProvider.GetRequiredService<TaskItemPairViewModel>();
         newPair.TopItem = topItem;
         newPair.BottomItem = null;
 
@@ -646,7 +646,7 @@ public partial class MainPageViewModel : ObservableObject
 
         SelectedItem = item;
         item.IsEditing = true;
-        ActiveSomedayMaybeItemIndex = null;
+        ActiveTaskItemIndex = null;
     }
 
     [RelayCommand]
@@ -657,7 +657,7 @@ public partial class MainPageViewModel : ObservableObject
             SelectedItem.IsEditing = false;
             SelectedItem = null;
         }
-        ActiveSomedayMaybeItemIndex = null;
+        ActiveTaskItemIndex = null;
     }
 
     public async Task PasteImageFromClipboardAsync(XamlRoot xamlRoot)
@@ -672,7 +672,7 @@ public partial class MainPageViewModel : ObservableObject
                 title = project.Title;
                 subtitle = project.Subtitle;
             }
-            else if (SelectedItem is SomedayMaybePairViewModel pair)
+            else if (SelectedItem is TaskItemPairViewModel pair)
             {
                 // If both items exist, show selection dialog
                 if (pair.HasBottomItem)
@@ -690,15 +690,15 @@ public partial class MainPageViewModel : ObservableObject
                         return;
                     }
 
-                    ActiveSomedayMaybeItemIndex = selection == PasteTargetSelection.Top ? 0 : 1;
+                    ActiveTaskItemIndex = selection == PasteTargetSelection.Top ? 0 : 1;
                 }
                 else
                 {
                     // Only top item exists, skip dialog
-                    ActiveSomedayMaybeItemIndex = 0;
+                    ActiveTaskItemIndex = 0;
                 }
 
-                var targetItem = ActiveSomedayMaybeItemIndex == 1 ? pair.BottomItem : pair.TopItem;
+                var targetItem = ActiveTaskItemIndex == 1 ? pair.BottomItem : pair.TopItem;
                 title = targetItem?.Title;
                 subtitle = targetItem?.Subtitle;
             }
@@ -733,9 +733,9 @@ public partial class MainPageViewModel : ObservableObject
                 projectItem.ImageOffsetY = offsetY;
                 projectItem.Image = imageUri;
             }
-            else if (SelectedItem is SomedayMaybePairViewModel pairItem)
+            else if (SelectedItem is TaskItemPairViewModel pairItem)
             {
-                var targetItem = ActiveSomedayMaybeItemIndex == 1 ? pairItem.BottomItem : pairItem.TopItem;
+                var targetItem = ActiveTaskItemIndex == 1 ? pairItem.BottomItem : pairItem.TopItem;
                 if (targetItem != null)
                 {
                     targetItem.ImageZoomFactor = scale;
@@ -799,9 +799,9 @@ public partial class MainPageViewModel : ObservableObject
                 title = project.Title;
                 subtitle = project.Subtitle;
             }
-            else if (SelectedItem is SomedayMaybePairViewModel pair)
+            else if (SelectedItem is TaskItemPairViewModel pair)
             {
-                var targetItem = ActiveSomedayMaybeItemIndex == 1 ? pair.BottomItem : pair.TopItem;
+                var targetItem = ActiveTaskItemIndex == 1 ? pair.BottomItem : pair.TopItem;
                 title = targetItem?.Title;
                 subtitle = targetItem?.Subtitle;
             }
@@ -818,9 +818,9 @@ public partial class MainPageViewModel : ObservableObject
                 projectItem.ImageOffsetY = offsetY;
                 projectItem.Image = imageUri;
             }
-            else if (SelectedItem is SomedayMaybePairViewModel pairItem)
+            else if (SelectedItem is TaskItemPairViewModel pairItem)
             {
-                var targetItem = ActiveSomedayMaybeItemIndex == 1 ? pairItem.BottomItem : pairItem.TopItem;
+                var targetItem = ActiveTaskItemIndex == 1 ? pairItem.BottomItem : pairItem.TopItem;
                 if (targetItem != null)
                 {
                     targetItem.ImageZoomFactor = scale;
@@ -897,7 +897,7 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    private async Task ApplyUniformToFillTransformAsync(SomedayMaybeViewModel item, string imageUri)
+    private async Task ApplyUniformToFillTransformAsync(TaskItemViewModel item, string imageUri)
     {
         try
         {

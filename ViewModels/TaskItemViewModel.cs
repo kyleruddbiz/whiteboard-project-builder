@@ -3,7 +3,7 @@ using WhiteboardProjectBuilder.Models;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class SomedayMaybeViewModel : ObservableObject
+public partial class TaskItemViewModel : ObservableObject
 {
     [ObservableProperty]
     private string title = string.Empty;
@@ -75,7 +75,7 @@ public partial class SomedayMaybeViewModel : ObservableObject
     /// <summary>
     /// Converts this ViewModel to a Model for serialization.
     /// </summary>
-    public SomedayMaybe ToModel()
+    public TaskItem ToModel()
     {
         ImageTransform? transform = null;
         if (ImageOffsetX != 0 || ImageOffsetY != 0 || ImageZoomFactor != 1.0)
@@ -88,7 +88,7 @@ public partial class SomedayMaybeViewModel : ObservableObject
             };
         }
 
-        return new SomedayMaybe
+        return new TaskItem
         {
             Title = Title,
             Subtitle = Subtitle,
@@ -101,9 +101,9 @@ public partial class SomedayMaybeViewModel : ObservableObject
     /// <summary>
     /// Creates a ViewModel from a Model.
     /// </summary>
-    public static SomedayMaybeViewModel FromModel(SomedayMaybe model)
+    public static TaskItemViewModel FromModel(TaskItem model)
     {
-        return new SomedayMaybeViewModel
+        return new TaskItemViewModel
         {
             Title = model.Title,
             Subtitle = model.Subtitle,

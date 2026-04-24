@@ -2,21 +2,21 @@ using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;
 
-public sealed partial class SomedayMaybeItemView : UserControl
+public sealed partial class TaskItemView : UserControl
 {
     public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
         nameof(ViewModel),
-        typeof(SomedayMaybeViewModel),
-        typeof(SomedayMaybeItemView),
+        typeof(TaskItemViewModel),
+        typeof(TaskItemView),
         new PropertyMetadata(null));
 
-    public SomedayMaybeViewModel? ViewModel
+    public TaskItemViewModel? ViewModel
     {
-        get => (SomedayMaybeViewModel?)GetValue(ViewModelProperty);
+        get => (TaskItemViewModel?)GetValue(ViewModelProperty);
         set => SetValue(ViewModelProperty, value);
     }
 
-    public SomedayMaybeItemView()
+    public TaskItemView()
     {
         InitializeComponent();
         DataContext = this;

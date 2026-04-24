@@ -3,17 +3,17 @@ using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;
 
-public sealed partial class SomedayMaybePairView : UserControl
+public sealed partial class TaskItemPairView : UserControl
 {
     public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
         nameof(ViewModel),
-        typeof(SomedayMaybePairViewModel),
-        typeof(SomedayMaybePairView),
+        typeof(TaskItemPairViewModel),
+        typeof(TaskItemPairView),
         new PropertyMetadata(null));
 
-    public SomedayMaybePairViewModel? ViewModel
+    public TaskItemPairViewModel? ViewModel
     {
-        get => (SomedayMaybePairViewModel?)GetValue(ViewModelProperty);
+        get => (TaskItemPairViewModel?)GetValue(ViewModelProperty);
         set => SetValue(ViewModelProperty, value);
     }
 
@@ -21,7 +21,7 @@ public sealed partial class SomedayMaybePairView : UserControl
     public event EventHandler<int>? ImageReplaceRequested;
     public event EventHandler? ReactivateRequested;
 
-    public SomedayMaybePairView()
+    public TaskItemPairView()
     {
         InitializeComponent();
         DataContext = this;
@@ -57,7 +57,7 @@ public sealed partial class SomedayMaybePairView : UserControl
         ReactivateRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    private void SomedayMaybePairEditView_ImageReplaceRequested(object sender, int itemIndex)
+    private void TaskItemPairEditView_ImageReplaceRequested(object sender, int itemIndex)
     {
         ImageReplaceRequested?.Invoke(this, itemIndex);
     }

@@ -54,8 +54,8 @@ public partial class App : Application
         // ViewModels - Transient (created on demand)
         services.AddTransient<WhiteboardItemSelectorViewModel>();
         services.AddTransient<ProjectItemViewModel>();
-        services.AddTransient<SomedayMaybePairViewModel>();
-        services.AddTransient<SomedayMaybeViewModel>();
+        services.AddTransient<TaskItemPairViewModel>();
+        services.AddTransient<TaskItemViewModel>();
         services.AddTransient<SettingsViewModel>();
 
         return services.BuildServiceProvider();

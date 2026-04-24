@@ -8,7 +8,7 @@ public class GridItemTemplateSelector : DataTemplateSelector
     public DataTemplate? AddButtonTemplate { get; set; }
     public DataTemplate? SelectorTemplate { get; set; }
     public DataTemplate? ProjectTemplate { get; set; }
-    public DataTemplate? SomedayMaybeTemplate { get; set; }
+    public DataTemplate? TaskItemTemplate { get; set; }
     public DataTemplate? GoalTemplate { get; set; }
     public DataTemplate? InspirationTemplate { get; set; }
 
@@ -24,7 +24,7 @@ public class GridItemTemplateSelector : DataTemplateSelector
             GridItemType.WhiteboardItem => wrapper.WhiteboardItemType switch
             {
                 WhiteboardItemType.Project => ProjectTemplate,
-                WhiteboardItemType.SomedayMaybe => SomedayMaybeTemplate,
+                WhiteboardItemType.TaskItem => TaskItemTemplate,
                 WhiteboardItemType.Goal => GoalTemplate,
                 WhiteboardItemType.Inspiration => InspirationTemplate,
                 _ => null

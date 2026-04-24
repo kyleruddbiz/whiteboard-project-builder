@@ -29,8 +29,8 @@ public partial class GridItemWrapper : ObservableObject
                             case Enums.WhiteboardItemType.Project:
                                 OnPropertyChanged(nameof(ProjectItem));
                                 break;
-                            case Enums.WhiteboardItemType.SomedayMaybe:
-                                OnPropertyChanged(nameof(SomedayMaybePair));
+                            case Enums.WhiteboardItemType.TaskItem:
+                                OnPropertyChanged(nameof(TaskItemPair));
                                 break;
                             case Enums.WhiteboardItemType.Goal:
                                 OnPropertyChanged(nameof(GoalItem));
@@ -50,7 +50,7 @@ public partial class GridItemWrapper : ObservableObject
 
     // Convenience accessors for XAML x:Bind (returns concrete types)
     public ProjectItemViewModel? ProjectItem => Content as ProjectItemViewModel;
-    public SomedayMaybePairViewModel? SomedayMaybePair => Content as SomedayMaybePairViewModel;
+    public TaskItemPairViewModel? TaskItemPair => Content as TaskItemPairViewModel;
     public GoalItemViewModel? GoalItem => Content as GoalItemViewModel;
     public InspirationItemViewModel? InspirationItem => Content as InspirationItemViewModel;
     public WhiteboardItemSelectorViewModel? Selector => Content as WhiteboardItemSelectorViewModel;

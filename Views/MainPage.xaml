@@ -66,15 +66,15 @@
                     </Grid>
                 </DataTemplate>
             </selectors:GridItemTemplateSelector.ProjectTemplate>
-            <selectors:GridItemTemplateSelector.SomedayMaybeTemplate>
+            <selectors:GridItemTemplateSelector.TaskItemTemplate>
                 <DataTemplate x:DataType="models:GridItemWrapper">
                     <Grid>
-                        <local:SomedayMaybePairView
+                        <local:TaskItemPairView
                             Margin="10"
-                            EditRequested="SomedayMaybePairView_EditRequested"
-                            ImageReplaceRequested="SomedayMaybePairView_ImageReplaceRequested"
-                            ReactivateRequested="SomedayMaybePairView_ReactivateRequested"
-                            ViewModel="{x:Bind SomedayMaybePair}" />
+                            EditRequested="TaskItemPairView_EditRequested"
+                            ImageReplaceRequested="TaskItemPairView_ImageReplaceRequested"
+                            ReactivateRequested="TaskItemPairView_ReactivateRequested"
+                            ViewModel="{x:Bind TaskItemPair}" />
                         <local:RemoveItemButton
                             Margin="0 12 12 0"
                             HorizontalAlignment="Right"
@@ -82,10 +82,10 @@
                             ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
                             IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
                             RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            WhiteboardItem="{x:Bind SomedayMaybePair}" />
+                            WhiteboardItem="{x:Bind TaskItemPair}" />
                     </Grid>
                 </DataTemplate>
-            </selectors:GridItemTemplateSelector.SomedayMaybeTemplate>
+            </selectors:GridItemTemplateSelector.TaskItemTemplate>
         </selectors:GridItemTemplateSelector>
     </Page.Resources>
     <Page.Content>

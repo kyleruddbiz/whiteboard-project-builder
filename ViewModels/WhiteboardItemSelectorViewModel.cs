@@ -18,9 +18,9 @@ public partial class WhiteboardItemSelectorViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void SelectSomedayMaybeItem()
+    private void SelectTaskItem()
     {
-        ItemTypeSelected?.Invoke(this, WhiteboardItemType.SomedayMaybe);
+        ItemTypeSelected?.Invoke(this, WhiteboardItemType.TaskItem);
     }
 
     [RelayCommand]

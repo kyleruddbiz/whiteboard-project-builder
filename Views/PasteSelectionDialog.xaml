@@ -15,7 +15,7 @@
     <StackPanel Spacing="12">
         <TextBlock
             Style="{StaticResource BodyTextBlockStyle}"
-            Text="Which SomedayMaybe item should receive the image?"
+            Text="Which task item should receive the image?"
             TextWrapping="Wrap" />
     </StackPanel>
 </ContentDialog>

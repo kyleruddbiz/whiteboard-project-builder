@@ -2,30 +2,30 @@ using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;
 
-public sealed partial class SomedayMaybePairEditView : UserControl
+public sealed partial class TaskItemPairEditView : UserControl
 {
     public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
         nameof(ViewModel),
-        typeof(SomedayMaybePairViewModel),
-        typeof(SomedayMaybePairEditView),
+        typeof(TaskItemPairViewModel),
+        typeof(TaskItemPairEditView),
         new PropertyMetadata(null));
 
-    public SomedayMaybePairViewModel? ViewModel
+    public TaskItemPairViewModel? ViewModel
     {
-        get => (SomedayMaybePairViewModel?)GetValue(ViewModelProperty);
+        get => (TaskItemPairViewModel?)GetValue(ViewModelProperty);
         set => SetValue(ViewModelProperty, value);
     }
 
     public event EventHandler<int>? ImageReplaceRequested;
 
-    public SomedayMaybePairEditView()
+    public TaskItemPairEditView()
     {
         InitializeComponent();
         DataContext = this;
-        Loaded += SomedayMaybePairEditView_Loaded;
+        Loaded += TaskItemPairEditView_Loaded;
     }
 
-    private void SomedayMaybePairEditView_Loaded(object sender, RoutedEventArgs e)
+    private void TaskItemPairEditView_Loaded(object sender, RoutedEventArgs e)
     {
         TopItemEditor.SetFocus();
     }
