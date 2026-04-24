@@ -21,16 +21,14 @@
         BorderBrush="#005FBA"
         BorderThickness="4">
         <StackPanel Padding="16" Spacing="12">
-                <TextBox
+                <local:FloatingLabelTextBox
                     x:Name="TitleTextBox"
-                    Header="Title"
-                    PlaceholderText="New Project"
+                    Label="Title"
                     Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBox
+                <local:FloatingLabelTextBox
                     x:Name="SubtitleTextBox"
-                    Header="Subtitle"
-                    PlaceholderText="Add Details"
+                    Label="Subtitle"
                     Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <StackPanel Spacing="8">

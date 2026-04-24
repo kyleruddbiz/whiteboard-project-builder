@@ -10,15 +10,13 @@
     mc:Ignorable="d">
 
     <StackPanel Padding="16" Spacing="12">
-        <TextBox
+        <local:FloatingLabelTextBox
             x:Name="TitleTextBox"
-            Header="Title"
-            PlaceholderText="Task"
+            Label="Title"
             Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <TextBox
-            Header="Subtitle"
-            PlaceholderText="Add Details"
+        <local:FloatingLabelTextBox
+            Label="Subtitle"
             Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel Spacing="8">
