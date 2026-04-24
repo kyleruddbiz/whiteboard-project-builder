@@ -137,7 +137,7 @@
             </StackPanel>
 
             <ScrollViewer Grid.Row="1" Margin="0 20 0 0">
-                <StackPanel HorizontalAlignment="Center" Spacing="20">
+                <StackPanel Margin="150 0 150 0" Spacing="20">
                     <TextBlock
                         Margin="20 0 0 0"
                         FontSize="40"
@@ -146,7 +146,7 @@
 
                     <GridView
                         x:Name="ProjectsGridView"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Left"
                         IsTabStop="True"
                         ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
                         ItemsSource="{x:Bind ViewModel.ProjectGridItems, Mode=OneWay}"
@@ -161,7 +161,7 @@
 
                     <GridView
                         x:Name="TasksGridView"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Left"
                         IsTabStop="True"
                         ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
                         ItemsSource="{x:Bind ViewModel.TaskGridItems, Mode=OneWay}"
