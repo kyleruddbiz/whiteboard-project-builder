@@ -46,13 +46,11 @@ public partial class MainPageViewModel : ObservableObject
     private WhiteboardItemViewModelBase? selectedItem;
 
     [ObservableProperty]
-    private int? activeTaskItemIndex;
-
-    [ObservableProperty]
     private SettingsViewModel settings = null!;
 
     public ObservableCollection<WhiteboardItemViewModelBase> WhiteboardItems { get; }
-    public ObservableCollection<GridItemWrapper> GridItems { get; }
+    public ObservableCollection<GridItemWrapper> ProjectGridItems { get; }
+    public ObservableCollection<GridItemWrapper> TaskGridItems { get; }
 
     public MainPageViewModel(PrintService printService, WhiteboardItemRepository whiteboardItemRepository, SettingsService settingsService, ImageStorageService imageStorageService, ImageTransformService imageTransformService, ImageDimensionService imageDimensionService, IServiceProvider serviceProvider)
     {
@@ -67,14 +65,10 @@ public partial class MainPageViewModel : ObservableObject
         Settings = serviceProvider.GetRequiredService<SettingsViewModel>();
 
         WhiteboardItems = [];
-        GridItems = [];
+        ProjectGridItems = [];
+        TaskGridItems = [];
 
-        GridItems.Add(new GridItemWrapper
-        {
-            GridItemType = GridItemType.AddButton,
-            WhiteboardItemType = null,
-            Content = null
-        });
+        RebuildGridItems();
 
         WhiteboardItems.CollectionChanged += WhiteboardItems_CollectionChanged;
         WhiteboardItems.CollectionChanged += OnWhiteboardItemsCollectionChanged;
@@ -108,8 +102,27 @@ public partial class MainPageViewModel : ObservableObject
     [RelayCommand]
     private async Task PrintWhiteboardItemsAsync()
     {
-        var activeItems = WhiteboardItems.Where(i => !i.IsArchived);
-        await printService.ShowPrintUIAsync(activeItems);
+        var slots = BuildPrintSlots(WhiteboardItems.Where(i => !i.IsArchived));
+        await printService.ShowPrintUIAsync(slots);
+    }
+
+    /// <summary>
+    /// Groups items into print slots: projects first (each its own slot), then tasks
+    /// paired up into TaskSlotViewModel slots so two tasks share a single print cell.
+    /// </summary>
+    public static IEnumerable<IPrintSlot> BuildPrintSlots(IEnumerable<WhiteboardItemViewModelBase> items)
+    {
+        var itemList = items.ToList();
+
+        foreach (var project in itemList.OfType<ProjectItemViewModel>())
+        {
+            yield return project;
+        }
+
+        foreach (var (top, bottom) in PairUpTasks(itemList.OfType<TaskItemViewModel>()))
+        {
+            yield return new TaskSlotViewModel { TopTask = top, BottomTask = bottom };
+        }
     }
 
     [RelayCommand]
@@ -140,37 +153,7 @@ public partial class MainPageViewModel : ObservableObject
 
     private void WhiteboardItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        switch (e.Action)
-        {
-            case NotifyCollectionChangedAction.Add:
-                if (e.NewItems != null)
-                {
-                    foreach (WhiteboardItemViewModelBase item in e.NewItems)
-                    {
-                        AddGridItem(item);
-                    }
-                }
-                break;
-
-            case NotifyCollectionChangedAction.Remove:
-                if (e.OldItems != null)
-                {
-                    foreach (WhiteboardItemViewModelBase item in e.OldItems)
-                    {
-                        RemoveGridItem(item);
-                    }
-                }
-                break;
-
-            case NotifyCollectionChangedAction.Reset:
-                RebuildGridItems();
-                break;
-
-            case NotifyCollectionChangedAction.Replace:
-            case NotifyCollectionChangedAction.Move:
-                RebuildGridItems();
-                break;
-        }
+        RebuildGridItems();
     }
 
     private void OnWhiteboardItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -203,102 +186,76 @@ public partial class MainPageViewModel : ObservableObject
 
     private void OnWhiteboardItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(WhiteboardItemViewModelBase.IsArchived) && sender is WhiteboardItemViewModelBase item)
+        if (e.PropertyName == nameof(WhiteboardItemViewModelBase.IsArchived))
         {
-            if (!Settings.ShowArchived)
-            {
-                if (item.IsArchived)
-                {
-                    RemoveGridItem(item);
-                }
-                else
-                {
-                    AddGridItem(item);
-                }
-            }
-        }
-    }
-
-    private void AddGridItem(WhiteboardItemViewModelBase item)
-    {
-        if (!Settings.ShowArchived && item.IsArchived)
-        {
-            return;
-        }
-
-        if (GridItems.Any(w => w.WhiteboardItem == item))
-        {
-            return;
-        }
-
-        int insertIndex;
-
-        if (Settings.IsSortDescending)
-        {
-            insertIndex = GridItems.Count > 0 && GridItems[0].GridItemType == GridItemType.AddButton ? 1 : 0;
-        }
-        else
-        {
-            insertIndex = GridItems.Count > 0 && GridItems[^1].GridItemType == GridItemType.AddButton
-                ? GridItems.Count - 1
-                : GridItems.Count;
-        }
-
-        GridItems.Insert(insertIndex, new GridItemWrapper
-        {
-            GridItemType = GridItemType.WhiteboardItem,
-            WhiteboardItemType = item.GetItemType(),
-            Content = item
-        });
-    }
-
-    private void RemoveGridItem(WhiteboardItemViewModelBase item)
-    {
-        var wrapper = GridItems.FirstOrDefault(w => w.WhiteboardItem == item);
-        if (wrapper != null)
-        {
-            GridItems.Remove(wrapper);
+            RebuildGridItems();
         }
     }
 
     private void RebuildGridItems()
     {
-        GridItems.Clear();
+        RebuildSection(
+            ProjectGridItems,
+            WhiteboardItems.OfType<ProjectItemViewModel>(),
+            WhiteboardItemType.Project);
+
+        RebuildSection(
+            TaskGridItems,
+            WhiteboardItems.OfType<TaskItemViewModel>(),
+            WhiteboardItemType.TaskItem);
+    }
+
+    private void RebuildSection<T>(
+        ObservableCollection<GridItemWrapper> gridItems,
+        IEnumerable<T> allItems,
+        WhiteboardItemType itemType)
+        where T : WhiteboardItemViewModelBase
+    {
+        gridItems.Clear();
 
         if (Settings.IsSortDescending)
         {
-            GridItems.Add(new GridItemWrapper
-            {
-                GridItemType = GridItemType.AddButton,
-                WhiteboardItemType = null,
-                Content = null
-            });
+            gridItems.Add(BuildAddButtonWrapper(itemType));
         }
 
-        var itemsToDisplay = WhiteboardItems.Where(i => Settings.ShowArchived || !i.IsArchived);
+        var visibleItems = allItems.Where(i => Settings.ShowArchived || !i.IsArchived);
 
-        var sortedItems = Settings.IsSortDescending
-            ? itemsToDisplay.Reverse()
-            : itemsToDisplay;
-
-        foreach (var item in sortedItems)
+        if (Settings.IsSortDescending)
         {
-            GridItems.Add(new GridItemWrapper
+            visibleItems = visibleItems.Reverse();
+        }
+
+        foreach (var item in visibleItems)
+        {
+            gridItems.Add(new GridItemWrapper
             {
                 GridItemType = GridItemType.WhiteboardItem,
-                WhiteboardItemType = item.GetItemType(),
+                WhiteboardItemType = itemType,
                 Content = item
             });
         }
 
         if (!Settings.IsSortDescending)
         {
-            GridItems.Add(new GridItemWrapper
-            {
-                GridItemType = GridItemType.AddButton,
-                WhiteboardItemType = null,
-                Content = null
-            });
+            gridItems.Add(BuildAddButtonWrapper(itemType));
+        }
+    }
+
+    private static GridItemWrapper BuildAddButtonWrapper(WhiteboardItemType forType) => new()
+    {
+        GridItemType = GridItemType.AddButton,
+        WhiteboardItemType = forType,
+        Content = null
+    };
+
+    public static IEnumerable<(TaskItemViewModel top, TaskItemViewModel? bottom)> PairUpTasks(IEnumerable<TaskItemViewModel> tasks)
+    {
+        using var e = tasks.GetEnumerator();
+        while (e.MoveNext())
+        {
+            var top = e.Current;
+            var bottom = e.MoveNext() ? e.Current : null;
+            yield return (top, bottom);
         }
     }
 
@@ -414,71 +371,10 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void AddItem()
+    private async Task AddProjectAsync()
     {
         ExitEditMode();
 
-        var selectorViewModel = serviceProvider.GetRequiredService<WhiteboardItemSelectorViewModel>();
-
-        selectorViewModel.ItemTypeSelected += OnSelectorItemTypeSelected;
-        selectorViewModel.CancelRequested += OnSelectorCancelRequested;
-
-        int insertIndex = Settings.IsSortDescending
-            ? (GridItems.Count > 0 && GridItems[0].GridItemType == GridItemType.AddButton ? 1 : 0)
-            : (GridItems.Count > 0 && GridItems[^1].GridItemType == GridItemType.AddButton ? GridItems.Count - 1 : GridItems.Count);
-
-        GridItems.Insert(insertIndex, new GridItemWrapper
-        {
-            GridItemType = GridItemType.Selector,
-            WhiteboardItemType = null,
-            Content = selectorViewModel
-        });
-    }
-
-    private void OnSelectorItemTypeSelected(object? sender, WhiteboardItemType itemType)
-    {
-        if (sender is WhiteboardItemSelectorViewModel selectorViewModel)
-        {
-            _ = CreateWhiteboardItemCommand.ExecuteAsync((selectorViewModel, itemType));
-        }
-    }
-
-    private void OnSelectorCancelRequested(object? sender, EventArgs e)
-    {
-        if (sender is WhiteboardItemSelectorViewModel selectorViewModel)
-        {
-            CancelSelectorCommand.Execute(selectorViewModel);
-        }
-    }
-
-    [RelayCommand]
-    private async Task CreateWhiteboardItemAsync((WhiteboardItemSelectorViewModel Selector, WhiteboardItemType ItemType) parameters)
-    {
-        var wrapper = GridItems.FirstOrDefault(w => w.Selector == parameters.Selector);
-        if (wrapper == null)
-        {
-            throw new InvalidOperationException($"GridItemWrapper not found for selector {parameters.Selector.Id}. The selector may have been removed before the item could be created.");
-        }
-
-        switch (parameters.ItemType)
-        {
-            case WhiteboardItemType.Project:
-                await CreateProjectItemAsync(wrapper);
-                break;
-            case WhiteboardItemType.TaskItem:
-                await CreateTaskItemPairAsync(wrapper);
-                break;
-            case WhiteboardItemType.Goal:
-                // Future implementation
-                break;
-            case WhiteboardItemType.Inspiration:
-                // Future implementation
-                break;
-        }
-    }
-
-    private async Task CreateProjectItemAsync(GridItemWrapper wrapper)
-    {
         string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
         var newProject = serviceProvider.GetRequiredService<ProjectItemViewModel>();
@@ -489,59 +385,26 @@ public partial class MainPageViewModel : ObservableObject
 
         await ApplyUniformToFillTransformAsync(newProject, imagePath);
 
-        if (wrapper.Selector != null)
-        {
-            UnsubscribeFromSelector(wrapper.Selector);
-        }
-
-        GridItems.Remove(wrapper);
-
         WhiteboardItems.Add(newProject);
 
         EnterEditMode(newProject);
     }
 
-    private async Task CreateTaskItemPairAsync(GridItemWrapper wrapper)
-    {
-        string topImagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
-
-        var topItem = serviceProvider.GetRequiredService<TaskItemViewModel>();
-        topItem.Image = topImagePath;
-        topItem.CreatedDate = DateTime.Today;
-
-        await ApplyUniformToFillTransformAsync(topItem, topImagePath);
-
-        var newPair = serviceProvider.GetRequiredService<TaskItemPairViewModel>();
-        newPair.TopItem = topItem;
-        newPair.BottomItem = null;
-
-        if (wrapper.Selector != null)
-        {
-            UnsubscribeFromSelector(wrapper.Selector);
-        }
-
-        GridItems.Remove(wrapper);
-
-        WhiteboardItems.Add(newPair);
-
-        EnterEditMode(newPair);
-    }
-
     [RelayCommand]
-    private void CancelSelector(WhiteboardItemSelectorViewModel selector)
+    private async Task AddTaskAsync()
     {
-        var wrapper = GridItems.FirstOrDefault(w => w.Selector == selector);
-        if (wrapper != null)
-        {
-            UnsubscribeFromSelector(selector);
-            GridItems.Remove(wrapper);
-        }
-    }
+        ExitEditMode();
 
-    private void UnsubscribeFromSelector(WhiteboardItemSelectorViewModel selector)
-    {
-        selector.ItemTypeSelected -= OnSelectorItemTypeSelected;
-        selector.CancelRequested -= OnSelectorCancelRequested;
+        string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
+
+        var newTask = serviceProvider.GetRequiredService<TaskItemViewModel>();
+        newTask.Image = imagePath;
+
+        await ApplyUniformToFillTransformAsync(newTask, imagePath);
+
+        WhiteboardItems.Add(newTask);
+
+        EnterEditMode(newTask);
     }
 
     [RelayCommand]
@@ -646,7 +509,6 @@ public partial class MainPageViewModel : ObservableObject
 
         SelectedItem = item;
         item.IsEditing = true;
-        ActiveTaskItemIndex = null;
     }
 
     [RelayCommand]
@@ -657,7 +519,6 @@ public partial class MainPageViewModel : ObservableObject
             SelectedItem.IsEditing = false;
             SelectedItem = null;
         }
-        ActiveTaskItemIndex = null;
     }
 
     public async Task PasteImageFromClipboardAsync(XamlRoot xamlRoot)
@@ -672,35 +533,10 @@ public partial class MainPageViewModel : ObservableObject
                 title = project.Title;
                 subtitle = project.Subtitle;
             }
-            else if (SelectedItem is TaskItemPairViewModel pair)
+            else if (SelectedItem is TaskItemViewModel task)
             {
-                // If both items exist, show selection dialog
-                if (pair.HasBottomItem)
-                {
-                    var selectionDialog = new PasteSelectionDialog
-                    {
-                        XamlRoot = xamlRoot
-                    };
-
-                    var selectionResult = await selectionDialog.ShowAsync();
-                    var selection = selectionResult.ToPasteTargetSelection();
-
-                    if (selection == PasteTargetSelection.Cancel)
-                    {
-                        return;
-                    }
-
-                    ActiveTaskItemIndex = selection == PasteTargetSelection.Top ? 0 : 1;
-                }
-                else
-                {
-                    // Only top item exists, skip dialog
-                    ActiveTaskItemIndex = 0;
-                }
-
-                var targetItem = ActiveTaskItemIndex == 1 ? pair.BottomItem : pair.TopItem;
-                title = targetItem?.Title;
-                subtitle = targetItem?.Subtitle;
+                title = task.Title;
+                subtitle = task.Subtitle;
             }
 
             string defaultFileName = imageStorageService.GenerateFileName(title, subtitle);
@@ -733,16 +569,12 @@ public partial class MainPageViewModel : ObservableObject
                 projectItem.ImageOffsetY = offsetY;
                 projectItem.Image = imageUri;
             }
-            else if (SelectedItem is TaskItemPairViewModel pairItem)
+            else if (SelectedItem is TaskItemViewModel taskItem)
             {
-                var targetItem = ActiveTaskItemIndex == 1 ? pairItem.BottomItem : pairItem.TopItem;
-                if (targetItem != null)
-                {
-                    targetItem.ImageZoomFactor = scale;
-                    targetItem.ImageOffsetX = offsetX;
-                    targetItem.ImageOffsetY = offsetY;
-                    targetItem.Image = imageUri;
-                }
+                taskItem.ImageZoomFactor = scale;
+                taskItem.ImageOffsetX = offsetX;
+                taskItem.ImageOffsetY = offsetY;
+                taskItem.Image = imageUri;
             }
 
             Debug.WriteLine($"Image saved successfully: {imageUri}");
@@ -757,7 +589,8 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    public async Task ReplaceImageAsync(XamlRoot xamlRoot)
+    [RelayCommand]
+    private async Task ReplaceImageAsync(XamlRoot xamlRoot)
     {
         if (SelectedItem == null)
         {
@@ -799,11 +632,10 @@ public partial class MainPageViewModel : ObservableObject
                 title = project.Title;
                 subtitle = project.Subtitle;
             }
-            else if (SelectedItem is TaskItemPairViewModel pair)
+            else if (SelectedItem is TaskItemViewModel task)
             {
-                var targetItem = ActiveTaskItemIndex == 1 ? pair.BottomItem : pair.TopItem;
-                title = targetItem?.Title;
-                subtitle = targetItem?.Subtitle;
+                title = task.Title;
+                subtitle = task.Subtitle;
             }
 
             string fileName = imageStorageService.GenerateFileName(title, subtitle);
@@ -818,16 +650,12 @@ public partial class MainPageViewModel : ObservableObject
                 projectItem.ImageOffsetY = offsetY;
                 projectItem.Image = imageUri;
             }
-            else if (SelectedItem is TaskItemPairViewModel pairItem)
+            else if (SelectedItem is TaskItemViewModel taskItem)
             {
-                var targetItem = ActiveTaskItemIndex == 1 ? pairItem.BottomItem : pairItem.TopItem;
-                if (targetItem != null)
-                {
-                    targetItem.ImageZoomFactor = scale;
-                    targetItem.ImageOffsetX = offsetX;
-                    targetItem.ImageOffsetY = offsetY;
-                    targetItem.Image = imageUri;
-                }
+                taskItem.ImageZoomFactor = scale;
+                taskItem.ImageOffsetX = offsetX;
+                taskItem.ImageOffsetY = offsetY;
+                taskItem.Image = imageUri;
             }
 
             Debug.WriteLine($"Image replaced successfully: {imageUri}");

@@ -1,9 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class TaskItemViewModel : ObservableObject
+public partial class TaskItemViewModel : WhiteboardItemViewModelBase
 {
     [ObservableProperty]
     private string title = string.Empty;
@@ -23,21 +24,9 @@ public partial class TaskItemViewModel : ObservableObject
     [ObservableProperty]
     private double imageZoomFactor = 1.0;
 
-    public DateTime CreatedDate { get; set; } = DateTime.Today;
-
     public string CreatedDateDisplay => CreatedDate.ToShortDateString();
     public bool IsUsingTemporaryImage => Image.StartsWith("Assets/Backgrounds/Examples");
     public bool HasError => string.IsNullOrWhiteSpace(Title) || IsUsingTemporaryImage;
-
-    /// <summary>
-    /// Raised when any property changes to trigger autosave.
-    /// </summary>
-    public event EventHandler? DataChanged;
-
-    protected void RaiseDataChanged()
-    {
-        DataChanged?.Invoke(this, EventArgs.Empty);
-    }
 
     partial void OnTitleChanged(string value)
     {
@@ -72,10 +61,9 @@ public partial class TaskItemViewModel : ObservableObject
         RaiseDataChanged();
     }
 
-    /// <summary>
-    /// Converts this ViewModel to a Model for serialization.
-    /// </summary>
-    public TaskItem ToModel()
+    public override WhiteboardItemType GetItemType() => WhiteboardItemType.TaskItem;
+
+    public override TaskItem ToModel()
     {
         ImageTransform? transform = null;
         if (ImageOffsetX != 0 || ImageOffsetY != 0 || ImageZoomFactor != 1.0)
@@ -94,13 +82,11 @@ public partial class TaskItemViewModel : ObservableObject
             Subtitle = Subtitle,
             Image = Image,
             Transform = transform,
-            CreatedDate = CreatedDate
+            CreatedDate = CreatedDate,
+            IsArchived = IsArchived
         };
     }
 
-    /// <summary>
-    /// Creates a ViewModel from a Model.
-    /// </summary>
     public static TaskItemViewModel FromModel(TaskItem model)
     {
         return new TaskItemViewModel
@@ -111,7 +97,8 @@ public partial class TaskItemViewModel : ObservableObject
             ImageOffsetX = model.Transform?.OffsetX ?? 0,
             ImageOffsetY = model.Transform?.OffsetY ?? 0,
             ImageZoomFactor = model.Transform?.ZoomFactor ?? 1.0,
-            CreatedDate = model.CreatedDate
+            CreatedDate = model.CreatedDate,
+            IsArchived = model.IsArchived
         };
     }
 }

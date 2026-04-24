@@ -57,5 +57,5 @@ public abstract partial class WhiteboardItemViewModelBase : ObservableObject
     /// <summary>
     /// Helper property for conditional rendering in XAML.
     /// </summary>
-    public bool IsTaskItemPair => GetItemType() == WhiteboardItemType.TaskItem;
+    public bool IsTaskItem => GetItemType() == WhiteboardItemType.TaskItem;
 }

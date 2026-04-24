@@ -8,13 +8,13 @@ public sealed partial class PrintPageView : UserControl
     public static readonly DependencyProperty ItemsProperty =
         DependencyProperty.Register(
             nameof(Items),
-            typeof(List<WhiteboardItemViewModelBase>),
+            typeof(List<IPrintSlot>),
             typeof(PrintPageView),
             new PropertyMetadata(null, OnItemsChanged));
 
-    public List<WhiteboardItemViewModelBase>? Items
+    public List<IPrintSlot>? Items
     {
-        get => (List<WhiteboardItemViewModelBase>?)GetValue(ItemsProperty);
+        get => (List<IPrintSlot>?)GetValue(ItemsProperty);
         set => SetValue(ItemsProperty, value);
     }
 
@@ -56,8 +56,8 @@ public sealed partial class PrintPageView : UserControl
             UserControl itemView = Items[i] switch
             {
                 ProjectItemViewModel projectVm => new ProjectItemView { ViewModel = projectVm },
-                TaskItemPairViewModel pairVm => new TaskItemPairView { ViewModel = pairVm },
-                _ => throw new NotSupportedException($"Unsupported item type for printing: {Items[i].GetType().Name}")
+                TaskSlotViewModel slotVm => new TaskSlotView { ViewModel = slotVm },
+                var slot => throw new NotSupportedException($"Unsupported print slot type: {slot.GetType().Name}")
             };
 
             viewbox.Child = itemView;

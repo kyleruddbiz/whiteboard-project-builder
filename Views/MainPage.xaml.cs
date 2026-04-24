@@ -175,42 +175,4 @@ public partial class MainPage : Page
             ViewModel.SelectedItem = null;
         }
     }
-
-    private void ProjectItemView_EditRequested(object? sender, ProjectItemViewModel e)
-    {
-        ViewModel.EnterEditModeCommand.Execute(e);
-    }
-
-    private async void ProjectItemView_ImageReplaceRequested(object? sender, EventArgs e)
-    {
-        ViewModel.ActiveTaskItemIndex = null;
-        await ViewModel.ReplaceImageAsync(XamlRoot);
-    }
-
-    private void ProjectItemView_ReactivateRequested(object? sender, ProjectItemViewModel e)
-    {
-        ViewModel.ReactivateItemCommand.Execute(e);
-    }
-
-    private void TaskItemPairView_EditRequested(object? sender, EventArgs e)
-    {
-        if (sender is TaskItemPairView view && view.ViewModel != null)
-        {
-            ViewModel.EnterEditModeCommand.Execute(view.ViewModel);
-        }
-    }
-
-    private async void TaskItemPairView_ImageReplaceRequested(object? sender, int itemIndex)
-    {
-        ViewModel.ActiveTaskItemIndex = itemIndex;
-        await ViewModel.ReplaceImageAsync(XamlRoot);
-    }
-
-    private void TaskItemPairView_ReactivateRequested(object? sender, EventArgs e)
-    {
-        if (sender is TaskItemPairView view && view.ViewModel != null)
-        {
-            ViewModel.ReactivateItemCommand.Execute(view.ViewModel);
-        }
-    }
 }

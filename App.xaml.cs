@@ -52,9 +52,7 @@ public partial class App : Application
         services.AddSingleton<MainPageViewModel>();
 
         // ViewModels - Transient (created on demand)
-        services.AddTransient<WhiteboardItemSelectorViewModel>();
         services.AddTransient<ProjectItemViewModel>();
-        services.AddTransient<TaskItemPairViewModel>();
         services.AddTransient<TaskItemViewModel>();
         services.AddTransient<SettingsViewModel>();
 

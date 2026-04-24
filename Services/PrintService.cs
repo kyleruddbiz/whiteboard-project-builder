@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.UI.Xaml.Printing;
 using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.Views;
 using Windows.Foundation;
 using Windows.Graphics.Printing;
 using WinRT.Interop;
@@ -9,7 +10,8 @@ namespace WhiteboardProjectBuilder.Services;
 
 /// <summary>
 /// Service for printing whiteboard items using the Windows print system.
-/// Supports printing multiple WhiteboardItemViewModelBase instances with up to 4 items per page in a 2x2 grid layout.
+/// Accepts a list of <see cref="IPrintSlot"/> (one project or one TaskSlotViewModel
+/// per slot) and renders up to 4 slots per page in a 2x2 grid layout.
 /// </summary>
 public class PrintService
 {
@@ -17,7 +19,7 @@ public class PrintService
     private IPrintDocumentSource? printDocumentSource;
     private PrintManager? printManager;
     private readonly List<UIElement> printPages = new();
-    private List<WhiteboardItemViewModelBase> itemsToPrint = new();
+    private List<IPrintSlot> itemsToPrint = new();
     private Canvas? printCanvas;
 
     /// <summary>
@@ -82,10 +84,11 @@ public class PrintService
     }
 
     /// <summary>
-    /// Displays the Windows print dialog for the specified whiteboard items.
+    /// Displays the Windows print dialog for the specified print slots.
+    /// Each slot is either a ProjectItemViewModel or a TaskSlotViewModel.
     /// </summary>
-    /// <param name="items">Collection of WhiteboardItemViewModelBase instances to print</param>
-    public async Task ShowPrintUIAsync(IEnumerable<WhiteboardItemViewModelBase> items)
+    /// <param name="items">Collection of print slots to render</param>
+    public async Task ShowPrintUIAsync(IEnumerable<IPrintSlot> items)
     {
         if (App.MainWindow == null)
         {

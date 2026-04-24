@@ -9,27 +9,26 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:TaskItemViewModel}"
     mc:Ignorable="d">
 
-    <StackPanel Padding="16" Spacing="12">
-        <local:FloatingLabelTextBox
-            x:Name="TitleTextBox"
-            Label="Title"
-            Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Padding="16" Spacing="8">
+            <local:FloatingLabelTextBox
+                x:Name="TitleTextBox"
+                Label="Title"
+                Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <local:FloatingLabelTextBox
-            Label="Subtitle"
-            Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <local:FloatingLabelTextBox
+                Label="Subtitle"
+                Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <StackPanel Spacing="8">
-            <TextBlock FontWeight="SemiBold" Text="Image" />
             <local:ImageEditor
                 x:Name="MainImageEditor"
                 Width="420"
-                Height="240"
+                Height="200"
                 ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
                 ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                 OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
                 OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=TwoWay}"
                 ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=TwoWay}" />
         </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </UserControl>

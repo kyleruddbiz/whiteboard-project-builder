@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using WhiteboardProjectBuilder.ViewModels;
@@ -13,15 +14,47 @@ public sealed partial class ProjectItemView : UserControl
             typeof(ProjectItemView),
             new PropertyMetadata(null));
 
+    public static readonly DependencyProperty EditCommandProperty = DependencyProperty.Register(
+        nameof(EditCommand),
+        typeof(ICommand),
+        typeof(ProjectItemView),
+        new PropertyMetadata(null));
+
+    public static readonly DependencyProperty ImageReplaceCommandProperty = DependencyProperty.Register(
+        nameof(ImageReplaceCommand),
+        typeof(ICommand),
+        typeof(ProjectItemView),
+        new PropertyMetadata(null));
+
+    public static readonly DependencyProperty ReactivateCommandProperty = DependencyProperty.Register(
+        nameof(ReactivateCommand),
+        typeof(ICommand),
+        typeof(ProjectItemView),
+        new PropertyMetadata(null));
+
     public ProjectItemViewModel? ViewModel
     {
         get => (ProjectItemViewModel?)GetValue(ViewModelProperty);
         set => SetValue(ViewModelProperty, value);
     }
 
-    public event EventHandler<ProjectItemViewModel>? EditRequested;
-    public event EventHandler? ImageReplaceRequested;
-    public event EventHandler<ProjectItemViewModel>? ReactivateRequested;
+    public ICommand? EditCommand
+    {
+        get => (ICommand?)GetValue(EditCommandProperty);
+        set => SetValue(EditCommandProperty, value);
+    }
+
+    public ICommand? ImageReplaceCommand
+    {
+        get => (ICommand?)GetValue(ImageReplaceCommandProperty);
+        set => SetValue(ImageReplaceCommandProperty, value);
+    }
+
+    public ICommand? ReactivateCommand
+    {
+        get => (ICommand?)GetValue(ReactivateCommandProperty);
+        set => SetValue(ReactivateCommandProperty, value);
+    }
 
     public ProjectItemView()
     {
@@ -40,16 +73,7 @@ public sealed partial class ProjectItemView : UserControl
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
-            var animation = new DoubleAnimation
-            {
-                To = 0.3,
-                Duration = TimeSpan.FromMilliseconds(200)
-            };
-            Storyboard.SetTarget(animation, indicator);
-            Storyboard.SetTargetProperty(animation, "Opacity");
-            var storyboard = new Storyboard();
-            storyboard.Children.Add(animation);
-            storyboard.Begin();
+            AnimateHoverIndicator(indicator, 0.3);
         }
     }
 
@@ -57,46 +81,31 @@ public sealed partial class ProjectItemView : UserControl
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
-            var animation = new DoubleAnimation
-            {
-                To = 0,
-                Duration = TimeSpan.FromMilliseconds(200)
-            };
-            Storyboard.SetTarget(animation, indicator);
-            Storyboard.SetTargetProperty(animation, "Opacity");
-            var storyboard = new Storyboard();
-            storyboard.Children.Add(animation);
-            storyboard.Begin();
+            AnimateHoverIndicator(indicator, 0);
         }
     }
 
     private void Overlay_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (ViewModel != null)
+        if (ViewModel != null && EditCommand?.CanExecute(ViewModel) == true)
         {
-            EditRequested?.Invoke(this, ViewModel);
+            EditCommand.Execute(ViewModel);
         }
     }
 
     private void ProjectItemEditView_ImageReplaceRequested(object? sender, EventArgs e)
     {
-        ImageReplaceRequested?.Invoke(this, EventArgs.Empty);
+        if (ImageReplaceCommand?.CanExecute(XamlRoot) == true)
+        {
+            ImageReplaceCommand.Execute(XamlRoot);
+        }
     }
 
     private void ReactivateOverlay_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
-            var animation = new DoubleAnimation
-            {
-                To = 0.3,
-                Duration = TimeSpan.FromMilliseconds(200)
-            };
-            Storyboard.SetTarget(animation, indicator);
-            Storyboard.SetTargetProperty(animation, "Opacity");
-            var storyboard = new Storyboard();
-            storyboard.Children.Add(animation);
-            storyboard.Begin();
+            AnimateHoverIndicator(indicator, 0.3);
         }
     }
 
@@ -104,24 +113,29 @@ public sealed partial class ProjectItemView : UserControl
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
-            var animation = new DoubleAnimation
-            {
-                To = 0,
-                Duration = TimeSpan.FromMilliseconds(200)
-            };
-            Storyboard.SetTarget(animation, indicator);
-            Storyboard.SetTargetProperty(animation, "Opacity");
-            var storyboard = new Storyboard();
-            storyboard.Children.Add(animation);
-            storyboard.Begin();
+            AnimateHoverIndicator(indicator, 0);
         }
     }
 
     private void ReactivateOverlay_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (ViewModel != null)
+        if (ViewModel != null && ReactivateCommand?.CanExecute(ViewModel) == true)
         {
-            ReactivateRequested?.Invoke(this, ViewModel);
+            ReactivateCommand.Execute(ViewModel);
         }
+    }
+
+    private static void AnimateHoverIndicator(UIElement target, double toOpacity)
+    {
+        var animation = new DoubleAnimation
+        {
+            To = toOpacity,
+            Duration = TimeSpan.FromMilliseconds(200)
+        };
+        Storyboard.SetTarget(animation, target);
+        Storyboard.SetTargetProperty(animation, "Opacity");
+        var storyboard = new Storyboard();
+        storyboard.Children.Add(animation);
+        storyboard.Begin();
     }
 }

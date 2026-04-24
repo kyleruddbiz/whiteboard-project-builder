@@ -4,7 +4,7 @@ namespace WhiteboardProjectBuilder.Models;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "itemType")]
 [JsonDerivedType(typeof(ProjectItem), "project")]
-[JsonDerivedType(typeof(TaskItemPair), "task")]
+[JsonDerivedType(typeof(TaskItem), "task")]
 public interface IWhiteboardItem
 {
     DateTime CreatedDate { get; set; }

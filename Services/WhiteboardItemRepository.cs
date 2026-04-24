@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Models.Serialization;
 using WhiteboardProjectBuilder.ViewModels;
@@ -12,14 +11,10 @@ public class WhiteboardItemRepository
 {
     private const string DataFileName = "whiteboard-items.json";
     private readonly DataPersistenceService dataPersistenceService;
-    private readonly IServiceProvider serviceProvider;
 
-    public WhiteboardItemRepository(
-        DataPersistenceService dataPersistenceService,
-        IServiceProvider serviceProvider)
+    public WhiteboardItemRepository(DataPersistenceService dataPersistenceService)
     {
         this.dataPersistenceService = dataPersistenceService;
-        this.serviceProvider = serviceProvider;
     }
 
     public async Task SaveWhiteboardItemsAsync(IEnumerable<WhiteboardItemViewModelBase> items)
@@ -49,7 +44,7 @@ public class WhiteboardItemRepository
             WhiteboardItemViewModelBase viewModel = item switch
             {
                 ProjectItem project => ProjectItemViewModel.FromModel(project),
-                TaskItemPair pair => CreateTaskItemPairViewModel(pair),
+                TaskItem task => TaskItemViewModel.FromModel(task),
                 _ => throw new NotSupportedException($"Unsupported whiteboard item type: {item.GetType().Name}")
             };
 
@@ -57,12 +52,5 @@ public class WhiteboardItemRepository
         }
 
         return viewModels;
-    }
-
-    private TaskItemPairViewModel CreateTaskItemPairViewModel(TaskItemPair model)
-    {
-        var viewModel = serviceProvider.GetRequiredService<TaskItemPairViewModel>();
-        viewModel.LoadFromModel(model);
-        return viewModel;
     }
 }

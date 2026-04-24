@@ -20,39 +20,14 @@ public partial class GridItemWrapper : ObservableObject
         {
             if (SetProperty(ref content, value))
             {
-                switch (GridItemType)
-                {
-                    case GridItemType.WhiteboardItem:
-                        OnPropertyChanged(nameof(WhiteboardItem));
-                        switch (WhiteboardItemType)
-                        {
-                            case Enums.WhiteboardItemType.Project:
-                                OnPropertyChanged(nameof(ProjectItem));
-                                break;
-                            case Enums.WhiteboardItemType.TaskItem:
-                                OnPropertyChanged(nameof(TaskItemPair));
-                                break;
-                            case Enums.WhiteboardItemType.Goal:
-                                OnPropertyChanged(nameof(GoalItem));
-                                break;
-                            case Enums.WhiteboardItemType.Inspiration:
-                                OnPropertyChanged(nameof(InspirationItem));
-                                break;
-                        }
-                        break;
-                    case GridItemType.Selector:
-                        OnPropertyChanged(nameof(Selector));
-                        break;
-                }
+                OnPropertyChanged(nameof(WhiteboardItem));
+                OnPropertyChanged(nameof(ProjectItem));
+                OnPropertyChanged(nameof(TaskItem));
             }
         }
     }
 
-    // Convenience accessors for XAML x:Bind (returns concrete types)
     public ProjectItemViewModel? ProjectItem => Content as ProjectItemViewModel;
-    public TaskItemPairViewModel? TaskItemPair => Content as TaskItemPairViewModel;
-    public GoalItemViewModel? GoalItem => Content as GoalItemViewModel;
-    public InspirationItemViewModel? InspirationItem => Content as InspirationItemViewModel;
-    public WhiteboardItemSelectorViewModel? Selector => Content as WhiteboardItemSelectorViewModel;
+    public TaskItemViewModel? TaskItem => Content as TaskItemViewModel;
     public WhiteboardItemViewModelBase? WhiteboardItem => Content as WhiteboardItemViewModelBase;
 }
