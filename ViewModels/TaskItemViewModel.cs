@@ -26,13 +26,10 @@ public partial class TaskItemViewModel : WhiteboardItemViewModelBase
     private double imageZoomFactor = 1.0;
 
     public string CreatedDateDisplay => CreatedDate.ToShortDateString();
-    public bool IsUsingTemporaryImage => Image.StartsWith("Assets/Backgrounds/Examples");
-    public bool HasError => string.IsNullOrWhiteSpace(Title) || IsUsingTemporaryImage;
 
     partial void OnTitleChanged(string value)
     {
         RaiseDataChanged();
-        OnPropertyChanged(nameof(HasError));
     }
 
     partial void OnSubtitleChanged(string? value)
@@ -43,8 +40,6 @@ public partial class TaskItemViewModel : WhiteboardItemViewModelBase
     partial void OnImageChanged(string value)
     {
         RaiseDataChanged();
-        OnPropertyChanged(nameof(IsUsingTemporaryImage));
-        OnPropertyChanged(nameof(HasError));
     }
 
     partial void OnImageOffsetXChanged(double value)

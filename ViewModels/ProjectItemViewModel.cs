@@ -49,8 +49,6 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
     public string DateDisplay => DueDate?.ToShortDateString() ?? string.Empty;
     public string DatePrefix => DueDate?.Date == DateTime.Now.Date ? "TODAY: " : string.Empty;
     public string CreatedDateDisplay => CreatedDate.ToShortDateString();
-    public bool IsUsingTemporaryImage => Image.StartsWith("Assets/Backgrounds/Examples");
-    public bool HasError => string.IsNullOrWhiteSpace(Title) || IsUsingTemporaryImage;
 
     public List<ProjectSize> SizeOptions { get; } = [.. Enum.GetValues<ProjectSize>().Cast<ProjectSize>()];
     public List<ProjectValue> ValueOptions { get; } = [.. Enum.GetValues<ProjectValue>().Cast<ProjectValue>()];
@@ -61,7 +59,6 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
     partial void OnTitleChanged(string value)
     {
         RaiseDataChanged();
-        OnPropertyChanged(nameof(HasError));
     }
 
     partial void OnSubtitleChanged(string? value)
@@ -72,8 +69,6 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
     partial void OnImageChanged(string value)
     {
         RaiseDataChanged();
-        OnPropertyChanged(nameof(IsUsingTemporaryImage));
-        OnPropertyChanged(nameof(HasError));
     }
 
     partial void OnImageOffsetXChanged(double value)
