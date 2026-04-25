@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:constants="using:WhiteboardProjectBuilder.Constants"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     xmlns:xbind="using:WhiteboardProjectBuilder.XBind"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
@@ -45,11 +46,11 @@
 
                     <Grid
                         Grid.Row="1"
-                        Width="420"
-                        Height="360"
+                        Width="{x:Bind constants:ImageLayoutXamlConstants.ProjectWidth}"
+                        Height="{x:Bind constants:ImageLayoutXamlConstants.ProjectHeight}"
                         Margin="0 38 0 0"
                         VerticalAlignment="Top">
-                        <Border BorderBrush="{x:Bind ViewModel.SizeValueBorderBrush, Mode=OneWay}" BorderThickness="4">
+                        <Border BorderBrush="{x:Bind ViewModel.SizeValueBorderBrush, Mode=OneWay}" BorderThickness="{x:Bind constants:ImageLayoutXamlConstants.ProjectOuterBorderThickness}">
                             <local:ImageViewport
                                 ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                                 OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=OneWay}"

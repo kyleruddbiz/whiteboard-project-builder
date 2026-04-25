@@ -8,9 +8,6 @@ namespace WhiteboardProjectBuilder.ViewModels;
 
 public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintSlot
 {
-    public const double ImageViewportWidth = 420;
-    public const double ImageViewportHeight = 360;
-
     [ObservableProperty]
     private string title = string.Empty;
 

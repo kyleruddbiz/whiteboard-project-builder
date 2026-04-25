@@ -7,9 +7,6 @@ namespace WhiteboardProjectBuilder.ViewModels;
 
 public partial class TaskItemViewModel : WhiteboardItemViewModelBase
 {
-    public const double ImageViewportWidth = 420;
-    public const double ImageViewportHeight = 240;
-
     [ObservableProperty]
     private string title = string.Empty;
 

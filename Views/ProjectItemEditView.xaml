@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:constants="using:WhiteboardProjectBuilder.Constants"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
     KeyboardAcceleratorPlacementMode="Hidden"
@@ -35,8 +36,8 @@
                     <TextBlock FontWeight="SemiBold" Text="Image" />
                     <local:ImageEditor
                         x:Name="MainImageEditor"
-                        Width="420"
-                        Height="360"
+                        Width="{x:Bind constants:ImageLayoutXamlConstants.ProjectWidth}"
+                        Height="{x:Bind constants:ImageLayoutXamlConstants.ProjectHeight}"
                         ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
                         ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                         OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
