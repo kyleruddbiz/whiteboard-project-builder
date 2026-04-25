@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:constants="using:WhiteboardProjectBuilder.Constants"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     xmlns:xbind="using:WhiteboardProjectBuilder.XBind"
     d:DataContext="{d:DesignInstance Type=viewmodels:TaskItemViewModel}"
@@ -45,8 +46,8 @@
 
                     <Grid
                         Grid.Row="1"
-                        Width="420"
-                        Height="240"
+                        Width="{x:Bind constants:ImageLayoutXamlConstants.TaskWidth}"
+                        Height="{x:Bind constants:ImageLayoutXamlConstants.TaskHeight}"
                         Margin="0 20 0 4">
                         <local:ImageViewport
                             ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"

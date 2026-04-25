@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
+using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
@@ -96,7 +97,7 @@ public partial class TaskItemViewModel : WhiteboardItemViewModelBase
             Image = model.Image,
             ImageOffsetX = model.Transform?.OffsetX ?? 0,
             ImageOffsetY = model.Transform?.OffsetY ?? 0,
-            ImageZoomFactor = model.Transform?.ZoomFactor ?? 1.0,
+            ImageZoomFactor = Math.Max(model.Transform?.ZoomFactor ?? 1.0, ImageTransformService.MinZoomFactor),
             CreatedDate = model.CreatedDate,
             IsArchived = model.IsArchived
         };

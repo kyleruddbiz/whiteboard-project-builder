@@ -9,6 +9,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
+using WhiteboardProjectBuilder.Constants;
 using WhiteboardProjectBuilder.Services;
 using WhiteboardProjectBuilder.Views;
 using Windows.ApplicationModel.DataTransfer;
@@ -560,10 +561,13 @@ public partial class MainPageViewModel : ObservableObject
             }
 
             var (imageUri, width, height) = await imageStorageService.SaveBitmapFromClipboardAsync(dialog.FileName);
-            var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
 
             if (SelectedItem is ProjectItemViewModel projectItem)
             {
+                var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
+                    width, height,
+                    ImageLayoutConstants.Project.ClipWidth,
+                    ImageLayoutConstants.Project.ClipHeight);
                 projectItem.ImageZoomFactor = scale;
                 projectItem.ImageOffsetX = offsetX;
                 projectItem.ImageOffsetY = offsetY;
@@ -571,6 +575,10 @@ public partial class MainPageViewModel : ObservableObject
             }
             else if (SelectedItem is TaskItemViewModel taskItem)
             {
+                var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
+                    width, height,
+                    ImageLayoutConstants.Task.ClipWidth,
+                    ImageLayoutConstants.Task.ClipHeight);
                 taskItem.ImageZoomFactor = scale;
                 taskItem.ImageOffsetX = offsetX;
                 taskItem.ImageOffsetY = offsetY;
@@ -641,10 +649,12 @@ public partial class MainPageViewModel : ObservableObject
             string fileName = imageStorageService.GenerateFileName(title, subtitle);
             string imageUri = await imageStorageService.SaveImageAsync(file.Path, fileName + Path.GetExtension(file.Path));
 
-            var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
-
             if (SelectedItem is ProjectItemViewModel projectItem)
             {
+                var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
+                    width, height,
+                    ImageLayoutConstants.Project.ClipWidth,
+                    ImageLayoutConstants.Project.ClipHeight);
                 projectItem.ImageZoomFactor = scale;
                 projectItem.ImageOffsetX = offsetX;
                 projectItem.ImageOffsetY = offsetY;
@@ -652,6 +662,10 @@ public partial class MainPageViewModel : ObservableObject
             }
             else if (SelectedItem is TaskItemViewModel taskItem)
             {
+                var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
+                    width, height,
+                    ImageLayoutConstants.Task.ClipWidth,
+                    ImageLayoutConstants.Task.ClipHeight);
                 taskItem.ImageZoomFactor = scale;
                 taskItem.ImageOffsetX = offsetX;
                 taskItem.ImageOffsetY = offsetY;
@@ -713,7 +727,10 @@ public partial class MainPageViewModel : ObservableObject
         try
         {
             var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
-            var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
+            var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
+                width, height,
+                ImageLayoutConstants.Project.ClipWidth,
+                ImageLayoutConstants.Project.ClipHeight);
 
             project.ImageZoomFactor = scale;
             project.ImageOffsetX = offsetX;
@@ -730,7 +747,10 @@ public partial class MainPageViewModel : ObservableObject
         try
         {
             var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
-            var (scale, offsetX, offsetY) = imageTransformService.CalculateUniformToFillTransform(width, height);
+            var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
+                width, height,
+                ImageLayoutConstants.Task.ClipWidth,
+                ImageLayoutConstants.Task.ClipHeight);
 
             item.ImageZoomFactor = scale;
             item.ImageOffsetX = offsetX;

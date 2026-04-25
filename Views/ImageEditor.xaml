@@ -27,6 +27,7 @@
             PointerPressed="Viewport_PointerPressed"
             PointerReleased="Viewport_PointerReleased">
             <local:ImageViewport
+                x:Name="InnerViewport"
                 ImageSource="{x:Bind ImageSource, Mode=OneWay}"
                 OffsetX="{x:Bind OffsetX, Mode=OneWay}"
                 OffsetY="{x:Bind OffsetY, Mode=OneWay}"

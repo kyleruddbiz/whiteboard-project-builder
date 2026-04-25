@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:constants="using:WhiteboardProjectBuilder.Constants"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:TaskItemViewModel}"
     mc:Ignorable="d">
@@ -22,8 +23,8 @@
 
             <local:ImageEditor
                 x:Name="MainImageEditor"
-                Width="420"
-                Height="200"
+                Width="{x:Bind constants:ImageLayoutXamlConstants.TaskWidth}"
+                Height="{x:Bind constants:ImageLayoutXamlConstants.TaskHeight}"
                 ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
                 ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                 OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
