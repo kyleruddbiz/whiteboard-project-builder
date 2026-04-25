@@ -22,9 +22,11 @@ public sealed partial class TaskItemEditView : UserControl
     {
         InitializeComponent();
         DataContext = this;
+
+        Loaded += TaskItemEditView_Loaded;
     }
 
-    public void SetFocus()
+    private void TaskItemEditView_Loaded(object sender, RoutedEventArgs e)
     {
         if (string.IsNullOrEmpty(ViewModel?.Title))
         {
