@@ -11,11 +11,12 @@ namespace WhiteboardProjectBuilder.Views;
 public sealed partial class ImageEditor : UserControl
 {
     private const double ZoomSensitivityFactor = 300.0;
-    private const double MinZoomFactor = 0.5;
     private const double MaxZoomFactor = 3.0;
     private const double AxisLockHysteresis = 2.5;
     private const double AxisSwitchMaxDistance = 150.0;
     private const double ArrowKeyStepSize = 1.0;
+
+    private static readonly ImageTransformService transformService = new();
 
     private bool isDragging = false;
     private Point startPoint;
@@ -24,6 +25,8 @@ public sealed partial class ImageEditor : UserControl
     private double startOffsetY;
     private double startZoomFactor;
     private LockedAxis? lockedAxis = null;
+    private double imagePixelWidth;
+    private double imagePixelHeight;
 
     public event EventHandler? ImageReplaceRequested;
 
@@ -99,11 +102,38 @@ public sealed partial class ImageEditor : UserControl
     {
         InitializeComponent();
         Loaded += ImageEditor_Loaded;
+        InnerViewport.NaturalSizeAvailable += InnerViewport_NaturalSizeAvailable;
     }
 
     private void ImageEditor_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateButtonStyles();
+    }
+
+    private void InnerViewport_NaturalSizeAvailable(ImageViewport sender, Size naturalSize)
+    {
+        imagePixelWidth = naturalSize.Width;
+        imagePixelHeight = naturalSize.Height;
+        // A new image with prior offsets/zoom may now be out of bounds — re-clamp.
+        ApplyTransform(ZoomFactor, OffsetX, OffsetY);
+    }
+
+    private void ApplyTransform(double zoom, double offsetX, double offsetY)
+    {
+        zoom = Math.Clamp(zoom, ImageTransformService.MinZoomFactor, MaxZoomFactor);
+
+        Size viewport = InnerViewport.ViewportSize;
+        if (imagePixelWidth > 0 && imagePixelHeight > 0 && viewport.Width > 0 && viewport.Height > 0)
+        {
+            (offsetX, offsetY) = transformService.ClampOffset(
+                offsetX, offsetY, zoom,
+                imagePixelWidth, imagePixelHeight,
+                viewport.Width, viewport.Height);
+        }
+
+        ZoomFactor = zoom;
+        OffsetX = offsetX;
+        OffsetY = offsetY;
     }
 
     private static void OnEditModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -156,22 +186,25 @@ public sealed partial class ImageEditor : UserControl
             return;
         }
 
+        double newOffsetX = OffsetX;
+        double newOffsetY = OffsetY;
         switch (sender.Key)
         {
             case VirtualKey.Left:
-                OffsetX -= ArrowKeyStepSize;
+                newOffsetX -= ArrowKeyStepSize;
                 break;
             case VirtualKey.Right:
-                OffsetX += ArrowKeyStepSize;
+                newOffsetX += ArrowKeyStepSize;
                 break;
             case VirtualKey.Up:
-                OffsetY -= ArrowKeyStepSize;
+                newOffsetY -= ArrowKeyStepSize;
                 break;
             case VirtualKey.Down:
-                OffsetY += ArrowKeyStepSize;
+                newOffsetY += ArrowKeyStepSize;
                 break;
         }
 
+        ApplyTransform(ZoomFactor, newOffsetX, newOffsetY);
         args.Handled = true;
     }
 
@@ -250,8 +283,7 @@ public sealed partial class ImageEditor : UserControl
                 lockedAxis = null;
             }
 
-            OffsetX = startOffsetX + deltaX;
-            OffsetY = startOffsetY + deltaY;
+            ApplyTransform(ZoomFactor, startOffsetX + deltaX, startOffsetY + deltaY);
 
             // Update start values for next movement segment
             startPoint = currentPoint;
@@ -267,17 +299,12 @@ public sealed partial class ImageEditor : UserControl
 
             // Zoom: right/up = zoom in, left/down = zoom out
             double scaleDelta = 1 - (dominantDelta / ZoomSensitivityFactor);
-            double newZoomFactor = startZoomFactor * scaleDelta;
-            newZoomFactor = Math.Clamp(newZoomFactor, MinZoomFactor, MaxZoomFactor);
+            double newZoomFactor = Math.Clamp(startZoomFactor * scaleDelta, ImageTransformService.MinZoomFactor, MaxZoomFactor);
 
-            // Adjust offsets proportionally to maintain visual center
+            // Scale offsets proportionally to keep the image's visual centre stable through the zoom,
+            // then clamp — the new (smaller or larger) zoom may push the scaled offsets out of bounds.
             double scaleRatio = newZoomFactor / startZoomFactor;
-            double newOffsetX = startOffsetX * scaleRatio;
-            double newOffsetY = startOffsetY * scaleRatio;
-
-            ZoomFactor = newZoomFactor;
-            OffsetX = newOffsetX;
-            OffsetY = newOffsetY;
+            ApplyTransform(newZoomFactor, startOffsetX * scaleRatio, startOffsetY * scaleRatio);
 
             // Update start values for next movement segment
             startPoint = currentPoint;

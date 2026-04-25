@@ -2,11 +2,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
+using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
 public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintSlot
 {
+    public const double ImageViewportWidth = 420;
+    public const double ImageViewportHeight = 360;
+
     [ObservableProperty]
     private string title = string.Empty;
 
@@ -149,7 +153,7 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
             Image = model.Image,
             ImageOffsetX = model.Transform?.OffsetX ?? 0,
             ImageOffsetY = model.Transform?.OffsetY ?? 0,
-            ImageZoomFactor = model.Transform?.ZoomFactor ?? 1.0,
+            ImageZoomFactor = Math.Max(model.Transform?.ZoomFactor ?? 1.0, ImageTransformService.MinZoomFactor),
             Size = model.Size,
             Value = model.Value,
             DueDate = model.DueDate,

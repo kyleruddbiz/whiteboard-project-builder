@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Foundation;
 
 namespace WhiteboardProjectBuilder.Views;
@@ -33,6 +34,13 @@ public sealed partial class ImageViewport : UserControl
             typeof(ImageViewport),
             new PropertyMetadata(1.0));
 
+    /// <summary>
+    /// Raised when the underlying bitmap finishes loading and its natural pixel dimensions
+    /// are known. Subscribers (e.g. <see cref="ImageEditor"/>) use this to compute clamping
+    /// bounds for pan and zoom.
+    /// </summary>
+    public event TypedEventHandler<ImageViewport, Size>? NaturalSizeAvailable;
+
     public string ImageSource
     {
         get => (string)GetValue(ImageSourceProperty);
@@ -57,11 +65,21 @@ public sealed partial class ImageViewport : UserControl
         set => SetValue(ZoomFactorProperty, value);
     }
 
+    /// <summary>
+    /// The actual on-screen pixel size of the clipped image area (excludes the 2px black border).
+    /// Returns <see cref="Size.Empty"/> if the control hasn't laid out yet.
+    /// </summary>
+    public Size ViewportSize =>
+        ClipContainer is { ActualWidth: > 0, ActualHeight: > 0 }
+            ? new Size(ClipContainer.ActualWidth, ClipContainer.ActualHeight)
+            : Size.Empty;
+
     public ImageViewport()
     {
         InitializeComponent();
         Loaded += ImageViewport_Loaded;
         SizeChanged += ImageViewport_SizeChanged;
+        ImageElement.ImageOpened += ImageElement_ImageOpened;
     }
 
     private void ImageViewport_Loaded(object sender, RoutedEventArgs e)
@@ -72,6 +90,14 @@ public sealed partial class ImageViewport : UserControl
     private void ImageViewport_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         UpdateClip();
+    }
+
+    private void ImageElement_ImageOpened(object sender, RoutedEventArgs e)
+    {
+        if (ImageElement.Source is BitmapImage bitmap && bitmap.PixelWidth > 0 && bitmap.PixelHeight > 0)
+        {
+            NaturalSizeAvailable?.Invoke(this, new Size(bitmap.PixelWidth, bitmap.PixelHeight));
+        }
     }
 
     private void UpdateClip()

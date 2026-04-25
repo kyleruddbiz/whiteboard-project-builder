@@ -23,7 +23,7 @@
             <local:ImageEditor
                 x:Name="MainImageEditor"
                 Width="420"
-                Height="200"
+                Height="240"
                 ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
                 ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                 OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
