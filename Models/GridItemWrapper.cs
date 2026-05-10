@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using WhiteboardProjectBuilder.Constants;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.ViewModels;
 
@@ -11,6 +12,9 @@ public partial class GridItemWrapper : ObservableObject
 
     [ObservableProperty]
     private WhiteboardItemType? whiteboardItemType;
+
+    [ObservableProperty]
+    private WhiteboardItemSize layoutSize;
 
     private object? content;
     public object? Content
@@ -30,4 +34,7 @@ public partial class GridItemWrapper : ObservableObject
     public ProjectItemViewModel? ProjectItem => Content as ProjectItemViewModel;
     public TaskItemViewModel? TaskItem => Content as TaskItemViewModel;
     public WhiteboardItemViewModelBase? WhiteboardItem => Content as WhiteboardItemViewModelBase;
+
+    public double Width => WhiteboardItemSizes.WidthOf(LayoutSize);
+    public double Height => WhiteboardItemSizes.HeightOf(LayoutSize);
 }

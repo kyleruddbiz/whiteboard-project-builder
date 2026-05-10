@@ -16,8 +16,6 @@
         <!--  Readonly View  -->
         <Grid x:Name="ReadonlyView" x:Load="{x:Bind xbind:Bools.Not(ViewModel.IsEditing), Mode=OneWay}">
             <Border
-                Width="502"
-                Height="400"
                 Background="{x:Bind converters:BackgroundColorHelper.GetBackgroundBrush(ViewModel.IsArchived), Mode=OneWay}"
                 BorderBrush="Black"
                 BorderThickness="2">
@@ -122,11 +120,7 @@
 
         <!--  Edit View  -->
         <Grid x:Name="EditView" x:Load="{x:Bind ViewModel.IsEditing, Mode=OneWay}">
-            <Border
-                Width="502"
-                Height="400"
-                BorderBrush="#005FBA"
-                BorderThickness="4">
+            <Border BorderBrush="#005FBA" BorderThickness="4">
                 <local:TaskItemEditView ImageReplaceRequested="TaskItemEditView_ImageReplaceRequested" ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
             </Border>
         </Grid>

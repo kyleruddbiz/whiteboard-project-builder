@@ -16,8 +16,6 @@
         <!--  Readonly View  -->
         <Grid x:Name="ReadonlyView" x:Load="{x:Bind xbind:Bools.Not(ViewModel.IsEditing), Mode=OneWay}">
             <Border
-                Width="502"
-                Height="800"
                 Background="{x:Bind converters:BackgroundColorHelper.GetBackgroundBrush(ViewModel.IsArchived), Mode=OneWay}"
                 BorderBrush="Black"
                 BorderThickness="2">

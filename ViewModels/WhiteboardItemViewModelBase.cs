@@ -15,9 +15,6 @@ public abstract partial class WhiteboardItemViewModelBase : ObservableObject
 
     public DateTime CreatedDate { get; protected set; } = DateTime.Today;
 
-    /// <summary>
-    /// Raised when any property changes to trigger autosave.
-    /// </summary>
     public event EventHandler? DataChanged;
 
     protected void RaiseDataChanged()
@@ -39,23 +36,9 @@ public abstract partial class WhiteboardItemViewModelBase : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Gets the type of this whiteboard item.
-    /// </summary>
-    public abstract WhiteboardItemType GetItemType();
+    public abstract WhiteboardItemType ItemType { get; }
 
-    /// <summary>
-    /// Converts this ViewModel to a Model for serialization.
-    /// </summary>
+    public abstract WhiteboardItemSize LayoutSize { get; }
+
     public abstract IWhiteboardItem ToModel();
-
-    /// <summary>
-    /// Helper property for conditional rendering in XAML.
-    /// </summary>
-    public bool IsProjectItem => GetItemType() == WhiteboardItemType.Project;
-
-    /// <summary>
-    /// Helper property for conditional rendering in XAML.
-    /// </summary>
-    public bool IsTaskItem => GetItemType() == WhiteboardItemType.TaskItem;
 }

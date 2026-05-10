@@ -10,11 +10,12 @@ WhiteboardProjectBuilder is a WinUI 3 desktop application built on .NET 9.0, tar
 
 This application creates printable whiteboard items for use on physical whiteboards. Key features include:
 
-- **Multiple Templates**: Projects, Goals, and Inspiration templates
-- **Standardized Size**: All whiteboard items are the same size with template-specific content
-- **Editable Items**: Each whiteboard item can be edited based on its template
-- **List Management**: Users can add and remove whiteboard items from a list
-- **Print Functionality**: Print whiteboard items with up to four items per page
+- **Item Types**: Currently Project items and Task items. Each item has both a Type (`WhiteboardItemType`) and a Size (`WhiteboardItemSize`); these are orthogonal axes that the template selector keys on as a tuple.
+- **Sizes**: `Small` (502×400), `Medium` (502×800), `Large` (1004×800), `Huge` (1004×1600). Sizes are multiples of 2 along one axis so they tile cleanly into the print page (a 2×2 grid of Medium cells). The active (Type, Size) pairs are declared in `Constants/ItemTypeSizeRegistry.cs`.
+- **Largest-first ordering**: Home-page sections and print slots are ordered by descending size (Huge → Large → Medium → Small). The `WhiteboardItemSize` enum is declared smallest-to-largest, so this is just `OrderByDescending(size => size)`. This is a packing rule (rocks-then-sand), not aesthetics — preserve it when adding new sizes or layout/print code.
+- **Editable Items**: Each whiteboard item can be edited based on its template.
+- **List Management**: Users add items via per-size Add buttons and can remove them from the list.
+- **Print Functionality**: Print whiteboard items with up to four Medium-sized cells per page (Smalls pair into a Medium-sized slot; Large/Huge support is not yet wired into the print packer).
 
 ## Development Commands
 
@@ -70,9 +71,9 @@ git log --graph --oneline --all
 - `App.xaml` / `App.xaml.cs` - Application entry point and lifecycle management
 - `Views/` - XAML pages/controls and their code-behind files
   - `MainPage.xaml` / `MainPage.xaml.cs` - Main application page
-  - `ProjectItemView.xaml` / `ProjectItemView.xaml.cs` - Project item UserControl
-  - `GoalItemView.xaml` / `GoalItemView.xaml.cs` - Goal item UserControl
-  - `InspirationItemView.xaml` / `InspirationItemView.xaml.cs` - Inspiration item UserControl
+  - `ProjectItemView.xaml` / `ProjectItemView.xaml.cs` - Project item UserControl (current Medium size)
+  - `TaskItemView.xaml` / `TaskItemView.xaml.cs` - Task item UserControl (current Small size)
+  - Card UserControls do **not** pin their own `Width`/`Height` — the host (DataTemplate cell or print slot) supplies the layout footprint per `WhiteboardItemSize`.
 - `ViewModels/` - MVVM view models (using CommunityToolkit.Mvvm)
 - `Models/` - Data models for whiteboard items
 - `Enums/` - Enumerations with their extension methods

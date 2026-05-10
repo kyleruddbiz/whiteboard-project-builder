@@ -5,30 +5,24 @@ namespace WhiteboardProjectBuilder.Selectors;
 
 public class GridItemTemplateSelector : DataTemplateSelector
 {
-    public DataTemplate? AddProjectButtonTemplate { get; set; }
-    public DataTemplate? AddTaskButtonTemplate { get; set; }
-    public DataTemplate? ProjectTemplate { get; set; }
-    public DataTemplate? TaskItemTemplate { get; set; }
+    public DataTemplate? AddButtonTemplate { get; set; }
+    public DataTemplate? ProjectMediumTemplate { get; set; }
+    public DataTemplate? TaskItemSmallTemplate { get; set; }
 
     protected override DataTemplate? SelectTemplateCore(object item)
     {
         if (item is not GridItemWrapper wrapper)
             return null;
 
-        return wrapper.GridItemType switch
+        if (wrapper.GridItemType == GridItemType.AddButton)
         {
-            GridItemType.AddButton => wrapper.WhiteboardItemType switch
-            {
-                WhiteboardItemType.Project => AddProjectButtonTemplate,
-                WhiteboardItemType.TaskItem => AddTaskButtonTemplate,
-                _ => null
-            },
-            GridItemType.WhiteboardItem => wrapper.WhiteboardItemType switch
-            {
-                WhiteboardItemType.Project => ProjectTemplate,
-                WhiteboardItemType.TaskItem => TaskItemTemplate,
-                _ => null
-            },
+            return AddButtonTemplate;
+        }
+
+        return (wrapper.WhiteboardItemType, wrapper.LayoutSize) switch
+        {
+            (WhiteboardItemType.Project, WhiteboardItemSize.Medium) => ProjectMediumTemplate,
+            (WhiteboardItemType.TaskItem, WhiteboardItemSize.Small) => TaskItemSmallTemplate,
             _ => null
         };
     }

@@ -6,12 +6,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml.Controls;
+using WhiteboardProjectBuilder.Constants;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
-using WhiteboardProjectBuilder.Constants;
 using WhiteboardProjectBuilder.Services;
-using WhiteboardProjectBuilder.Views;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -50,8 +48,8 @@ public partial class MainPageViewModel : ObservableObject
     private SettingsViewModel settings = null!;
 
     public ObservableCollection<WhiteboardItemViewModelBase> WhiteboardItems { get; }
-    public ObservableCollection<GridItemWrapper> ProjectGridItems { get; }
-    public ObservableCollection<GridItemWrapper> TaskGridItems { get; }
+
+    public IReadOnlyList<WhiteboardSection> Sections { get; }
 
     public MainPageViewModel(PrintService printService, WhiteboardItemRepository whiteboardItemRepository, SettingsService settingsService, ImageStorageService imageStorageService, ImageTransformService imageTransformService, ImageDimensionService imageDimensionService, IServiceProvider serviceProvider)
     {
@@ -66,8 +64,10 @@ public partial class MainPageViewModel : ObservableObject
         Settings = serviceProvider.GetRequiredService<SettingsViewModel>();
 
         WhiteboardItems = [];
-        ProjectGridItems = [];
-        TaskGridItems = [];
+        Sections = ItemTypeSizeRegistry.ActiveSizes()
+            .OrderByDescending(size => size)
+            .Select(size => new WhiteboardSection(size))
+            .ToList();
 
         RebuildGridItems();
 
@@ -107,22 +107,28 @@ public partial class MainPageViewModel : ObservableObject
         await printService.ShowPrintUIAsync(slots);
     }
 
-    /// <summary>
-    /// Groups items into print slots: projects first (each its own slot), then tasks
-    /// paired up into TaskSlotViewModel slots so two tasks share a single print cell.
-    /// </summary>
     public static IEnumerable<IPrintSlot> BuildPrintSlots(IEnumerable<WhiteboardItemViewModelBase> items)
     {
         var itemList = items.ToList();
 
-        foreach (var project in itemList.OfType<ProjectItemViewModel>())
+        foreach (var size in ItemTypeSizeRegistry.ActiveSizes().OrderByDescending(size => size))
         {
-            yield return project;
-        }
+            var itemsAtSize = itemList.Where(i => i.LayoutSize == size);
 
-        foreach (var (top, bottom) in PairUpTasks(itemList.OfType<TaskItemViewModel>()))
-        {
-            yield return new TaskSlotViewModel { TopTask = top, BottomTask = bottom };
+            if (size == WhiteboardItemSize.Medium)
+            {
+                foreach (var item in itemsAtSize.OfType<IPrintSlot>())
+                {
+                    yield return item;
+                }
+            }
+            else if (size == WhiteboardItemSize.Small)
+            {
+                foreach (var (top, bottom) in PairUpTasks(itemsAtSize.OfType<TaskItemViewModel>()))
+                {
+                    yield return new TaskSlotViewModel { TopTask = top, BottomTask = bottom };
+                }
+            }
         }
     }
 
@@ -195,31 +201,24 @@ public partial class MainPageViewModel : ObservableObject
 
     private void RebuildGridItems()
     {
-        RebuildSection(
-            ProjectGridItems,
-            WhiteboardItems.OfType<ProjectItemViewModel>(),
-            WhiteboardItemType.Project);
-
-        RebuildSection(
-            TaskGridItems,
-            WhiteboardItems.OfType<TaskItemViewModel>(),
-            WhiteboardItemType.TaskItem);
+        foreach (var section in Sections)
+        {
+            RebuildSection(section);
+        }
     }
 
-    private void RebuildSection<T>(
-        ObservableCollection<GridItemWrapper> gridItems,
-        IEnumerable<T> allItems,
-        WhiteboardItemType itemType)
-        where T : WhiteboardItemViewModelBase
+    private void RebuildSection(WhiteboardSection section)
     {
-        gridItems.Clear();
+        section.Items.Clear();
 
         if (Settings.IsSortDescending)
         {
-            gridItems.Add(BuildAddButtonWrapper(itemType));
+            section.Items.Add(BuildAddButtonWrapper(section.Size));
         }
 
-        var visibleItems = allItems.Where(i => Settings.ShowArchived || !i.IsArchived);
+        var visibleItems = WhiteboardItems
+            .Where(i => i.LayoutSize == section.Size)
+            .Where(i => Settings.ShowArchived || !i.IsArchived);
 
         if (Settings.IsSortDescending)
         {
@@ -228,24 +227,26 @@ public partial class MainPageViewModel : ObservableObject
 
         foreach (var item in visibleItems)
         {
-            gridItems.Add(new GridItemWrapper
+            section.Items.Add(new GridItemWrapper
             {
                 GridItemType = GridItemType.WhiteboardItem,
-                WhiteboardItemType = itemType,
+                WhiteboardItemType = item.ItemType,
+                LayoutSize = item.LayoutSize,
                 Content = item
             });
         }
 
         if (!Settings.IsSortDescending)
         {
-            gridItems.Add(BuildAddButtonWrapper(itemType));
+            section.Items.Add(BuildAddButtonWrapper(section.Size));
         }
     }
 
-    private static GridItemWrapper BuildAddButtonWrapper(WhiteboardItemType forType) => new()
+    private static GridItemWrapper BuildAddButtonWrapper(WhiteboardItemSize size) => new()
     {
         GridItemType = GridItemType.AddButton,
-        WhiteboardItemType = forType,
+        WhiteboardItemType = null,
+        LayoutSize = size,
         Content = null
     };
 
@@ -372,40 +373,50 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task AddProjectAsync()
+    private async Task AddItemAsync(WhiteboardItemSize size)
     {
         ExitEditMode();
 
+        var itemType = ItemTypeSizeRegistry.ItemTypesForSize(size).Cast<WhiteboardItemType?>().FirstOrDefault();
+        if (itemType is null)
+        {
+            return;
+        }
+
+        WhiteboardItemViewModelBase newItem = itemType switch
+        {
+            WhiteboardItemType.Project => await CreateProjectAsync(),
+            WhiteboardItemType.TaskItem => await CreateTaskAsync(),
+            _ => throw new NotSupportedException($"Unsupported item type: {itemType}")
+        };
+
+        WhiteboardItems.Add(newItem);
+        EnterEditMode(newItem);
+    }
+
+    private async Task<ProjectItemViewModel> CreateProjectAsync()
+    {
         string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
         var newProject = serviceProvider.GetRequiredService<ProjectItemViewModel>();
         newProject.Image = imagePath;
-        newProject.Size = ProjectSize.Medium;
+        newProject.ProjectSize = ProjectSize.Medium;
         newProject.Value = ProjectValue.Good;
         newProject.DueDate = null;
 
         await ApplyUniformToFillTransformAsync(newProject, imagePath);
-
-        WhiteboardItems.Add(newProject);
-
-        EnterEditMode(newProject);
+        return newProject;
     }
 
-    [RelayCommand]
-    private async Task AddTaskAsync()
+    private async Task<TaskItemViewModel> CreateTaskAsync()
     {
-        ExitEditMode();
-
         string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
         var newTask = serviceProvider.GetRequiredService<TaskItemViewModel>();
         newTask.Image = imagePath;
 
         await ApplyUniformToFillTransformAsync(newTask, imagePath);
-
-        WhiteboardItems.Add(newTask);
-
-        EnterEditMode(newTask);
+        return newTask;
     }
 
     [RelayCommand]
@@ -515,11 +526,8 @@ public partial class MainPageViewModel : ObservableObject
     [RelayCommand]
     private void ExitEditMode()
     {
-        if (SelectedItem != null)
-        {
-            SelectedItem.IsEditing = false;
-            SelectedItem = null;
-        }
+        SelectedItem?.IsEditing = false;
+        SelectedItem = null;
     }
 
     public async Task PasteImageFromClipboardAsync(XamlRoot xamlRoot)
@@ -761,5 +769,4 @@ public partial class MainPageViewModel : ObservableObject
             Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
         }
     }
-
 }

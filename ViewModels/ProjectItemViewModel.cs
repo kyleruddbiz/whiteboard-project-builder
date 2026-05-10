@@ -27,7 +27,7 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
     private double imageZoomFactor = 1.0;
 
     [ObservableProperty]
-    private ProjectSize size;
+    private ProjectSize projectSize;
 
     [ObservableProperty]
     private ProjectValue value;
@@ -35,13 +35,13 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
     [ObservableProperty]
     private DateTime? dueDate;
 
-    public string SizeIcon => Size.ToIcon();
+    public string SizeIcon => ProjectSize.ToIcon();
     public string ValueIcon => Value.ToIcon();
     public Brush SizeValueBorderBrush
     {
         get
         {
-            var category = WinCategoryExtensions.GetWinCategory(Size, Value);
+            var category = WinCategoryExtensions.GetWinCategory(ProjectSize, Value);
             var color = category.GetBorderColor();
             return new SolidColorBrush(color);
         }
@@ -86,7 +86,7 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
         RaiseDataChanged();
     }
 
-    partial void OnSizeChanged(ProjectSize value)
+    partial void OnProjectSizeChanged(ProjectSize value)
     {
         RaiseDataChanged();
         OnPropertyChanged(nameof(SizeIcon));
@@ -107,7 +107,9 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
         OnPropertyChanged(nameof(DatePrefix));
     }
 
-    public override WhiteboardItemType GetItemType() => WhiteboardItemType.Project;
+    public override WhiteboardItemType ItemType => WhiteboardItemType.Project;
+
+    public override WhiteboardItemSize LayoutSize => WhiteboardItemSize.Medium;
 
     public override ProjectItem ToModel()
     {
@@ -128,7 +130,7 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
             Subtitle = Subtitle,
             Image = Image,
             Transform = transform,
-            Size = Size,
+            Size = ProjectSize,
             Value = Value,
             DueDate = DueDate,
             CreatedDate = CreatedDate,
@@ -146,7 +148,7 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
             ImageOffsetX = model.Transform?.OffsetX ?? 0,
             ImageOffsetY = model.Transform?.OffsetY ?? 0,
             ImageZoomFactor = Math.Max(model.Transform?.ZoomFactor ?? 1.0, ImageTransformService.MinZoomFactor),
-            Size = model.Size,
+            ProjectSize = model.Size,
             Value = model.Value,
             DueDate = model.DueDate,
             CreatedDate = model.CreatedDate,

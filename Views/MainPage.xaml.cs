@@ -158,6 +158,15 @@ public partial class MainPage : Page
         Unloaded -= MainPage_Unloaded;
     }
 
+    private void SectionGridView_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is GridView gridView)
+        {
+            gridView.SelectionChanged -= GridView_SelectionChanged;
+            gridView.SelectionChanged += GridView_SelectionChanged;
+        }
+    }
+
     private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (ViewModel.SelectedItem?.IsEditing == true)

@@ -9,13 +9,12 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:TaskSlotViewModel}"
     mc:Ignorable="d">
 
-    <!--  Outer dimensions match ProjectItemView so two stacked tasks (400 + 400)  -->
-    <!--  print exactly as wide and tall as a single project. Bottom row stays  -->
-    <!--  empty when only the top task is present, top-justifying the lone task.  -->
-    <Grid Width="502" Height="800">
+    <!--  Sized by the host (print slot or DataTemplate cell) to a Medium-sized box.  -->
+    <!--  Two stacked Smalls fill it; the bottom row stays empty when only one task.  -->
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="400" />
-            <RowDefinition Height="400" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <local:TaskItemView Grid.Row="0" ViewModel="{x:Bind ViewModel.TopTask, Mode=OneWay}" />

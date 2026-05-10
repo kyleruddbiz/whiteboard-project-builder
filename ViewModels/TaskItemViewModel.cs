@@ -57,7 +57,9 @@ public partial class TaskItemViewModel : WhiteboardItemViewModelBase
         RaiseDataChanged();
     }
 
-    public override WhiteboardItemType GetItemType() => WhiteboardItemType.TaskItem;
+    public override WhiteboardItemType ItemType => WhiteboardItemType.TaskItem;
+
+    public override WhiteboardItemSize LayoutSize => WhiteboardItemSize.Small;
 
     public override TaskItem ToModel()
     {
