@@ -11,18 +11,14 @@ public partial class GridItemWrapper : ObservableObject
     private GridItemType gridItemType;
 
     [ObservableProperty]
-    private WhiteboardItemType? whiteboardItemType;
-
-    [ObservableProperty]
     private WhiteboardItemSize layoutSize;
 
-    private object? content;
     public object? Content
     {
-        get => content;
+        get;
         set
         {
-            if (SetProperty(ref content, value))
+            if (SetProperty(ref field, value))
             {
                 OnPropertyChanged(nameof(WhiteboardItem));
                 OnPropertyChanged(nameof(ProjectItem));

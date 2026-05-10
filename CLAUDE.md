@@ -111,7 +111,7 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 - **Never use `x:Name` to reference UserControls** - Avoid directly accessing UserControl instances in code-behind
 - **Always use data binding** - Pass ViewModels to UserControls via DependencyProperty bindings, not constructor parameters or property setters
 - **UserControl ViewModels must be DependencyProperties** - Use `DependencyProperty.Register` for ViewModel properties in UserControls, not get-only properties
-- **Set DataContext in UserControl** - UserControls should set `this.DataContext = this` to enable internal binding
+- **Set DataContext in UserControl only when needed** - Set `this.DataContext = this` only if the UserControl uses plain `{Binding}` internally. If every internal binding is `{x:Bind}` (which targets the code-behind, not DataContext), `DataContext = this` is redundant and actively harmful: it overrides the DataContext a parent template would otherwise inherit, breaking parent-side `{Binding}` expressions that target this control's DependencyProperties (e.g. `ViewModel="{Binding}"` from a hosting `DataTemplate`).
 
 ### Comments
 - Keep comments clear and concise
@@ -121,6 +121,7 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 
 ### XAML Guidelines
 - Prefer `x:Bind` over `Binding` whenever possible for better performance and compile-time checking
+- **Exception: `ContentControl` + `ContentTemplateSelector` boundary** - When a `ContentControl` hosts CLR ViewModels and dispatches templates by runtime type (`ContentTemplateSelector`), the inner `DataTemplate` root must use plain `{Binding}` (not `{x:Bind}`) to receive the typed VM. `ContentControl.Content` marshals managed objects through WinRT's `IInspectable` projection; `x:Bind`'s compile-time cast cannot unwrap it and throws `InvalidCastException`. Plain `{Binding}` resolves through the DP system at runtime, which handles the unwrap. Don't add `x:DataType` to these inner templates — it generates the same failing cast.
 - Use spaces (not commas) to separate values in Margin and Padding attributes (e.g., `Margin="10 20 10 20"` not `Margin="10,20,10,20"`)
 - **Image binding in WinUI 3** - Always use `StringToImageSourceConverter` when binding string paths to Image.Source properties. WinUI 3 requires proper `ms-appx:///` URI scheme for packaged assets. Example: `Source="{x:Bind ViewModel.ImagePath, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"`
 - **Conditional visibility** - Always use `x:Load` instead of `Visibility` for conditional element rendering. Elements using `x:Load` MUST have an `x:Name` attribute. Example: `<Button x:Name="MyButton" x:Load="{x:Bind ViewModel.IsVisible, Mode=OneWay}" />`

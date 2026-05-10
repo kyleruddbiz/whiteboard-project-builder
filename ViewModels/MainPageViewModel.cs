@@ -230,7 +230,6 @@ public partial class MainPageViewModel : ObservableObject
             section.Items.Add(new GridItemWrapper
             {
                 GridItemType = GridItemType.WhiteboardItem,
-                WhiteboardItemType = item.ItemType,
                 LayoutSize = item.LayoutSize,
                 Content = item
             });
@@ -245,7 +244,6 @@ public partial class MainPageViewModel : ObservableObject
     private static GridItemWrapper BuildAddButtonWrapper(WhiteboardItemSize size) => new()
     {
         GridItemType = GridItemType.AddButton,
-        WhiteboardItemType = null,
         LayoutSize = size,
         Content = null
     };

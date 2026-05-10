@@ -27,6 +27,29 @@
             Modifiers="Control" />
     </Page.KeyboardAccelerators>
     <Page.Resources>
+        <selectors:WhiteboardItemBodyTemplateSelector x:Key="WhiteboardItemBodyTemplateSelector">
+            <!--  ViewModel uses {Binding} instead of {x:Bind}: ContentControl.Content marshals CLR VMs through the WinRT IInspectable boundary, breaking x:Bind's compile-time cast.  -->
+
+            <selectors:WhiteboardItemBodyTemplateSelector.ProjectTemplate>
+                <DataTemplate>
+                    <local:ProjectItemView
+                        EditCommand="{Binding ViewModel.EnterEditModeCommand, ElementName=PageRoot}"
+                        ImageReplaceCommand="{Binding ViewModel.ReplaceImageCommand, ElementName=PageRoot}"
+                        ReactivateCommand="{Binding ViewModel.ReactivateItemCommand, ElementName=PageRoot}"
+                        ViewModel="{Binding}" />
+                </DataTemplate>
+            </selectors:WhiteboardItemBodyTemplateSelector.ProjectTemplate>
+            <selectors:WhiteboardItemBodyTemplateSelector.TaskItemTemplate>
+                <DataTemplate>
+                    <local:TaskItemView
+                        EditCommand="{Binding ViewModel.EnterEditModeCommand, ElementName=PageRoot}"
+                        ImageReplaceCommand="{Binding ViewModel.ReplaceImageCommand, ElementName=PageRoot}"
+                        ReactivateCommand="{Binding ViewModel.ReactivateItemCommand, ElementName=PageRoot}"
+                        ViewModel="{Binding}" />
+                </DataTemplate>
+            </selectors:WhiteboardItemBodyTemplateSelector.TaskItemTemplate>
+        </selectors:WhiteboardItemBodyTemplateSelector>
+
         <selectors:GridItemTemplateSelector x:Key="GridItemTemplateSelector">
             <selectors:GridItemTemplateSelector.AddButtonTemplate>
                 <DataTemplate x:DataType="models:GridItemWrapper">
@@ -42,15 +65,19 @@
                     </Button>
                 </DataTemplate>
             </selectors:GridItemTemplateSelector.AddButtonTemplate>
-            <selectors:GridItemTemplateSelector.ProjectMediumTemplate>
+            <selectors:GridItemTemplateSelector.WhiteboardItemTemplate>
                 <DataTemplate x:DataType="models:GridItemWrapper">
                     <Grid Width="{x:Bind Width}" Height="{x:Bind Height}">
-                        <local:ProjectItemView
+                        <ContentControl
                             Margin="10"
-                            DataContext="{x:Bind ProjectItem}"
-                            EditCommand="{Binding ViewModel.EnterEditModeCommand, ElementName=PageRoot}"
-                            ImageReplaceCommand="{Binding ViewModel.ReplaceImageCommand, ElementName=PageRoot}"
-                            ReactivateCommand="{Binding ViewModel.ReactivateItemCommand, ElementName=PageRoot}" />
+                            Padding="0"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Content="{x:Bind WhiteboardItem}"
+                            ContentTemplateSelector="{StaticResource WhiteboardItemBodyTemplateSelector}"
+                            IsTabStop="False" />
                         <local:RemoveItemButton
                             Margin="0 12 12 0"
                             HorizontalAlignment="Right"
@@ -58,30 +85,10 @@
                             ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
                             IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
                             RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            WhiteboardItem="{x:Bind ProjectItem}" />
+                            WhiteboardItem="{x:Bind WhiteboardItem}" />
                     </Grid>
                 </DataTemplate>
-            </selectors:GridItemTemplateSelector.ProjectMediumTemplate>
-            <selectors:GridItemTemplateSelector.TaskItemSmallTemplate>
-                <DataTemplate x:DataType="models:GridItemWrapper">
-                    <Grid Width="{x:Bind Width}" Height="{x:Bind Height}">
-                        <local:TaskItemView
-                            Margin="10"
-                            EditCommand="{Binding ViewModel.EnterEditModeCommand, ElementName=PageRoot}"
-                            ImageReplaceCommand="{Binding ViewModel.ReplaceImageCommand, ElementName=PageRoot}"
-                            ReactivateCommand="{Binding ViewModel.ReactivateItemCommand, ElementName=PageRoot}"
-                            ViewModel="{x:Bind TaskItem}" />
-                        <local:RemoveItemButton
-                            Margin="0 12 12 0"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
-                            RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            WhiteboardItem="{x:Bind TaskItem}" />
-                    </Grid>
-                </DataTemplate>
-            </selectors:GridItemTemplateSelector.TaskItemSmallTemplate>
+            </selectors:GridItemTemplateSelector.WhiteboardItemTemplate>
         </selectors:GridItemTemplateSelector>
 
         <DataTemplate x:Key="SectionTemplate" x:DataType="models:WhiteboardSection">

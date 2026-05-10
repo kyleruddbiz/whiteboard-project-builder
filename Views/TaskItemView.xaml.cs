@@ -58,7 +58,6 @@ public sealed partial class TaskItemView : UserControl
     public TaskItemView()
     {
         InitializeComponent();
-        DataContext = this;
     }
 
     private void Overlay_PointerEntered(object sender, PointerRoutedEventArgs e)

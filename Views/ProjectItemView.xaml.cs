@@ -59,14 +59,6 @@ public sealed partial class ProjectItemView : UserControl
     public ProjectItemView()
     {
         InitializeComponent();
-
-        DataContextChanged += (s, e) =>
-        {
-            if (e.NewValue is ProjectItemViewModel vm)
-            {
-                ViewModel = vm;
-            }
-        };
     }
 
     private void Overlay_PointerEntered(object sender, PointerRoutedEventArgs e)
