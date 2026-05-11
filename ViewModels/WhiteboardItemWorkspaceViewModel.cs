@@ -17,19 +17,14 @@ public partial class WhiteboardItemWorkspaceViewModel(
 
     partial void OnSelectedItemChanging(WhiteboardItemViewModelBase? oldValue, WhiteboardItemViewModelBase? newValue)
     {
-        if (oldValue != newValue)
-        {
-            oldValue?.IsEditing = false;
-        }
+        if (oldValue == newValue)
+            return;
+
+        oldValue?.IsEditing = false;
+        newValue?.IsEditing = true;
     }
 
-    public void EnterEditMode(WhiteboardItemViewModelBase item)
-    {
-        if (SelectedItem == item) return;
-
-        SelectedItem = item;
-        item.IsEditing = true;
-    }
+    public void EnterEditMode(WhiteboardItemViewModelBase item) => SelectedItem = item;
 
     public void ExitEditMode() => SelectedItem = null;
 
