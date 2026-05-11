@@ -10,21 +10,15 @@ namespace WhiteboardProjectBuilder.Services;
 /// <summary>
 /// Manages storage of user-selected images in LocalFolder and provides default example images.
 /// </summary>
-public class ImageStorageService
+public class ImageStorageService(SettingsService settingsService)
 {
     private const string ImagesFolderName = "Images";
-    private readonly SettingsService settingsService;
     private List<string>? exampleImagePaths;
-
-    public ImageStorageService(SettingsService settingsService)
-    {
-        this.settingsService = settingsService;
-    }
 
     /// <summary>
     /// Ensures the images folder exists in LocalFolder.
     /// </summary>
-    public static async Task EnsureImagesFolderExistsAsync()
+    public async Task EnsureImagesFolderExistsAsync()
     {
         await ApplicationData.Current.LocalFolder.CreateFolderAsync(
             ImagesFolderName,
@@ -214,7 +208,7 @@ public class ImageStorageService
     /// <summary>
     /// Gets the full path to the images folder in LocalFolder.
     /// </summary>
-    public static async Task<string> GetImagesFolderPathAsync()
+    public async Task<string> GetImagesFolderPathAsync()
     {
         await EnsureImagesFolderExistsAsync();
         var imagesFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(ImagesFolderName);

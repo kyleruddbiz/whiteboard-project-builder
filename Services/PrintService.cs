@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.UI.Xaml.Printing;
+using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.ViewModels;
 using WhiteboardProjectBuilder.Views;
 using Windows.Foundation;
@@ -14,7 +15,7 @@ namespace WhiteboardProjectBuilder.Services;
 /// grid (2 cols × 4 rows): Huge spans the whole page, Large spans a half-page row, Medium
 /// fills a column-pair of cells, Small fills one cell.
 /// </summary>
-public class PrintService
+public class PrintService(PrintPagePackerService printPagePackerService)
 {
     private PrintDocument? printDocument;
     private IPrintDocumentSource? printDocumentSource;
@@ -86,7 +87,7 @@ public class PrintService
 
     /// <summary>
     /// Displays the Windows print dialog for the specified print slots. Slots are packed
-    /// onto pages largest-first via <see cref="PrintPagePacker"/>.
+    /// onto pages largest-first via <see cref="PrintPagePackerService"/>.
     /// </summary>
     /// <param name="items">Collection of print slots to render</param>
     public async Task ShowPrintUIAsync(IEnumerable<IPrintSlot> items)
@@ -103,7 +104,7 @@ public class PrintService
             return;
         }
 
-        pageLayouts = PrintPagePacker.BuildPrintPages(items).ToList();
+        pageLayouts = printPagePackerService.BuildPrintPages(items).ToList();
 
         if (pageLayouts.Count == 0)
         {

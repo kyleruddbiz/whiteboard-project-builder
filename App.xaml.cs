@@ -41,10 +41,12 @@ public partial class App : Application
         services.AddSingleton<DataPersistenceService>();
         services.AddSingleton<ImageTransformService>();
         services.AddSingleton<ImageDimensionService>();
+        services.AddSingleton<PrintPagePackerService>();
 
         // Services with dependencies
         services.AddSingleton<SettingsService>();
         services.AddSingleton<ImageStorageService>();
+        services.AddSingleton<ClipboardService>();
         services.AddSingleton<WhiteboardItemRepository>();
         services.AddSingleton<PrintService>();
 

@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Constants;
-using WhiteboardProjectBuilder.Services;
+using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;

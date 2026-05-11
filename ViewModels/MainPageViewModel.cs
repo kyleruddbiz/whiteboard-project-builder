@@ -141,7 +141,7 @@ public partial class MainPageViewModel : ObservableObject
     {
         try
         {
-            string folderPath = await ImageStorageService.GetImagesFolderPathAsync();
+            string folderPath = await imageStorageService.GetImagesFolderPathAsync();
             Process.Start("explorer.exe", folderPath);
         }
         catch (Exception ex)
