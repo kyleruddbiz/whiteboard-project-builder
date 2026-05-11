@@ -10,8 +10,9 @@ namespace WhiteboardProjectBuilder.Services;
 
 /// <summary>
 /// Service for printing whiteboard items using the Windows print system.
-/// Accepts a list of <see cref="IPrintSlot"/> (one project or one TaskSlotViewModel
-/// per slot) and renders up to 4 slots per page in a 2x2 grid layout.
+/// Accepts a list of <see cref="IPrintSlot"/> and packs them into pages using a Small-unit
+/// grid (2 cols × 4 rows): Huge spans the whole page, Large spans a half-page row, Medium
+/// fills a column-pair of cells, Small fills one cell.
 /// </summary>
 public class PrintService
 {
@@ -19,7 +20,7 @@ public class PrintService
     private IPrintDocumentSource? printDocumentSource;
     private PrintManager? printManager;
     private readonly List<UIElement> printPages = new();
-    private List<IPrintSlot> itemsToPrint = new();
+    private List<PrintPageLayout> pageLayouts = new();
     private Canvas? printCanvas;
 
     /// <summary>
@@ -70,7 +71,7 @@ public class PrintService
         }
 
         printPages.Clear();
-        itemsToPrint.Clear();
+        pageLayouts.Clear();
 
         // Safely clear canvas children - may already be disposed on app shutdown
         try
@@ -84,8 +85,8 @@ public class PrintService
     }
 
     /// <summary>
-    /// Displays the Windows print dialog for the specified print slots.
-    /// Each slot is either a ProjectItemViewModel or a TaskSlotViewModel.
+    /// Displays the Windows print dialog for the specified print slots. Slots are packed
+    /// onto pages largest-first via <see cref="PrintPagePacker"/>.
     /// </summary>
     /// <param name="items">Collection of print slots to render</param>
     public async Task ShowPrintUIAsync(IEnumerable<IPrintSlot> items)
@@ -102,9 +103,9 @@ public class PrintService
             return;
         }
 
-        itemsToPrint = items.ToList();
+        pageLayouts = PrintPagePacker.BuildPrintPages(items).ToList();
 
-        if (itemsToPrint.Count == 0)
+        if (pageLayouts.Count == 0)
         {
             Debug.WriteLine("No items to print");
             return;
@@ -139,24 +140,13 @@ public class PrintService
         printPages.Clear();
         printCanvas?.Children.Clear();
 
-        int itemsPerPage = 4;
-        int totalPages = (int)Math.Ceiling(itemsToPrint.Count / (double)itemsPerPage);
-
         PrintPageDescription pageDescription = e.PrintTaskOptions.GetPageDescription(0);
 
-        for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
+        foreach (var layout in pageLayouts)
         {
-            int startIndex = pageIndex * itemsPerPage;
-            int itemsOnThisPage = Math.Min(itemsPerPage, itemsToPrint.Count - startIndex);
-
-            var pageItems = itemsToPrint
-                .Skip(startIndex)
-                .Take(itemsOnThisPage)
-                .ToList();
-
             var printPageView = new PrintPageView
             {
-                Items = pageItems,
+                Layout = layout,
                 Width = pageDescription.PageSize.Width,
                 Height = pageDescription.PageSize.Height
             };
@@ -173,7 +163,7 @@ public class PrintService
 
         if (printDocument != null)
         {
-            printDocument.SetPreviewPageCount(totalPages, PreviewPageCountType.Final);
+            printDocument.SetPreviewPageCount(printPages.Count, PreviewPageCountType.Final);
         }
     }
 

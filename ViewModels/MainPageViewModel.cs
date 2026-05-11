@@ -19,7 +19,6 @@ public partial class MainPageViewModel : ObservableObject
     private readonly WhiteboardItemRepository whiteboardItemRepository;
     private readonly SettingsService settingsService;
     private readonly ImageStorageService imageStorageService;
-    private readonly ImageDimensionService imageDimensionService;
     private readonly WhiteboardItemWorkspaceViewModel workspace;
     private readonly IServiceProvider serviceProvider;
     private CancellationTokenSource? saveCts;
@@ -55,7 +54,6 @@ public partial class MainPageViewModel : ObservableObject
         WhiteboardItemRepository whiteboardItemRepository,
         SettingsService settingsService,
         ImageStorageService imageStorageService,
-        ImageDimensionService imageDimensionService,
         WhiteboardItemWorkspaceViewModel workspace,
         IServiceProvider serviceProvider)
     {
@@ -63,7 +61,6 @@ public partial class MainPageViewModel : ObservableObject
         this.whiteboardItemRepository = whiteboardItemRepository;
         this.settingsService = settingsService;
         this.imageStorageService = imageStorageService;
-        this.imageDimensionService = imageDimensionService;
         this.workspace = workspace;
         this.serviceProvider = serviceProvider;
 
@@ -80,7 +77,30 @@ public partial class MainPageViewModel : ObservableObject
         WhiteboardItems.CollectionChanged += WhiteboardItems_CollectionChanged;
         WhiteboardItems.CollectionChanged += OnWhiteboardItemsCollectionChanged;
 
+        workspace.ItemCreated += OnWorkspaceItemCreated;
+        workspace.SelectorAdded += OnWorkspaceSelectorAdded;
+        workspace.SelectorRemoved += OnWorkspaceSelectorRemoved;
+
         _ = LoadDataAsync();
+    }
+
+    private void OnWorkspaceItemCreated(object? sender, WhiteboardItemViewModelBase item)
+    {
+        WhiteboardItems.Add(item);
+    }
+
+    private void OnWorkspaceSelectorAdded(object? sender, (WhiteboardItemSize Size, WhiteboardItemSelectorViewModel Selector) e)
+    {
+        var section = Sections.First(s => s.Size == e.Size);
+        section.Selectors.Add(e.Selector);
+        RebuildSection(section);
+    }
+
+    private void OnWorkspaceSelectorRemoved(object? sender, (WhiteboardItemSize Size, WhiteboardItemSelectorViewModel Selector) e)
+    {
+        var section = Sections.First(s => s.Size == e.Size);
+        section.Selectors.Remove(e.Selector);
+        RebuildSection(section);
     }
 
     partial void OnSettingsChanged(SettingsViewModel? oldValue, SettingsViewModel newValue)
@@ -113,30 +133,8 @@ public partial class MainPageViewModel : ObservableObject
         await printService.ShowPrintUIAsync(slots);
     }
 
-    public static IEnumerable<IPrintSlot> BuildPrintSlots(IEnumerable<WhiteboardItemViewModelBase> items)
-    {
-        var itemList = items.ToList();
-
-        foreach (var size in Enum.GetValues<WhiteboardItemSize>().OrderByDescending(size => size))
-        {
-            var itemsAtSize = itemList.Where(i => i.LayoutSize == size);
-
-            if (size == WhiteboardItemSize.Medium)
-            {
-                foreach (var item in itemsAtSize.OfType<IPrintSlot>())
-                {
-                    yield return item;
-                }
-            }
-            else if (size == WhiteboardItemSize.Small)
-            {
-                foreach (var (top, bottom) in PairUpTasks(itemsAtSize.OfType<TaskItemViewModel>()))
-                {
-                    yield return new TaskSlotViewModel { TopTask = top, BottomTask = bottom };
-                }
-            }
-        }
-    }
+    public static IEnumerable<IPrintSlot> BuildPrintSlots(IEnumerable<WhiteboardItemViewModelBase> items) =>
+        items.OfType<IPrintSlot>().OrderByDescending(slot => slot.LayoutSize);
 
     [RelayCommand]
     private async Task OpenImagesFolderAsync()
@@ -238,6 +236,16 @@ public partial class MainPageViewModel : ObservableObject
             });
         }
 
+        foreach (var selector in section.Selectors)
+        {
+            section.Items.Add(new GridItemWrapper
+            {
+                GridItemType = GridItemType.Selector,
+                LayoutSize = section.Size,
+                Content = selector
+            });
+        }
+
         if (!Settings.IsSortDescending)
         {
             section.Items.Add(BuildAddButtonWrapper(section.Size));
@@ -250,17 +258,6 @@ public partial class MainPageViewModel : ObservableObject
         LayoutSize = size,
         Content = null
     };
-
-    public static IEnumerable<(TaskItemViewModel top, TaskItemViewModel? bottom)> PairUpTasks(IEnumerable<TaskItemViewModel> tasks)
-    {
-        using var e = tasks.GetEnumerator();
-        while (e.MoveNext())
-        {
-            var top = e.Current;
-            var bottom = e.MoveNext() ? e.Current : null;
-            yield return (top, bottom);
-        }
-    }
 
     private async Task TriggerAutoSaveAsync()
     {
@@ -374,60 +371,7 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task AddItemAsync(WhiteboardItemSize size)
-    {
-        workspace.ExitEditMode();
-
-        // TODO - Adding more than one support type for a size will require we reintroduce SelectorViews.
-        var itemType = size.SupportedItemTypes().First();
-
-        WhiteboardItemViewModelBase newItem = itemType switch
-        {
-            WhiteboardItemType.Project => await CreateProjectAsync(),
-            WhiteboardItemType.TaskItem => await CreateTaskAsync(),
-            _ => throw new NotSupportedException($"Unsupported item type: {itemType}")
-        };
-
-        WhiteboardItems.Add(newItem);
-        workspace.EnterEditMode(newItem);
-    }
-
-    private async Task<ProjectItemViewModel> CreateProjectAsync()
-    {
-        string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
-
-        var newProjectItem = serviceProvider.GetRequiredService<ProjectItemViewModel>();
-        newProjectItem.ProjectSize = ProjectSize.Medium;
-        newProjectItem.Value = ProjectValue.Good;
-        newProjectItem.DueDate = null;
-
-        await ApplyDefaultImageAsync(newProjectItem, imagePath);
-        return newProjectItem;
-    }
-
-    private async Task<TaskItemViewModel> CreateTaskAsync()
-    {
-        string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
-
-        var newTaskItem = serviceProvider.GetRequiredService<TaskItemViewModel>();
-
-        await ApplyDefaultImageAsync(newTaskItem, imagePath);
-        return newTaskItem;
-    }
-
-    private async Task ApplyDefaultImageAsync(ISingleImageItem item, string imageUri)
-    {
-        try
-        {
-            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
-            workspace.ApplyImageWithDefaultTransform(item, imageUri, width, height);
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Failed to apply default image: {ex.Message}");
-            item.Image = imageUri;
-        }
-    }
+    private Task AddItemAsync(WhiteboardItemSize size) => workspace.RequestAddItemAsync(size);
 
     [RelayCommand]
     private async Task ToggleShowArchivedAsync()

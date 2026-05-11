@@ -53,8 +53,6 @@ public partial class App : Application
         services.AddSingleton<MainPageViewModel>();
 
         // ViewModels - Transient (created on demand)
-        services.AddTransient<ProjectItemViewModel>();
-        services.AddTransient<TaskItemViewModel>();
         services.AddTransient<SettingsViewModel>();
 
         return services.BuildServiceProvider();

@@ -3,5 +3,6 @@ namespace WhiteboardProjectBuilder.Enums;
 public enum GridItemType
 {
     AddButton,
-    WhiteboardItem
+    WhiteboardItem,
+    Selector
 }

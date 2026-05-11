@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
+using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Services;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -14,6 +15,10 @@ public partial class WhiteboardItemWorkspaceViewModel(
 {
     [ObservableProperty]
     private WhiteboardItemViewModelBase? selectedItem;
+
+    public event EventHandler<WhiteboardItemViewModelBase>? ItemCreated;
+    public event EventHandler<(WhiteboardItemSize Size, WhiteboardItemSelectorViewModel Selector)>? SelectorAdded;
+    public event EventHandler<(WhiteboardItemSize Size, WhiteboardItemSelectorViewModel Selector)>? SelectorRemoved;
 
     partial void OnSelectedItemChanging(WhiteboardItemViewModelBase? oldValue, WhiteboardItemViewModelBase? newValue)
     {
@@ -33,6 +38,118 @@ public partial class WhiteboardItemWorkspaceViewModel(
         item.IsArchived = false;
 
         ExitEditMode();
+    }
+
+    public async Task RequestAddItemAsync(WhiteboardItemSize size)
+    {
+        ExitEditMode();
+
+        var types = size.SupportedItemTypes().ToList();
+
+        if (types.Count == 1)
+        {
+            await CreateAndAnnounceItemAsync(types[0], size);
+            return;
+        }
+
+        var selector = new WhiteboardItemSelectorViewModel(size, types);
+        selector.ItemTypeSelected += OnSelectorItemTypeSelected;
+        selector.CancelRequested += OnSelectorCancelRequested;
+        SelectorAdded?.Invoke(this, (size, selector));
+    }
+
+    private async void OnSelectorItemTypeSelected(object? sender, WhiteboardItemType type)
+    {
+        if (sender is not WhiteboardItemSelectorViewModel selector)
+        {
+            return;
+        }
+
+        DetachSelector(selector);
+        SelectorRemoved?.Invoke(this, (selector.LayoutSize, selector));
+
+        await CreateAndAnnounceItemAsync(type, selector.LayoutSize);
+    }
+
+    private void OnSelectorCancelRequested(object? sender, EventArgs e)
+    {
+        if (sender is not WhiteboardItemSelectorViewModel selector)
+        {
+            return;
+        }
+
+        DetachSelector(selector);
+        SelectorRemoved?.Invoke(this, (selector.LayoutSize, selector));
+    }
+
+    private void DetachSelector(WhiteboardItemSelectorViewModel selector)
+    {
+        selector.ItemTypeSelected -= OnSelectorItemTypeSelected;
+        selector.CancelRequested -= OnSelectorCancelRequested;
+    }
+
+    private async Task CreateAndAnnounceItemAsync(WhiteboardItemType type, WhiteboardItemSize size)
+    {
+        var item = await CreateItemAsync(type, size);
+        ItemCreated?.Invoke(this, item);
+        EnterEditMode(item);
+    }
+
+    private async Task<WhiteboardItemViewModelBase> CreateItemAsync(WhiteboardItemType type, WhiteboardItemSize size) => type switch
+    {
+        WhiteboardItemType.Project => await CreateProjectAsync(),
+        WhiteboardItemType.TaskItem => await CreateTaskAsync(),
+        WhiteboardItemType.FullImage => await CreateFullImageAsync(size),
+        _ => throw new NotSupportedException($"Unsupported item type: {type}")
+    };
+
+    private async Task<ProjectItemViewModel> CreateProjectAsync()
+    {
+        string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
+
+        var newProjectItem = new ProjectItemViewModel(this)
+        {
+            ProjectSize = ProjectSize.Medium,
+            Value = ProjectValue.Good,
+            DueDate = null
+        };
+
+        await ApplyDefaultImageAsync(newProjectItem, imagePath);
+        return newProjectItem;
+    }
+
+    private async Task<TaskItemViewModel> CreateTaskAsync()
+    {
+        string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
+
+        var newTaskItem = new TaskItemViewModel(this);
+
+        await ApplyDefaultImageAsync(newTaskItem, imagePath);
+        return newTaskItem;
+    }
+
+    private async Task<FullImageItemViewModel> CreateFullImageAsync(WhiteboardItemSize size)
+    {
+        string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
+
+        var newFullImage = new FullImageItemViewModel(this, size);
+
+        await ApplyDefaultImageAsync(newFullImage, imagePath);
+        return newFullImage;
+    }
+
+    private async Task ApplyDefaultImageAsync(ISingleImageItem item, string imageUri)
+    {
+        try
+        {
+            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
+            ApplyImageWithDefaultTransform(item, imageUri, width, height);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to apply default image: {ex.Message}");
+            item.Image = imageUri;
+        }
     }
 
     public void ApplyImageWithDefaultTransform(ISingleImageItem item, string imageUri, double width, double height)

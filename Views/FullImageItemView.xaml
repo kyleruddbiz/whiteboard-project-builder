@@ -1,0 +1,85 @@
+<UserControl
+    x:Class="WhiteboardProjectBuilder.Views.FullImageItemView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:WhiteboardProjectBuilder.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:WhiteboardProjectBuilder.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
+    xmlns:xbind="using:WhiteboardProjectBuilder.XBind"
+    d:DataContext="{d:DesignInstance Type=viewmodels:FullImageItemViewModel}"
+    mc:Ignorable="d">
+
+    <Grid>
+        <!--  Readonly View  -->
+        <Grid x:Name="ReadonlyView" x:Load="{x:Bind xbind:Bools.Not(ViewModel.IsEditing), Mode=OneWay}">
+            <Border
+                Background="{x:Bind converters:BackgroundColorHelper.GetBackgroundBrush(ViewModel.IsArchived), Mode=OneWay}"
+                BorderBrush="Black"
+                BorderThickness="2">
+                <local:ImageViewport
+                    ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
+                    OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=OneWay}"
+                    OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=OneWay}"
+                    ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=OneWay}" />
+            </Border>
+
+            <!--  Hover Overlay (Not Archived - Edit)  -->
+            <Border
+                x:Name="EditOverlay"
+                x:Load="{x:Bind xbind:Bools.Not(ViewModel.IsArchived), Mode=OneWay}"
+                Background="Transparent"
+                PointerEntered="Overlay_PointerEntered"
+                PointerExited="Overlay_PointerExited"
+                Tapped="Overlay_Tapped">
+                <Border
+                    x:Name="HoverIndicator"
+                    Background="Black"
+                    Opacity="0">
+                    <FontIcon
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="80"
+                        Foreground="White"
+                        Glyph="" />
+                </Border>
+            </Border>
+
+            <!--  Hover Overlay (Archived - Reactivate)  -->
+            <Border
+                x:Name="ReactivateOverlay"
+                x:Load="{x:Bind ViewModel.IsArchived, Mode=OneWay}"
+                Background="Transparent"
+                PointerEntered="ReactivateOverlay_PointerEntered"
+                PointerExited="ReactivateOverlay_PointerExited"
+                Tapped="ReactivateOverlay_Tapped">
+                <Border
+                    x:Name="ReactivateHoverIndicator"
+                    Background="Black"
+                    Opacity="0">
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="8">
+                        <FontIcon
+                            FontSize="80"
+                            Foreground="White"
+                            Glyph="" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="24"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            Text="Reactivate" />
+                    </StackPanel>
+                </Border>
+            </Border>
+        </Grid>
+
+        <!--  Edit View  -->
+        <Grid x:Name="EditView" x:Load="{x:Bind ViewModel.IsEditing, Mode=OneWay}">
+            <local:FullImageItemEditView ImageReplaceRequested="FullImageItemEditView_ImageReplaceRequested" ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
+        </Grid>
+    </Grid>
+</UserControl>

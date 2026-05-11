@@ -5,7 +5,7 @@ using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class TaskItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace), ISingleImageItem, ITitledItem
+public partial class TaskItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace), IPrintSlot, ISingleImageItem, ITitledItem
 {
     private const double ImageViewportBorder = 2;
 

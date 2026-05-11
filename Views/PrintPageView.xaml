@@ -13,8 +13,10 @@
         Padding="110 50"
         Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="480" />
-            <RowDefinition Height="480" />
+            <RowDefinition Height="240" />
+            <RowDefinition Height="240" />
+            <RowDefinition Height="240" />
+            <RowDefinition Height="240" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300" />

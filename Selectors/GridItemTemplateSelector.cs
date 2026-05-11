@@ -7,6 +7,7 @@ public class GridItemTemplateSelector : DataTemplateSelector
 {
     public DataTemplate? AddButtonTemplate { get; set; }
     public DataTemplate? WhiteboardItemTemplate { get; set; }
+    public DataTemplate? SelectorTemplate { get; set; }
 
     protected override DataTemplate? SelectTemplateCore(object item)
     {
@@ -17,6 +18,7 @@ public class GridItemTemplateSelector : DataTemplateSelector
         {
             GridItemType.AddButton => AddButtonTemplate,
             GridItemType.WhiteboardItem => WhiteboardItemTemplate,
+            GridItemType.Selector => SelectorTemplate,
             _ => null
         };
     }

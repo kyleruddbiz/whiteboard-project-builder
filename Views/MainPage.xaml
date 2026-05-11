@@ -40,6 +40,11 @@
                     <local:TaskItemView ViewModel="{Binding}" />
                 </DataTemplate>
             </selectors:WhiteboardItemBodyTemplateSelector.TaskItemTemplate>
+            <selectors:WhiteboardItemBodyTemplateSelector.FullImageTemplate>
+                <DataTemplate>
+                    <local:FullImageItemView ViewModel="{Binding}" />
+                </DataTemplate>
+            </selectors:WhiteboardItemBodyTemplateSelector.FullImageTemplate>
         </selectors:WhiteboardItemBodyTemplateSelector>
 
         <selectors:GridItemTemplateSelector x:Key="GridItemTemplateSelector">
@@ -81,6 +86,13 @@
                     </Grid>
                 </DataTemplate>
             </selectors:GridItemTemplateSelector.WhiteboardItemTemplate>
+            <selectors:GridItemTemplateSelector.SelectorTemplate>
+                <DataTemplate x:DataType="models:GridItemWrapper">
+                    <Grid Width="{x:Bind Width}" Height="{x:Bind Height}">
+                        <local:WhiteboardItemSelectorView Margin="10" ViewModel="{x:Bind Selector}" />
+                    </Grid>
+                </DataTemplate>
+            </selectors:GridItemTemplateSelector.SelectorTemplate>
         </selectors:GridItemTemplateSelector>
 
         <DataTemplate x:Key="SectionTemplate" x:DataType="viewmodels:WhiteboardSectionViewModel">
