@@ -378,11 +378,8 @@ public partial class MainPageViewModel : ObservableObject
     {
         workspace.ExitEditMode();
 
-        var itemType = size.SupportedItemTypes().Cast<WhiteboardItemType?>().FirstOrDefault();
-        if (itemType is null)
-        {
-            return;
-        }
+        // TODO - Adding more than one support type for a size will require we reintroduce SelectorViews.
+        var itemType = size.SupportedItemTypes().First();
 
         WhiteboardItemViewModelBase newItem = itemType switch
         {
