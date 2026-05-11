@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:constants="using:WhiteboardProjectBuilder.Constants"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     xmlns:xbind="using:WhiteboardProjectBuilder.XBind"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
@@ -16,8 +15,6 @@
         <!--  Readonly View  -->
         <Grid x:Name="ReadonlyView" x:Load="{x:Bind xbind:Bools.Not(ViewModel.IsEditing), Mode=OneWay}">
             <Border
-                Width="502"
-                Height="800"
                 Background="{x:Bind converters:BackgroundColorHelper.GetBackgroundBrush(ViewModel.IsArchived), Mode=OneWay}"
                 BorderBrush="Black"
                 BorderThickness="2">
@@ -46,11 +43,11 @@
 
                     <Grid
                         Grid.Row="1"
-                        Width="{x:Bind constants:ImageLayoutXamlConstants.ProjectWidth}"
-                        Height="{x:Bind constants:ImageLayoutXamlConstants.ProjectHeight}"
+                        Width="{x:Bind ViewModel.ImageAreaWidth, Mode=OneWay}"
+                        Height="{x:Bind ViewModel.ImageAreaHeight, Mode=OneWay}"
                         Margin="0 38 0 0"
                         VerticalAlignment="Top">
-                        <Border BorderBrush="{x:Bind ViewModel.SizeValueBorderBrush, Mode=OneWay}" BorderThickness="{x:Bind constants:ImageLayoutXamlConstants.ProjectOuterBorderThickness}">
+                        <Border BorderBrush="{x:Bind ViewModel.SizeValueBorderBrush, Mode=OneWay}" BorderThickness="{x:Bind ViewModel.OuterBorderThickness, Mode=OneWay}">
                             <local:ImageViewport
                                 ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                                 OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=OneWay}"

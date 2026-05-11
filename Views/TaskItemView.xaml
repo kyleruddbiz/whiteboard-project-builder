@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:constants="using:WhiteboardProjectBuilder.Constants"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     xmlns:xbind="using:WhiteboardProjectBuilder.XBind"
     d:DataContext="{d:DesignInstance Type=viewmodels:TaskItemViewModel}"
@@ -16,8 +15,6 @@
         <!--  Readonly View  -->
         <Grid x:Name="ReadonlyView" x:Load="{x:Bind xbind:Bools.Not(ViewModel.IsEditing), Mode=OneWay}">
             <Border
-                Width="502"
-                Height="400"
                 Background="{x:Bind converters:BackgroundColorHelper.GetBackgroundBrush(ViewModel.IsArchived), Mode=OneWay}"
                 BorderBrush="Black"
                 BorderThickness="2">
@@ -46,8 +43,8 @@
 
                     <Grid
                         Grid.Row="1"
-                        Width="{x:Bind constants:ImageLayoutXamlConstants.TaskWidth}"
-                        Height="{x:Bind constants:ImageLayoutXamlConstants.TaskHeight}"
+                        Width="{x:Bind ViewModel.ImageAreaWidth, Mode=OneWay}"
+                        Height="{x:Bind ViewModel.ImageAreaHeight, Mode=OneWay}"
                         Margin="0 20 0 4">
                         <local:ImageViewport
                             ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
@@ -122,11 +119,7 @@
 
         <!--  Edit View  -->
         <Grid x:Name="EditView" x:Load="{x:Bind ViewModel.IsEditing, Mode=OneWay}">
-            <Border
-                Width="502"
-                Height="400"
-                BorderBrush="#005FBA"
-                BorderThickness="4">
+            <Border BorderBrush="#005FBA" BorderThickness="4">
                 <local:TaskItemEditView ImageReplaceRequested="TaskItemEditView_ImageReplaceRequested" ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
             </Border>
         </Grid>

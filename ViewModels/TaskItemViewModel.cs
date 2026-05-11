@@ -5,8 +5,15 @@ using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class TaskItemViewModel : WhiteboardItemViewModelBase
+public partial class TaskItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace), ISingleImageItem, ITitledItem
 {
+    private const double ImageViewportBorder = 2;
+
+    public double ImageAreaWidth => 420;
+    public double ImageAreaHeight => 240;
+    public double ImageClipWidth => ImageAreaWidth - 2 * ImageViewportBorder;
+    public double ImageClipHeight => ImageAreaHeight - 2 * ImageViewportBorder;
+
     [ObservableProperty]
     private string title = string.Empty;
 
@@ -57,7 +64,9 @@ public partial class TaskItemViewModel : WhiteboardItemViewModelBase
         RaiseDataChanged();
     }
 
-    public override WhiteboardItemType GetItemType() => WhiteboardItemType.TaskItem;
+    public override WhiteboardItemType ItemType => WhiteboardItemType.TaskItem;
+
+    public override WhiteboardItemSize LayoutSize => WhiteboardItemSize.Small;
 
     public override TaskItem ToModel()
     {
@@ -83,9 +92,9 @@ public partial class TaskItemViewModel : WhiteboardItemViewModelBase
         };
     }
 
-    public static TaskItemViewModel FromModel(TaskItem model)
+    public static TaskItemViewModel FromModel(TaskItem model, WhiteboardItemWorkspaceViewModel workspace)
     {
-        return new TaskItemViewModel
+        return new TaskItemViewModel(workspace)
         {
             Title = model.Title,
             Subtitle = model.Subtitle,

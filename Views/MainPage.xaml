@@ -27,42 +27,49 @@
             Modifiers="Control" />
     </Page.KeyboardAccelerators>
     <Page.Resources>
+        <selectors:WhiteboardItemBodyTemplateSelector x:Key="WhiteboardItemBodyTemplateSelector">
+            <!--  ViewModel uses {Binding} instead of {x:Bind}: ContentControl.Content marshals CLR VMs through the WinRT IInspectable boundary, breaking x:Bind's compile-time cast.  -->
+
+            <selectors:WhiteboardItemBodyTemplateSelector.ProjectTemplate>
+                <DataTemplate>
+                    <local:ProjectItemView ViewModel="{Binding}" />
+                </DataTemplate>
+            </selectors:WhiteboardItemBodyTemplateSelector.ProjectTemplate>
+            <selectors:WhiteboardItemBodyTemplateSelector.TaskItemTemplate>
+                <DataTemplate>
+                    <local:TaskItemView ViewModel="{Binding}" />
+                </DataTemplate>
+            </selectors:WhiteboardItemBodyTemplateSelector.TaskItemTemplate>
+        </selectors:WhiteboardItemBodyTemplateSelector>
+
         <selectors:GridItemTemplateSelector x:Key="GridItemTemplateSelector">
-            <selectors:GridItemTemplateSelector.AddProjectButtonTemplate>
+            <selectors:GridItemTemplateSelector.AddButtonTemplate>
                 <DataTemplate x:DataType="models:GridItemWrapper">
                     <Button
-                        Width="502"
-                        Height="800"
+                        Width="{x:Bind Width}"
+                        Height="{x:Bind Height}"
                         Margin="10"
                         Padding="0"
                         Background="{StaticResource OffWhiteBrush}"
-                        Command="{Binding ViewModel.AddProjectCommand, ElementName=PageRoot}">
+                        Command="{Binding ViewModel.AddItemCommand, ElementName=PageRoot}"
+                        CommandParameter="{x:Bind LayoutSize}">
                         <FontIcon FontSize="120" Glyph="&#xE710;" />
                     </Button>
                 </DataTemplate>
-            </selectors:GridItemTemplateSelector.AddProjectButtonTemplate>
-            <selectors:GridItemTemplateSelector.AddTaskButtonTemplate>
+            </selectors:GridItemTemplateSelector.AddButtonTemplate>
+            <selectors:GridItemTemplateSelector.WhiteboardItemTemplate>
                 <DataTemplate x:DataType="models:GridItemWrapper">
-                    <Button
-                        Width="502"
-                        Height="400"
-                        Margin="10"
-                        Padding="0"
-                        Background="{StaticResource OffWhiteBrush}"
-                        Command="{Binding ViewModel.AddTaskCommand, ElementName=PageRoot}">
-                        <FontIcon FontSize="80" Glyph="&#xE710;" />
-                    </Button>
-                </DataTemplate>
-            </selectors:GridItemTemplateSelector.AddTaskButtonTemplate>
-            <selectors:GridItemTemplateSelector.ProjectTemplate>
-                <DataTemplate x:DataType="models:GridItemWrapper">
-                    <Grid>
-                        <local:ProjectItemView
+                    <Grid Width="{x:Bind Width}" Height="{x:Bind Height}">
+                        <ContentControl
                             Margin="10"
-                            DataContext="{x:Bind ProjectItem}"
-                            EditCommand="{Binding ViewModel.EnterEditModeCommand, ElementName=PageRoot}"
-                            ImageReplaceCommand="{Binding ViewModel.ReplaceImageCommand, ElementName=PageRoot}"
-                            ReactivateCommand="{Binding ViewModel.ReactivateItemCommand, ElementName=PageRoot}" />
+                            Padding="0"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Content="{x:Bind WhiteboardItem}"
+                            ContentTemplateSelector="{StaticResource WhiteboardItemBodyTemplateSelector}"
+                            IsTabStop="False" />
                         <local:RemoveItemButton
                             Margin="0 12 12 0"
                             HorizontalAlignment="Right"
@@ -70,31 +77,21 @@
                             ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
                             IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
                             RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            WhiteboardItem="{x:Bind ProjectItem}" />
+                            WhiteboardItem="{x:Bind WhiteboardItem}" />
                     </Grid>
                 </DataTemplate>
-            </selectors:GridItemTemplateSelector.ProjectTemplate>
-            <selectors:GridItemTemplateSelector.TaskItemTemplate>
-                <DataTemplate x:DataType="models:GridItemWrapper">
-                    <Grid>
-                        <local:TaskItemView
-                            Margin="10"
-                            EditCommand="{Binding ViewModel.EnterEditModeCommand, ElementName=PageRoot}"
-                            ImageReplaceCommand="{Binding ViewModel.ReplaceImageCommand, ElementName=PageRoot}"
-                            ReactivateCommand="{Binding ViewModel.ReactivateItemCommand, ElementName=PageRoot}"
-                            ViewModel="{x:Bind TaskItem}" />
-                        <local:RemoveItemButton
-                            Margin="0 12 12 0"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
-                            RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
-                            WhiteboardItem="{x:Bind TaskItem}" />
-                    </Grid>
-                </DataTemplate>
-            </selectors:GridItemTemplateSelector.TaskItemTemplate>
+            </selectors:GridItemTemplateSelector.WhiteboardItemTemplate>
         </selectors:GridItemTemplateSelector>
+
+        <DataTemplate x:Key="SectionTemplate" x:DataType="viewmodels:WhiteboardSectionViewModel">
+            <GridView
+                HorizontalAlignment="Left"
+                IsTabStop="True"
+                ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
+                ItemsSource="{x:Bind Items}"
+                SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
+                SelectionMode="Single" />
+        </DataTemplate>
     </Page.Resources>
     <Page.Content>
         <Grid
@@ -137,37 +134,10 @@
             </StackPanel>
 
             <ScrollViewer Grid.Row="1" Margin="0 20 0 0">
-                <StackPanel Margin="150 0 150 0" Spacing="20">
-                    <TextBlock
-                        Margin="20 0 0 0"
-                        FontSize="40"
-                        FontWeight="SemiBold"
-                        Text="Projects" />
-
-                    <GridView
-                        x:Name="ProjectsGridView"
-                        HorizontalAlignment="Left"
-                        IsTabStop="True"
-                        ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
-                        ItemsSource="{x:Bind ViewModel.ProjectGridItems, Mode=OneWay}"
-                        SelectionChanged="GridView_SelectionChanged"
-                        SelectionMode="Single" />
-
-                    <TextBlock
-                        Margin="20 20 0 0"
-                        FontSize="40"
-                        FontWeight="SemiBold"
-                        Text="Tasks" />
-
-                    <GridView
-                        x:Name="TasksGridView"
-                        HorizontalAlignment="Left"
-                        IsTabStop="True"
-                        ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
-                        ItemsSource="{x:Bind ViewModel.TaskGridItems, Mode=OneWay}"
-                        SelectionChanged="GridView_SelectionChanged"
-                        SelectionMode="Single" />
-                </StackPanel>
+                <ItemsControl
+                    Margin="150 0 150 0"
+                    ItemTemplate="{StaticResource SectionTemplate}"
+                    ItemsSource="{x:Bind ViewModel.Sections}" />
             </ScrollViewer>
 
             <ProgressRing

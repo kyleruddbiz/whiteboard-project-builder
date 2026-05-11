@@ -7,15 +7,9 @@ namespace WhiteboardProjectBuilder.Services;
 /// <summary>
 /// Manages persistence and retrieval of whiteboard items.
 /// </summary>
-public class WhiteboardItemRepository
+public class WhiteboardItemRepository(DataPersistenceService dataPersistenceService, WhiteboardItemWorkspaceViewModel workspace)
 {
     private const string DataFileName = "whiteboard-items.json";
-    private readonly DataPersistenceService dataPersistenceService;
-
-    public WhiteboardItemRepository(DataPersistenceService dataPersistenceService)
-    {
-        this.dataPersistenceService = dataPersistenceService;
-    }
 
     public async Task SaveWhiteboardItemsAsync(IEnumerable<WhiteboardItemViewModelBase> items)
     {
@@ -43,8 +37,8 @@ public class WhiteboardItemRepository
         {
             WhiteboardItemViewModelBase viewModel = item switch
             {
-                ProjectItem project => ProjectItemViewModel.FromModel(project),
-                TaskItem task => TaskItemViewModel.FromModel(task),
+                ProjectItem project => ProjectItemViewModel.FromModel(project, workspace),
+                TaskItem task => TaskItemViewModel.FromModel(task, workspace),
                 _ => throw new NotSupportedException($"Unsupported whiteboard item type: {item.GetType().Name}")
             };
 

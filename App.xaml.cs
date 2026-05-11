@@ -49,6 +49,7 @@ public partial class App : Application
         services.AddSingleton<PrintService>();
 
         // ViewModels - Singleton
+        services.AddSingleton<WhiteboardItemWorkspaceViewModel>();
         services.AddSingleton<MainPageViewModel>();
 
         // ViewModels - Transient (created on demand)

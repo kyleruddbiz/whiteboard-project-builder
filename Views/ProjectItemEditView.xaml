@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:constants="using:WhiteboardProjectBuilder.Constants"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
     KeyboardAcceleratorPlacementMode="Hidden"
@@ -16,54 +15,50 @@
         <KeyboardAccelerator Key="Escape" behaviors:KeyboardAcceleratorCommandBehavior.Command="{x:Bind ViewModel.CancelEditingCommand}" />
     </UserControl.KeyboardAccelerators>
 
-    <Border
-        Width="502"
-        Height="800"
-        BorderBrush="#005FBA"
-        BorderThickness="4">
+    <Border BorderBrush="#005FBA" BorderThickness="4">
         <StackPanel Padding="16" Spacing="12">
-                <local:FloatingLabelTextBox
-                    x:Name="TitleTextBox"
-                    Label="Title"
-                    Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <local:FloatingLabelTextBox
+                x:Name="TitleTextBox"
+                Label="Title"
+                Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <local:FloatingLabelTextBox
-                    x:Name="SubtitleTextBox"
-                    Label="Subtitle"
-                    Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <local:FloatingLabelTextBox
+                x:Name="SubtitleTextBox"
+                Label="Subtitle"
+                Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <StackPanel Spacing="8">
-                    <TextBlock FontWeight="SemiBold" Text="Image" />
-                    <local:ImageEditor
-                        x:Name="MainImageEditor"
-                        Width="{x:Bind constants:ImageLayoutXamlConstants.ProjectWidth}"
-                        Height="{x:Bind constants:ImageLayoutXamlConstants.ProjectHeight}"
-                        ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
-                        ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
-                        OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
-                        OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=TwoWay}"
-                        ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=TwoWay}" />
+            <StackPanel Spacing="8">
+                <TextBlock FontWeight="SemiBold" Text="Image" />
+                <local:ImageEditor
+                    x:Name="MainImageEditor"
+                    Width="{x:Bind ViewModel.ImageAreaWidth, Mode=OneWay}"
+                    Height="{x:Bind ViewModel.ImageAreaHeight, Mode=OneWay}"
+                    ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
+                    ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
+                    OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
+                    OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=TwoWay}"
+                    ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=TwoWay}" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock
+                    Margin="0 0 0 8"
+                    FontWeight="SemiBold"
+                    Text="Size and Value" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Border BorderBrush="{x:Bind ViewModel.SizeValueBorderBrush, Mode=OneWay}" BorderThickness="2">
+                        <local:IconSelector IconOptions="{x:Bind ViewModel.SizeIconOptions, Mode=OneWay}" SelectedValue="{Binding ProjectSize, Mode=TwoWay}" />
+                    </Border>
+                    <Border BorderBrush="{x:Bind ViewModel.SizeValueBorderBrush, Mode=OneWay}" BorderThickness="2">
+                        <local:IconSelector IconOptions="{x:Bind ViewModel.ValueIconOptions, Mode=OneWay}" SelectedValue="{Binding Value, Mode=TwoWay}" />
+                    </Border>
                 </StackPanel>
+            </StackPanel>
 
-                <StackPanel>
-                    <TextBlock
-                        Margin="0 0 0 8"
-                        FontWeight="SemiBold"
-                        Text="Size and Value" />
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Border BorderBrush="{x:Bind ViewModel.SizeValueBorderBrush, Mode=OneWay}" BorderThickness="2">
-                            <local:IconSelector IconOptions="{x:Bind ViewModel.SizeIconOptions, Mode=OneWay}" SelectedValue="{Binding Size, Mode=TwoWay}" />
-                        </Border>
-                        <Border BorderBrush="{x:Bind ViewModel.SizeValueBorderBrush, Mode=OneWay}" BorderThickness="2">
-                            <local:IconSelector IconOptions="{x:Bind ViewModel.ValueIconOptions, Mode=OneWay}" SelectedValue="{Binding Value, Mode=TwoWay}" />
-                        </Border>
-                    </StackPanel>
-                </StackPanel>
-
-                <CalendarDatePicker
-                    Date="{x:Bind ViewModel.DueDate, Mode=TwoWay, Converter={StaticResource NullableDateTimeToDateTimeOffsetConverter}}"
-                    Header="Due Date"
-                    PlaceholderText="Select a date" />
+            <CalendarDatePicker
+                Date="{x:Bind ViewModel.DueDate, Mode=TwoWay, Converter={StaticResource NullableDateTimeToDateTimeOffsetConverter}}"
+                Header="Due Date"
+                PlaceholderText="Select a date" />
         </StackPanel>
     </Border>
 </UserControl>

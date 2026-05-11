@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
 using WhiteboardProjectBuilder.ViewModels;
 using Windows.System;
@@ -156,23 +155,5 @@ public partial class MainPage : Page
         }
 
         Unloaded -= MainPage_Unloaded;
-    }
-
-    private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (ViewModel.SelectedItem?.IsEditing == true)
-        {
-            ViewModel.SelectedItem.IsEditing = false;
-        }
-
-        var gridView = (GridView)sender;
-        if (gridView.SelectedItem is GridItemWrapper wrapper && wrapper.WhiteboardItem != null)
-        {
-            ViewModel.SelectedItem = wrapper.WhiteboardItem;
-        }
-        else
-        {
-            ViewModel.SelectedItem = null;
-        }
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Media;
+using WhiteboardProjectBuilder.Constants;
 using WhiteboardProjectBuilder.ViewModels;
 
 namespace WhiteboardProjectBuilder.Views;
@@ -53,12 +54,16 @@ public sealed partial class PrintPageView : UserControl
 
             viewbox.Margin = new Thickness(leftMargin, topMargin, 0, 0);
 
-            UserControl itemView = Items[i] switch
+            var slot = Items[i];
+            UserControl itemView = slot switch
             {
                 ProjectItemViewModel projectVm => new ProjectItemView { ViewModel = projectVm },
                 TaskSlotViewModel slotVm => new TaskSlotView { ViewModel = slotVm },
-                var slot => throw new NotSupportedException($"Unsupported print slot type: {slot.GetType().Name}")
+                _ => throw new NotSupportedException($"Unsupported print slot type: {slot.GetType().Name}")
             };
+
+            itemView.Width = WhiteboardItemSizes.WidthOf(slot.LayoutSize);
+            itemView.Height = WhiteboardItemSizes.HeightOf(slot.LayoutSize);
 
             viewbox.Child = itemView;
 
