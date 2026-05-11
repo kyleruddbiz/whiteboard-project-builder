@@ -17,13 +17,11 @@ public partial class WhiteboardItemWorkspaceViewModel(
 
     public void EnterEditMode(WhiteboardItemViewModelBase item)
     {
-        if (SelectedItem != null && SelectedItem != item)
-        {
-            SelectedItem.IsEditing = false;
-        }
+        if (SelectedItem == item) return;
 
+        SelectedItem?.IsEditing = false;
         SelectedItem = item;
-        item.IsEditing = true;
+        SelectedItem.IsEditing = true;
     }
 
     public void ExitEditMode()
