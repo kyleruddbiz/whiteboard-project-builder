@@ -13,7 +13,7 @@ public class PrintPagePackerService
 {
     public IReadOnlyList<PrintPageLayout> BuildPrintPages(IEnumerable<IPrintSlot> slots)
     {
-        var ordered = slots.OrderByDescending(s => s.LayoutSize).ToList();
+        var ordered = slots.OrderByDescending(s => s.LayoutSize);
         var pages = new List<PackingPage>();
 
         foreach (var slot in ordered)

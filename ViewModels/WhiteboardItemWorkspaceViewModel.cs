@@ -11,7 +11,8 @@ namespace WhiteboardProjectBuilder.ViewModels;
 public partial class WhiteboardItemWorkspaceViewModel(
     ImageStorageService imageStorageService,
     ImageTransformService imageTransformService,
-    ImageDimensionService imageDimensionService) : ObservableObject
+    ImageDimensionService imageDimensionService,
+    ClipboardService clipboardService) : ObservableObject
 {
     [ObservableProperty]
     private WhiteboardItemViewModelBase? selectedItem;
@@ -169,6 +170,9 @@ public partial class WhiteboardItemWorkspaceViewModel(
         {
             return;
         }
+
+        // Pre-populate the clipboard so the user can paste the images folder path into the picker.
+        await clipboardService.CopyImagesFolderPathToClipboardAsync();
 
         StorageFile? file = null;
 

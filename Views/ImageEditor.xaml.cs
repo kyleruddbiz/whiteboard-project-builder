@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Input;
 using WhiteboardProjectBuilder.Enums;
@@ -325,10 +324,8 @@ public sealed partial class ImageEditor : UserControl
         e.Handled = true;
     }
 
-    private async void Viewport_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    private void Viewport_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
-        var clipboardService = App.Services.GetRequiredService<ClipboardService>();
-        await clipboardService.CopyImagesFolderPathToClipboardAsync();
         ImageReplaceRequested?.Invoke(this, EventArgs.Empty);
         e.Handled = true;
     }
