@@ -15,20 +15,23 @@ public partial class WhiteboardItemWorkspaceViewModel(
     [ObservableProperty]
     private WhiteboardItemViewModelBase? selectedItem;
 
+    partial void OnSelectedItemChanging(WhiteboardItemViewModelBase? oldValue, WhiteboardItemViewModelBase? newValue)
+    {
+        if (oldValue != newValue)
+        {
+            oldValue?.IsEditing = false;
+        }
+    }
+
     public void EnterEditMode(WhiteboardItemViewModelBase item)
     {
         if (SelectedItem == item) return;
 
-        SelectedItem?.IsEditing = false;
         SelectedItem = item;
-        SelectedItem.IsEditing = true;
+        item.IsEditing = true;
     }
 
-    public void ExitEditMode()
-    {
-        SelectedItem?.IsEditing = false;
-        SelectedItem = null;
-    }
+    public void ExitEditMode() => SelectedItem = null;
 
     public void ReactivateItem(WhiteboardItemViewModelBase item)
     {

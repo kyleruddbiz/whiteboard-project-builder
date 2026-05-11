@@ -83,13 +83,13 @@
             </selectors:GridItemTemplateSelector.WhiteboardItemTemplate>
         </selectors:GridItemTemplateSelector>
 
-        <DataTemplate x:Key="SectionTemplate" x:DataType="models:WhiteboardSection">
+        <DataTemplate x:Key="SectionTemplate" x:DataType="viewmodels:WhiteboardSectionViewModel">
             <GridView
                 HorizontalAlignment="Left"
                 IsTabStop="True"
                 ItemTemplateSelector="{StaticResource GridItemTemplateSelector}"
                 ItemsSource="{x:Bind Items}"
-                Loaded="SectionGridView_Loaded"
+                SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
                 SelectionMode="Single" />
         </DataTemplate>
     </Page.Resources>

@@ -42,7 +42,7 @@ public partial class MainPageViewModel : ObservableObject
 
     public ObservableCollection<WhiteboardItemViewModelBase> WhiteboardItems { get; }
 
-    public IReadOnlyList<WhiteboardSection> Sections { get; }
+    public IReadOnlyList<WhiteboardSectionViewModel> Sections { get; }
 
     public WhiteboardItemViewModelBase? SelectedItem
     {
@@ -72,7 +72,7 @@ public partial class MainPageViewModel : ObservableObject
         WhiteboardItems = [];
         Sections = Enum.GetValues<WhiteboardItemSize>()
             .OrderByDescending(size => size)
-            .Select(size => new WhiteboardSection(size))
+            .Select(size => new WhiteboardSectionViewModel(size, workspace))
             .ToList();
 
         RebuildGridItems();
@@ -210,7 +210,7 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    private void RebuildSection(WhiteboardSection section)
+    private void RebuildSection(WhiteboardSectionViewModel section)
     {
         section.Items.Clear();
 
