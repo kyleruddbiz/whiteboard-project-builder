@@ -21,8 +21,8 @@
                         ItemsStretch="Fill"
                         MaximumRowsOrColumns="2"
                         MinColumnSpacing="0"
-                        MinItemHeight="380"
-                        MinItemWidth="245"
+                        MinItemHeight="200"
+                        MinItemWidth="200"
                         MinRowSpacing="0"
                         Orientation="Horizontal" />
                 </controls:ItemsRepeater.Layout>
