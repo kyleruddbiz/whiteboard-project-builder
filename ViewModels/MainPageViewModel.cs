@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
-using WhiteboardProjectBuilder.Constants;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
@@ -71,7 +70,7 @@ public partial class MainPageViewModel : ObservableObject
         Settings = serviceProvider.GetRequiredService<SettingsViewModel>();
 
         WhiteboardItems = [];
-        Sections = ItemTypeSizeRegistry.ActiveSizes()
+        Sections = Enum.GetValues<WhiteboardItemSize>()
             .OrderByDescending(size => size)
             .Select(size => new WhiteboardSection(size))
             .ToList();
@@ -118,7 +117,7 @@ public partial class MainPageViewModel : ObservableObject
     {
         var itemList = items.ToList();
 
-        foreach (var size in ItemTypeSizeRegistry.ActiveSizes().OrderByDescending(size => size))
+        foreach (var size in Enum.GetValues<WhiteboardItemSize>().OrderByDescending(size => size))
         {
             var itemsAtSize = itemList.Where(i => i.LayoutSize == size);
 
@@ -379,7 +378,7 @@ public partial class MainPageViewModel : ObservableObject
     {
         workspace.ExitEditMode();
 
-        var itemType = ItemTypeSizeRegistry.ItemTypesForSize(size).Cast<WhiteboardItemType?>().FirstOrDefault();
+        var itemType = size.SupportedItemTypes().Cast<WhiteboardItemType?>().FirstOrDefault();
         if (itemType is null)
         {
             return;

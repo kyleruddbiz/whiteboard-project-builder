@@ -10,8 +10,8 @@ WhiteboardProjectBuilder is a WinUI 3 desktop application built on .NET 9.0, tar
 
 This application creates printable whiteboard items for use on physical whiteboards. Key features include:
 
-- **Item Types**: Currently Project items and Task items. Each item has both a Type (`WhiteboardItemType`) and a Size (`WhiteboardItemSize`); these are orthogonal axes that the template selector keys on as a tuple.
-- **Sizes**: `Small` (502×400), `Medium` (502×800), `Large` (1004×800), `Huge` (1004×1600). Sizes are multiples of 2 along one axis so they tile cleanly into the print page (a 2×2 grid of Medium cells). The active (Type, Size) pairs are declared in `Constants/ItemTypeSizeRegistry.cs`.
+- **Item Types**: Currently Project items and Task items. Each item has both a Type (`WhiteboardItemType`) and a Size (`WhiteboardItemSize`); these are orthogonal axes that the template selector keys on as a tuple. Which types support which sizes is declared in `Enums/WhiteboardItemSize.cs` (`SupportedItemTypes` extension method).
+- **Sizes**: `Small` (502×400), `Medium` (502×800), `Large` (1004×800), `Huge` (1004×1600). Sizes are multiples of 2 along one axis so they tile cleanly into the print page (a 2×2 grid of Medium cells).
 - **Largest-first ordering**: Home-page sections and print slots are ordered by descending size (Huge → Large → Medium → Small). The `WhiteboardItemSize` enum is declared smallest-to-largest, so this is just `OrderByDescending(size => size)`. This is a packing rule (rocks-then-sand), not aesthetics — preserve it when adding new sizes or layout/print code.
 - **Editable Items**: Each whiteboard item can be edited based on its template.
 - **List Management**: Users add items via per-size Add buttons and can remove them from the list.
