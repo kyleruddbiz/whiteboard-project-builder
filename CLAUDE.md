@@ -106,11 +106,13 @@ Supports building for multiple architectures: x86, x64, and ARM64 on Windows 10 
 - Include "Async" suffix on async methods
 - Use var with linq, annoymous types, and when the type is apparent
 - Avoid var for built-in types
+- **Prefer primary constructors** for services, repositories, and ViewModels whose constructor only captures parameters as fields. Use a traditional constructor body only when initialization logic is needed beyond capture (e.g., wiring events, computing derived state, calling base methods with non-pass-through arguments).
 
 ### MVVM Guidelines
 - **Never use `x:Name` to reference UserControls** - Avoid directly accessing UserControl instances in code-behind
 - **Always use data binding** - Pass ViewModels to UserControls via DependencyProperty bindings, not constructor parameters or property setters
 - **UserControl ViewModels must be DependencyProperties** - Use `DependencyProperty.Register` for ViewModel properties in UserControls, not get-only properties
+- **DP-backed `ViewModel` properties are typed non-nullable** - For a UserControl's `ViewModel` (or other required-by-binding) DP, declare the CLR getter as non-nullable and suppress the framework-boundary null with `!`: `get => (TViewModel)GetValue(ViewModelProperty)!;`. Keep `new PropertyMetadata(null)` — the suppression is a public-surface assertion that the binding has been applied before any consumer reads. This eliminates `if (ViewModel != null)` clutter in code-behind handlers; input/event handlers only fire after the template engine has applied the binding, so the null window is unreachable in practice. If code does access the property before binding evaluates (e.g., from a constructor), it will NRE loud and fast — the correct failure mode. This matches the project's existing `null!` convention for DI- and binding-initialized fields.
 - **Set DataContext in UserControl only when needed** - Set `this.DataContext = this` only if the UserControl uses plain `{Binding}` internally. If every internal binding is `{x:Bind}` (which targets the code-behind, not DataContext), `DataContext = this` is redundant and actively harmful: it overrides the DataContext a parent template would otherwise inherit, breaking parent-side `{Binding}` expressions that target this control's DependencyProperties (e.g. `ViewModel="{Binding}"` from a hosting `DataTemplate`).
 
 ### Comments

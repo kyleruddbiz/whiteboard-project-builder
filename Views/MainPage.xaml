@@ -32,20 +32,12 @@
 
             <selectors:WhiteboardItemBodyTemplateSelector.ProjectTemplate>
                 <DataTemplate>
-                    <local:ProjectItemView
-                        EditCommand="{Binding ViewModel.EnterEditModeCommand, ElementName=PageRoot}"
-                        ImageReplaceCommand="{Binding ViewModel.ReplaceImageCommand, ElementName=PageRoot}"
-                        ReactivateCommand="{Binding ViewModel.ReactivateItemCommand, ElementName=PageRoot}"
-                        ViewModel="{Binding}" />
+                    <local:ProjectItemView ViewModel="{Binding}" />
                 </DataTemplate>
             </selectors:WhiteboardItemBodyTemplateSelector.ProjectTemplate>
             <selectors:WhiteboardItemBodyTemplateSelector.TaskItemTemplate>
                 <DataTemplate>
-                    <local:TaskItemView
-                        EditCommand="{Binding ViewModel.EnterEditModeCommand, ElementName=PageRoot}"
-                        ImageReplaceCommand="{Binding ViewModel.ReplaceImageCommand, ElementName=PageRoot}"
-                        ReactivateCommand="{Binding ViewModel.ReactivateItemCommand, ElementName=PageRoot}"
-                        ViewModel="{Binding}" />
+                    <local:TaskItemView ViewModel="{Binding}" />
                 </DataTemplate>
             </selectors:WhiteboardItemBodyTemplateSelector.TaskItemTemplate>
         </selectors:WhiteboardItemBodyTemplateSelector>

@@ -6,7 +6,7 @@ using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintSlot
+public partial class ProjectItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace), IPrintSlot
 {
     [ObservableProperty]
     private string title = string.Empty;
@@ -37,6 +37,7 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
 
     public string SizeIcon => ProjectSize.ToIcon();
     public string ValueIcon => Value.ToIcon();
+
     public Brush SizeValueBorderBrush
     {
         get
@@ -138,9 +139,9 @@ public partial class ProjectItemViewModel : WhiteboardItemViewModelBase, IPrintS
         };
     }
 
-    public static ProjectItemViewModel FromModel(ProjectItem model)
+    public static ProjectItemViewModel FromModel(ProjectItem model, WhiteboardItemWorkspaceViewModel workspace)
     {
-        return new ProjectItemViewModel
+        return new ProjectItemViewModel(workspace)
         {
             Title = model.Title,
             Subtitle = model.Subtitle,

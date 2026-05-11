@@ -5,7 +5,7 @@ using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class TaskItemViewModel : WhiteboardItemViewModelBase
+public partial class TaskItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace)
 {
     [ObservableProperty]
     private string title = string.Empty;
@@ -85,9 +85,9 @@ public partial class TaskItemViewModel : WhiteboardItemViewModelBase
         };
     }
 
-    public static TaskItemViewModel FromModel(TaskItem model)
+    public static TaskItemViewModel FromModel(TaskItem model, WhiteboardItemWorkspaceViewModel workspace)
     {
-        return new TaskItemViewModel
+        return new TaskItemViewModel(workspace)
         {
             Title = model.Title,
             Subtitle = model.Subtitle,

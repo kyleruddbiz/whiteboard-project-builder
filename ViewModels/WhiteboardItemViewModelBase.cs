@@ -5,7 +5,7 @@ using WhiteboardProjectBuilder.Models;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public abstract partial class WhiteboardItemViewModelBase : ObservableObject
+public abstract partial class WhiteboardItemViewModelBase(WhiteboardItemWorkspaceViewModel workspace) : ObservableObject
 {
     [ObservableProperty]
     private bool isEditing;
@@ -35,6 +35,15 @@ public abstract partial class WhiteboardItemViewModelBase : ObservableObject
             IsEditing = false;
         }
     }
+
+    [RelayCommand]
+    private void EnterEditMode() => workspace.EnterEditMode(this);
+
+    [RelayCommand]
+    private void Reactivate() => workspace.ReactivateItem(this);
+
+    [RelayCommand]
+    private Task ReplaceImageAsync(XamlRoot xamlRoot) => workspace.ReplaceImageAsync(this, xamlRoot);
 
     public abstract WhiteboardItemType ItemType { get; }
 

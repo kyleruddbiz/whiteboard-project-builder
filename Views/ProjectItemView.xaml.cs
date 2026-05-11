@@ -1,4 +1,3 @@
-using System.Windows.Input;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using WhiteboardProjectBuilder.ViewModels;
@@ -14,46 +13,10 @@ public sealed partial class ProjectItemView : UserControl
             typeof(ProjectItemView),
             new PropertyMetadata(null));
 
-    public static readonly DependencyProperty EditCommandProperty = DependencyProperty.Register(
-        nameof(EditCommand),
-        typeof(ICommand),
-        typeof(ProjectItemView),
-        new PropertyMetadata(null));
-
-    public static readonly DependencyProperty ImageReplaceCommandProperty = DependencyProperty.Register(
-        nameof(ImageReplaceCommand),
-        typeof(ICommand),
-        typeof(ProjectItemView),
-        new PropertyMetadata(null));
-
-    public static readonly DependencyProperty ReactivateCommandProperty = DependencyProperty.Register(
-        nameof(ReactivateCommand),
-        typeof(ICommand),
-        typeof(ProjectItemView),
-        new PropertyMetadata(null));
-
-    public ProjectItemViewModel? ViewModel
+    public ProjectItemViewModel ViewModel
     {
-        get => (ProjectItemViewModel?)GetValue(ViewModelProperty);
+        get => (ProjectItemViewModel)GetValue(ViewModelProperty)!;
         set => SetValue(ViewModelProperty, value);
-    }
-
-    public ICommand? EditCommand
-    {
-        get => (ICommand?)GetValue(EditCommandProperty);
-        set => SetValue(EditCommandProperty, value);
-    }
-
-    public ICommand? ImageReplaceCommand
-    {
-        get => (ICommand?)GetValue(ImageReplaceCommandProperty);
-        set => SetValue(ImageReplaceCommandProperty, value);
-    }
-
-    public ICommand? ReactivateCommand
-    {
-        get => (ICommand?)GetValue(ReactivateCommandProperty);
-        set => SetValue(ReactivateCommandProperty, value);
     }
 
     public ProjectItemView()
@@ -79,18 +42,12 @@ public sealed partial class ProjectItemView : UserControl
 
     private void Overlay_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (ViewModel != null && EditCommand?.CanExecute(ViewModel) == true)
-        {
-            EditCommand.Execute(ViewModel);
-        }
+        ViewModel.EnterEditModeCommand.Execute(null);
     }
 
     private void ProjectItemEditView_ImageReplaceRequested(object? sender, EventArgs e)
     {
-        if (ImageReplaceCommand?.CanExecute(XamlRoot) == true)
-        {
-            ImageReplaceCommand.Execute(XamlRoot);
-        }
+        ViewModel.ReplaceImageCommand.Execute(XamlRoot);
     }
 
     private void ReactivateOverlay_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -111,10 +68,7 @@ public sealed partial class ProjectItemView : UserControl
 
     private void ReactivateOverlay_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (ViewModel != null && ReactivateCommand?.CanExecute(ViewModel) == true)
-        {
-            ReactivateCommand.Execute(ViewModel);
-        }
+        ViewModel.ReactivateCommand.Execute(null);
     }
 
     private static void AnimateHoverIndicator(UIElement target, double toOpacity)
