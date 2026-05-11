@@ -20,7 +20,6 @@ public partial class MainPageViewModel : ObservableObject
     private readonly WhiteboardItemRepository whiteboardItemRepository;
     private readonly SettingsService settingsService;
     private readonly ImageStorageService imageStorageService;
-    private readonly ImageTransformService imageTransformService;
     private readonly ImageDimensionService imageDimensionService;
     private readonly WhiteboardItemWorkspaceViewModel workspace;
     private readonly IServiceProvider serviceProvider;
@@ -57,7 +56,6 @@ public partial class MainPageViewModel : ObservableObject
         WhiteboardItemRepository whiteboardItemRepository,
         SettingsService settingsService,
         ImageStorageService imageStorageService,
-        ImageTransformService imageTransformService,
         ImageDimensionService imageDimensionService,
         WhiteboardItemWorkspaceViewModel workspace,
         IServiceProvider serviceProvider)
@@ -66,7 +64,6 @@ public partial class MainPageViewModel : ObservableObject
         this.whiteboardItemRepository = whiteboardItemRepository;
         this.settingsService = settingsService;
         this.imageStorageService = imageStorageService;
-        this.imageTransformService = imageTransformService;
         this.imageDimensionService = imageDimensionService;
         this.workspace = workspace;
         this.serviceProvider = serviceProvider;
@@ -157,10 +154,7 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(CanPasteImage))]
-    private async Task PasteImageAsync(XamlRoot xamlRoot)
-    {
-        await PasteImageFromClipboardAsync(xamlRoot);
-    }
+    private Task PasteImageAsync(XamlRoot xamlRoot) => workspace.PasteImageAsync(xamlRoot);
 
     private bool CanPasteImage(XamlRoot? xamlRoot)
     {
@@ -406,25 +400,37 @@ public partial class MainPageViewModel : ObservableObject
     {
         string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
-        var newProject = serviceProvider.GetRequiredService<ProjectItemViewModel>();
-        newProject.Image = imagePath;
-        newProject.ProjectSize = ProjectSize.Medium;
-        newProject.Value = ProjectValue.Good;
-        newProject.DueDate = null;
+        var newProjectItem = serviceProvider.GetRequiredService<ProjectItemViewModel>();
+        newProjectItem.ProjectSize = ProjectSize.Medium;
+        newProjectItem.Value = ProjectValue.Good;
+        newProjectItem.DueDate = null;
 
-        await ApplyUniformToFillTransformAsync(newProject, imagePath);
-        return newProject;
+        await ApplyDefaultImageAsync(newProjectItem, imagePath);
+        return newProjectItem;
     }
 
     private async Task<TaskItemViewModel> CreateTaskAsync()
     {
         string imagePath = await imageStorageService.GetRandomDefaultImagePathAsync();
 
-        var newTask = serviceProvider.GetRequiredService<TaskItemViewModel>();
-        newTask.Image = imagePath;
+        var newTaskItem = serviceProvider.GetRequiredService<TaskItemViewModel>();
 
-        await ApplyUniformToFillTransformAsync(newTask, imagePath);
-        return newTask;
+        await ApplyDefaultImageAsync(newTaskItem, imagePath);
+        return newTaskItem;
+    }
+
+    private async Task ApplyDefaultImageAsync(ISingleImageItem item, string imageUri)
+    {
+        try
+        {
+            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
+            workspace.ApplyImageWithDefaultTransform(item, imageUri, width, height);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to apply default image: {ex.Message}");
+            item.Image = imageUri;
+        }
     }
 
     [RelayCommand]
@@ -514,132 +520,4 @@ public partial class MainPageViewModel : ObservableObject
 
     [RelayCommand]
     private void ExitEditMode() => workspace.ExitEditMode();
-
-    public async Task PasteImageFromClipboardAsync(XamlRoot xamlRoot)
-    {
-        try
-        {
-            string? title = null;
-            string? subtitle = null;
-
-            if (SelectedItem is ProjectItemViewModel project)
-            {
-                title = project.Title;
-                subtitle = project.Subtitle;
-            }
-            else if (SelectedItem is TaskItemViewModel task)
-            {
-                title = task.Title;
-                subtitle = task.Subtitle;
-            }
-
-            string defaultFileName = imageStorageService.GenerateFileName(title, subtitle);
-
-            var dialog = new SaveImageDialog(defaultFileName)
-            {
-                XamlRoot = xamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-
-            if (result != ContentDialogResult.Primary)
-            {
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(dialog.FileName))
-            {
-                await ShowErrorDialogAsync(xamlRoot, "Invalid Filename", "Please enter a valid filename.");
-                return;
-            }
-
-            var (imageUri, width, height) = await imageStorageService.SaveBitmapFromClipboardAsync(dialog.FileName);
-
-            if (SelectedItem is ProjectItemViewModel projectItem)
-            {
-                var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
-                    width, height,
-                    ImageLayoutConstants.Project.ClipWidth,
-                    ImageLayoutConstants.Project.ClipHeight);
-                projectItem.ImageZoomFactor = scale;
-                projectItem.ImageOffsetX = offsetX;
-                projectItem.ImageOffsetY = offsetY;
-                projectItem.Image = imageUri;
-            }
-            else if (SelectedItem is TaskItemViewModel taskItem)
-            {
-                var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
-                    width, height,
-                    ImageLayoutConstants.Task.ClipWidth,
-                    ImageLayoutConstants.Task.ClipHeight);
-                taskItem.ImageZoomFactor = scale;
-                taskItem.ImageOffsetX = offsetX;
-                taskItem.ImageOffsetY = offsetY;
-                taskItem.Image = imageUri;
-            }
-
-            Debug.WriteLine($"Image saved successfully: {imageUri}");
-        }
-        catch (InvalidOperationException ex)
-        {
-            await ShowErrorDialogAsync(xamlRoot, "Clipboard Error", ex.Message);
-        }
-        catch (Exception ex)
-        {
-            await ShowErrorDialogAsync(xamlRoot, "Error Saving Image", $"An unexpected error occurred: {ex.Message}");
-        }
-    }
-
-    private async Task ShowErrorDialogAsync(XamlRoot xamlRoot, string title, string message)
-    {
-        var errorDialog = new ContentDialog
-        {
-            XamlRoot = xamlRoot,
-            Title = title,
-            Content = message,
-            CloseButtonText = "OK"
-        };
-
-        await errorDialog.ShowAsync();
-    }
-
-    private async Task ApplyUniformToFillTransformAsync(ProjectItemViewModel project, string imageUri)
-    {
-        try
-        {
-            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
-            var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
-                width, height,
-                ImageLayoutConstants.Project.ClipWidth,
-                ImageLayoutConstants.Project.ClipHeight);
-
-            project.ImageZoomFactor = scale;
-            project.ImageOffsetX = offsetX;
-            project.ImageOffsetY = offsetY;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
-        }
-    }
-
-    private async Task ApplyUniformToFillTransformAsync(TaskItemViewModel item, string imageUri)
-    {
-        try
-        {
-            var (width, height) = await imageDimensionService.GetImageDimensionsAsync(imageUri);
-            var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
-                width, height,
-                ImageLayoutConstants.Task.ClipWidth,
-                ImageLayoutConstants.Task.ClipHeight);
-
-            item.ImageZoomFactor = scale;
-            item.ImageOffsetX = offsetX;
-            item.ImageOffsetY = offsetY;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Failed to apply UniformToFill transform: {ex.Message}");
-        }
-    }
 }

@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
-using WhiteboardProjectBuilder.Constants;
 using WhiteboardProjectBuilder.Services;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -40,8 +39,24 @@ public partial class WhiteboardItemWorkspaceViewModel(
         ExitEditMode();
     }
 
+    public void ApplyImageWithDefaultTransform(ISingleImageItem item, string imageUri, double width, double height)
+    {
+        var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
+            width, height, item.ImageClipWidth, item.ImageClipHeight);
+
+        item.ImageZoomFactor = scale;
+        item.ImageOffsetX = offsetX;
+        item.ImageOffsetY = offsetY;
+        item.Image = imageUri;
+    }
+
     public async Task ReplaceImageAsync(WhiteboardItemViewModelBase item, XamlRoot xamlRoot)
     {
+        if (item is not ISingleImageItem imageItem)
+        {
+            return;
+        }
+
         StorageFile? file = null;
 
         try
@@ -69,45 +84,11 @@ public partial class WhiteboardItemWorkspaceViewModel(
 
             var (width, height) = await imageDimensionService.GetImageDimensionsAsync(file);
 
-            string? title = null;
-            string? subtitle = null;
-
-            if (item is ProjectItemViewModel project)
-            {
-                title = project.Title;
-                subtitle = project.Subtitle;
-            }
-            else if (item is TaskItemViewModel task)
-            {
-                title = task.Title;
-                subtitle = task.Subtitle;
-            }
-
-            string fileName = imageStorageService.GenerateFileName(title, subtitle);
+            var titledItem = item as ITitledItem;
+            string fileName = imageStorageService.GenerateFileName(titledItem?.Title, titledItem?.Subtitle);
             string imageUri = await imageStorageService.SaveImageAsync(file.Path, fileName + Path.GetExtension(file.Path));
 
-            if (item is ProjectItemViewModel projectItem)
-            {
-                var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
-                    width, height,
-                    ImageLayoutConstants.Project.ClipWidth,
-                    ImageLayoutConstants.Project.ClipHeight);
-                projectItem.ImageZoomFactor = scale;
-                projectItem.ImageOffsetX = offsetX;
-                projectItem.ImageOffsetY = offsetY;
-                projectItem.Image = imageUri;
-            }
-            else if (item is TaskItemViewModel taskItem)
-            {
-                var (scale, offsetX, offsetY) = imageTransformService.CalculateDefaultTransform(
-                    width, height,
-                    ImageLayoutConstants.Task.ClipWidth,
-                    ImageLayoutConstants.Task.ClipHeight);
-                taskItem.ImageZoomFactor = scale;
-                taskItem.ImageOffsetX = offsetX;
-                taskItem.ImageOffsetY = offsetY;
-                taskItem.Image = imageUri;
-            }
+            ApplyImageWithDefaultTransform(imageItem, imageUri, width, height);
 
             Debug.WriteLine($"Image replaced successfully: {imageUri}");
         }
@@ -141,6 +122,62 @@ public partial class WhiteboardItemWorkspaceViewModel(
         catch (Exception ex)
         {
             await ShowErrorDialogAsync(xamlRoot, "Error Replacing Image", $"An unexpected error occurred:\n\nType: {ex.GetType().Name}\nMessage: {ex.Message}");
+        }
+    }
+
+    public Task PasteImageAsync(XamlRoot xamlRoot)
+    {
+        if (SelectedItem == null)
+        {
+            return Task.CompletedTask;
+        }
+
+        return PasteImageAsync(SelectedItem, xamlRoot);
+    }
+
+    private async Task PasteImageAsync(WhiteboardItemViewModelBase item, XamlRoot xamlRoot)
+    {
+        if (item is not ISingleImageItem imageItem)
+        {
+            return;
+        }
+
+        try
+        {
+            var titledItem = item as ITitledItem;
+            string defaultFileName = imageStorageService.GenerateFileName(titledItem?.Title, titledItem?.Subtitle);
+
+            var dialog = new SaveImageDialog(defaultFileName)
+            {
+                XamlRoot = xamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result != ContentDialogResult.Primary)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(dialog.FileName))
+            {
+                await ShowErrorDialogAsync(xamlRoot, "Invalid Filename", "Please enter a valid filename.");
+                return;
+            }
+
+            var (imageUri, width, height) = await imageStorageService.SaveBitmapFromClipboardAsync(dialog.FileName);
+
+            ApplyImageWithDefaultTransform(imageItem, imageUri, width, height);
+
+            Debug.WriteLine($"Image saved successfully: {imageUri}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            await ShowErrorDialogAsync(xamlRoot, "Clipboard Error", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorDialogAsync(xamlRoot, "Error Saving Image", $"An unexpected error occurred: {ex.Message}");
         }
     }
 

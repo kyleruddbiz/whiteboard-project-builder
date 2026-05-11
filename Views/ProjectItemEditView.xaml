@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behaviors="using:WhiteboardProjectBuilder.Behaviors"
-    xmlns:constants="using:WhiteboardProjectBuilder.Constants"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WhiteboardProjectBuilder.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -32,8 +31,8 @@
                 <TextBlock FontWeight="SemiBold" Text="Image" />
                 <local:ImageEditor
                     x:Name="MainImageEditor"
-                    Width="{x:Bind constants:ImageLayoutXamlConstants.ProjectWidth}"
-                    Height="{x:Bind constants:ImageLayoutXamlConstants.ProjectHeight}"
+                    Width="{x:Bind ViewModel.ImageAreaWidth, Mode=OneWay}"
+                    Height="{x:Bind ViewModel.ImageAreaHeight, Mode=OneWay}"
                     ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
                     ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                     OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"

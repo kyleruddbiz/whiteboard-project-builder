@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
@@ -6,8 +7,17 @@ using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class ProjectItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace), IPrintSlot
+public partial class ProjectItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace), IPrintSlot, ISingleImageItem, ITitledItem
 {
+    private const double ImageViewportBorder = 2;
+    private const double OuterBorder = 4;
+
+    public double ImageAreaWidth => 420;
+    public double ImageAreaHeight => 360;
+    public Thickness OuterBorderThickness { get; } = new(OuterBorder);
+    public double ImageClipWidth => ImageAreaWidth - 2 * (OuterBorder + ImageViewportBorder);
+    public double ImageClipHeight => ImageAreaHeight - 2 * (OuterBorder + ImageViewportBorder);
+
     [ObservableProperty]
     private string title = string.Empty;
 

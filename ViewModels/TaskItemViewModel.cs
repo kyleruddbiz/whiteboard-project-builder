@@ -5,8 +5,15 @@ using WhiteboardProjectBuilder.Services;
 
 namespace WhiteboardProjectBuilder.ViewModels;
 
-public partial class TaskItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace)
+public partial class TaskItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace), ISingleImageItem, ITitledItem
 {
+    private const double ImageViewportBorder = 2;
+
+    public double ImageAreaWidth => 420;
+    public double ImageAreaHeight => 240;
+    public double ImageClipWidth => ImageAreaWidth - 2 * ImageViewportBorder;
+    public double ImageClipHeight => ImageAreaHeight - 2 * ImageViewportBorder;
+
     [ObservableProperty]
     private string title = string.Empty;
 
