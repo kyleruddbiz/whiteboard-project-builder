@@ -22,6 +22,7 @@
                     ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                     OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=OneWay}"
                     OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=OneWay}"
+                    ShowImageBorder="False"
                     ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=OneWay}" />
             </Border>
 

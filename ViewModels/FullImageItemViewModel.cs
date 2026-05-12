@@ -8,19 +8,34 @@ namespace WhiteboardProjectBuilder.ViewModels;
 
 public partial class FullImageItemViewModel : WhiteboardItemViewModelBase, IPrintSlot, ISingleImageItem
 {
-    private const double BorderThickness = 2;
+    // ImageAreaWidth/Height is the full cell footprint. The cell is inset by HostMargin
+    // (MainPage's ContentControl Margin) before FullImageItemView renders, then by the
+    // WhiteboardItem-level outer Border. ImageViewport's internal border is disabled here
+    // (ShowImageBorder=False), so the clip area runs to the inside of that outer Border.
+    // The editor mirrors the chain at the SAME logical clip size so pan/zoom values map 1:1
+    // between edit and readonly; a Viewbox absorbs the small physical-vs-logical gap.
+    private const double HostMargin = 10;
+    private const double OuterBorder = 2;
+    // Overscale guard: tell CalculateDefaultTransform the clip is slightly smaller than it
+    // actually is so the default zoom always overshoots and the image fills (cropping a few
+    // px) instead of letterboxing on aspect-mismatched images.
+    private const double OverscaleGuard = 4;
 
     public FullImageItemViewModel(WhiteboardItemWorkspaceViewModel workspace, WhiteboardItemSize size) : base(workspace)
     {
         LayoutSize = size;
         ImageAreaWidth = WhiteboardItemSizes.WidthOf(size);
         ImageAreaHeight = WhiteboardItemSizes.HeightOf(size);
-        ImageClipWidth = ImageAreaWidth - 2 * BorderThickness;
-        ImageClipHeight = ImageAreaHeight - 2 * BorderThickness;
+        ImageEditorWidth = ImageAreaWidth - 2 * (HostMargin + OuterBorder);
+        ImageEditorHeight = ImageAreaHeight - 2 * (HostMargin + OuterBorder);
+        ImageClipWidth = ImageEditorWidth - OverscaleGuard;
+        ImageClipHeight = ImageEditorHeight - OverscaleGuard;
     }
 
     public double ImageAreaWidth { get; }
     public double ImageAreaHeight { get; }
+    public double ImageEditorWidth { get; }
+    public double ImageEditorHeight { get; }
     public double ImageClipWidth { get; }
     public double ImageClipHeight { get; }
 

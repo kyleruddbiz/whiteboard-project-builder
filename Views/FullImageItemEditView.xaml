@@ -15,19 +15,18 @@
         <KeyboardAccelerator Key="Escape" behaviors:KeyboardAcceleratorCommandBehavior.Command="{x:Bind ViewModel.CancelEditingCommand}" />
     </UserControl.KeyboardAccelerators>
 
-    <Border BorderBrush="#005FBA" BorderThickness="4">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <StackPanel Padding="16">
-                <local:ImageEditor
-                    x:Name="MainImageEditor"
-                    Width="{x:Bind ViewModel.ImageAreaWidth, Mode=OneWay}"
-                    Height="{x:Bind ViewModel.ImageAreaHeight, Mode=OneWay}"
-                    ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
-                    ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
-                    OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
-                    OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=TwoWay}"
-                    ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=TwoWay}" />
-            </StackPanel>
-        </ScrollViewer>
+    <Border Padding="12" BorderBrush="#005FBA" BorderThickness="4">
+        <Viewbox Stretch="Uniform">
+            <local:ImageEditor
+                x:Name="MainImageEditor"
+                Width="{x:Bind ViewModel.ImageEditorWidth, Mode=OneWay}"
+                Height="{x:Bind ViewModel.ImageEditorHeight, Mode=OneWay}"
+                ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
+                ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
+                OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
+                OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=TwoWay}"
+                ShowImageBorder="False"
+                ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=TwoWay}" />
+        </Viewbox>
     </Border>
 </UserControl>

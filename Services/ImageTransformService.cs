@@ -14,15 +14,24 @@ public class ImageTransformService
     public const double MinZoomFactor = 1.0;
 
     /// <summary>
-    /// Centred UniformToFill: the ZoomFactor that makes the Stretch=Uniform image fill
-    /// the viewport in both axes (cropping the longer axis), with zero offset.
+    /// Multiplier applied to the default UniformToFill zoom so the image always slightly
+    /// overshoots the viewport on every axis instead of risking a pixel or two of
+    /// letterbox from sub-pixel rounding or layout drift. Crops a small fraction of the
+    /// image edges in exchange for guaranteeing no white borders on a fresh placement.
+    /// </summary>
+    public const double DefaultTransformOverscale = 1.01;
+
+    /// <summary>
+    /// Centred UniformToFill (with a small overscale guard): the ZoomFactor that makes the
+    /// Stretch=Uniform image fill the viewport in both axes, cropping the longer axis plus
+    /// a tiny margin on the shorter, with zero offset.
     /// </summary>
     public (double zoomFactor, double offsetX, double offsetY) CalculateDefaultTransform(
         double imageWidth, double imageHeight,
         double viewportWidth, double viewportHeight)
     {
         var (uniformWidth, uniformHeight) = CalculateUniformFitSize(imageWidth, imageHeight, viewportWidth, viewportHeight);
-        double zoomFactor = Math.Max(viewportWidth / uniformWidth, viewportHeight / uniformHeight);
+        double zoomFactor = Math.Max(viewportWidth / uniformWidth, viewportHeight / uniformHeight) * DefaultTransformOverscale;
         return (zoomFactor, 0, 0);
     }
 

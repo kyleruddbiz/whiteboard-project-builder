@@ -34,6 +34,13 @@ public sealed partial class ImageViewport : UserControl
             typeof(ImageViewport),
             new PropertyMetadata(1.0));
 
+    public static readonly DependencyProperty ShowImageBorderProperty =
+        DependencyProperty.Register(
+            nameof(ShowImageBorder),
+            typeof(bool),
+            typeof(ImageViewport),
+            new PropertyMetadata(true));
+
     /// <summary>
     /// Raised when the underlying bitmap finishes loading and its natural pixel dimensions
     /// are known. Subscribers (e.g. <see cref="ImageEditor"/>) use this to compute clamping
@@ -64,6 +71,14 @@ public sealed partial class ImageViewport : UserControl
         get => (double)GetValue(ZoomFactorProperty);
         set => SetValue(ZoomFactorProperty, value);
     }
+
+    public bool ShowImageBorder
+    {
+        get => (bool)GetValue(ShowImageBorderProperty);
+        set => SetValue(ShowImageBorderProperty, value);
+    }
+
+    public Thickness GetBorderThickness(bool showImageBorder) => showImageBorder ? new Thickness(2) : new Thickness(0);
 
     /// <summary>
     /// The actual on-screen pixel size of the clipped image area (excludes the 2px black border).
