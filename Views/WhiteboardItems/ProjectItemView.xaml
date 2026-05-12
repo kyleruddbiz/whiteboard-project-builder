@@ -1,12 +1,13 @@
 <UserControl
-    x:Class="WhiteboardProjectBuilder.Views.ProjectItemView"
+    x:Class="WhiteboardProjectBuilder.Views.WhiteboardItems.ProjectItemView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:WhiteboardProjectBuilder.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:WhiteboardProjectBuilder.Views"
+    xmlns:local="using:WhiteboardProjectBuilder.Views.WhiteboardItems"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
+    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels.WhiteboardItems"
+    xmlns:views="using:WhiteboardProjectBuilder.Views"
     xmlns:xbind="using:WhiteboardProjectBuilder.XBind"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
     mc:Ignorable="d">
@@ -48,7 +49,7 @@
                         Margin="0 38 0 0"
                         VerticalAlignment="Top">
                         <Border BorderBrush="{x:Bind ViewModel.SizeValueBorderBrush, Mode=OneWay}" BorderThickness="{x:Bind ViewModel.OuterBorderThickness, Mode=OneWay}">
-                            <local:ImageViewport
+                            <views:ImageViewport
                                 ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
                                 OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=OneWay}"
                                 OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=OneWay}"

@@ -1,0 +1,33 @@
+<UserControl
+    x:Class="WhiteboardProjectBuilder.Views.WhiteboardItems.FullImageItemEditView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:WhiteboardProjectBuilder.Behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:WhiteboardProjectBuilder.Views.WhiteboardItems"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels.WhiteboardItems"
+    xmlns:views="using:WhiteboardProjectBuilder.Views"
+    d:DataContext="{d:DesignInstance Type=viewmodels:FullImageItemViewModel}"
+    KeyboardAcceleratorPlacementMode="Hidden"
+    mc:Ignorable="d">
+
+    <UserControl.KeyboardAccelerators>
+        <KeyboardAccelerator Key="Escape" behaviors:KeyboardAcceleratorCommandBehavior.Command="{x:Bind ViewModel.CancelEditingCommand}" />
+    </UserControl.KeyboardAccelerators>
+
+    <Border Padding="12" BorderBrush="#005FBA" BorderThickness="4">
+        <Viewbox Stretch="Uniform">
+            <views:ImageEditor
+                x:Name="MainImageEditor"
+                Width="{x:Bind ViewModel.ImageEditorWidth, Mode=OneWay}"
+                Height="{x:Bind ViewModel.ImageEditorHeight, Mode=OneWay}"
+                ImageReplaceRequested="ImageEditor_ImageReplaceRequested"
+                ImageSource="{x:Bind ViewModel.Image, Mode=OneWay}"
+                OffsetX="{x:Bind ViewModel.ImageOffsetX, Mode=TwoWay}"
+                OffsetY="{x:Bind ViewModel.ImageOffsetY, Mode=TwoWay}"
+                ShowImageBorder="False"
+                ZoomFactor="{x:Bind ViewModel.ImageZoomFactor, Mode=TwoWay}" />
+        </Viewbox>
+    </Border>
+</UserControl>

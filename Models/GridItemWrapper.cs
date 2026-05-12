@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using WhiteboardProjectBuilder.Constants;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
 namespace WhiteboardProjectBuilder.Models;
 
@@ -23,6 +24,7 @@ public partial class GridItemWrapper : ObservableObject
                 OnPropertyChanged(nameof(WhiteboardItem));
                 OnPropertyChanged(nameof(ProjectItem));
                 OnPropertyChanged(nameof(TaskItem));
+                OnPropertyChanged(nameof(Selector));
             }
         }
     }
@@ -30,6 +32,7 @@ public partial class GridItemWrapper : ObservableObject
     public ProjectItemViewModel? ProjectItem => Content as ProjectItemViewModel;
     public TaskItemViewModel? TaskItem => Content as TaskItemViewModel;
     public WhiteboardItemViewModelBase? WhiteboardItem => Content as WhiteboardItemViewModelBase;
+    public WhiteboardItemSelectorViewModel? Selector => Content as WhiteboardItemSelectorViewModel;
 
     public double Width => WhiteboardItemSizes.WidthOf(LayoutSize);
     public double Height => WhiteboardItemSizes.HeightOf(LayoutSize);

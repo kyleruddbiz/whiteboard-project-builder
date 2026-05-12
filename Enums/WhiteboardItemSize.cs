@@ -13,8 +13,9 @@ public static class WhiteboardItemSizeExtensions
     private static readonly IReadOnlyDictionary<WhiteboardItemType, IReadOnlyList<WhiteboardItemSize>> SupportedSizesByType =
         new Dictionary<WhiteboardItemType, IReadOnlyList<WhiteboardItemSize>>
         {
-            [WhiteboardItemType.Project]  = [WhiteboardItemSize.Medium],
-            [WhiteboardItemType.TaskItem] = [WhiteboardItemSize.Small],
+            [WhiteboardItemType.Project]   = [WhiteboardItemSize.Medium],
+            [WhiteboardItemType.TaskItem]  = [WhiteboardItemSize.Small],
+            [WhiteboardItemType.FullImage] = [WhiteboardItemSize.Small, WhiteboardItemSize.Medium, WhiteboardItemSize.Large, WhiteboardItemSize.Huge],
         };
 
     public static IEnumerable<WhiteboardItemType> SupportedItemTypes(this WhiteboardItemSize size)

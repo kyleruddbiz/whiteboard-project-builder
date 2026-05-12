@@ -4,7 +4,7 @@ using System.Windows.Input;
 using Microsoft.UI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Media;
-using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 using Windows.System;
 using Windows.UI;
 using Windows.UI.Core;

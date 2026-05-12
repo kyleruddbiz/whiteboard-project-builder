@@ -1,6 +1,7 @@
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Models.Serialization;
 using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
 namespace WhiteboardProjectBuilder.Services;
 
@@ -39,6 +40,7 @@ public class WhiteboardItemRepository(DataPersistenceService dataPersistenceServ
             {
                 ProjectItem project => ProjectItemViewModel.FromModel(project, workspace),
                 TaskItem task => TaskItemViewModel.FromModel(task, workspace),
+                FullImageItem fullImage => FullImageItemViewModel.FromModel(fullImage, workspace),
                 _ => throw new NotSupportedException($"Unsupported whiteboard item type: {item.GetType().Name}")
             };
 

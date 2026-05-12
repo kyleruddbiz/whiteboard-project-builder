@@ -65,6 +65,13 @@ public sealed partial class ImageEditor : UserControl
             typeof(ImageEditor),
             new PropertyMetadata(ImageEditMode.Pan, OnEditModeChanged));
 
+    public static readonly DependencyProperty ShowImageBorderProperty =
+        DependencyProperty.Register(
+            nameof(ShowImageBorder),
+            typeof(bool),
+            typeof(ImageEditor),
+            new PropertyMetadata(true));
+
     public string ImageSource
     {
         get => (string)GetValue(ImageSourceProperty);
@@ -93,6 +100,12 @@ public sealed partial class ImageEditor : UserControl
     {
         get => (ImageEditMode)GetValue(EditModeProperty);
         set => SetValue(EditModeProperty, value);
+    }
+
+    public bool ShowImageBorder
+    {
+        get => (bool)GetValue(ShowImageBorderProperty);
+        set => SetValue(ShowImageBorderProperty, value);
     }
 
     public string PanIcon => ImageEditMode.Pan.ToIcon();
@@ -324,9 +337,8 @@ public sealed partial class ImageEditor : UserControl
         e.Handled = true;
     }
 
-    private async void Viewport_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    private void Viewport_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
-        await ClipboardService.CopyImagesFolderPathToClipboardAsync();
         ImageReplaceRequested?.Invoke(this, EventArgs.Empty);
         e.Handled = true;
     }

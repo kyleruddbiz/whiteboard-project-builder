@@ -9,6 +9,8 @@
     xmlns:models="using:WhiteboardProjectBuilder.Models"
     xmlns:selectors="using:WhiteboardProjectBuilder.Selectors"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
+    xmlns:items="using:WhiteboardProjectBuilder.Views.WhiteboardItems"
+    xmlns:xbind="using:WhiteboardProjectBuilder.XBind"
     x:Name="PageRoot"
     IsTabStop="True"
     KeyDown="Page_KeyDown"
@@ -32,14 +34,19 @@
 
             <selectors:WhiteboardItemBodyTemplateSelector.ProjectTemplate>
                 <DataTemplate>
-                    <local:ProjectItemView ViewModel="{Binding}" />
+                    <items:ProjectItemView ViewModel="{Binding}" />
                 </DataTemplate>
             </selectors:WhiteboardItemBodyTemplateSelector.ProjectTemplate>
             <selectors:WhiteboardItemBodyTemplateSelector.TaskItemTemplate>
                 <DataTemplate>
-                    <local:TaskItemView ViewModel="{Binding}" />
+                    <items:TaskItemView ViewModel="{Binding}" />
                 </DataTemplate>
             </selectors:WhiteboardItemBodyTemplateSelector.TaskItemTemplate>
+            <selectors:WhiteboardItemBodyTemplateSelector.FullImageTemplate>
+                <DataTemplate>
+                    <items:FullImageItemView ViewModel="{Binding}" />
+                </DataTemplate>
+            </selectors:WhiteboardItemBodyTemplateSelector.FullImageTemplate>
         </selectors:WhiteboardItemBodyTemplateSelector>
 
         <selectors:GridItemTemplateSelector x:Key="GridItemTemplateSelector">
@@ -71,9 +78,11 @@
                             ContentTemplateSelector="{StaticResource WhiteboardItemBodyTemplateSelector}"
                             IsTabStop="False" />
                         <local:RemoveItemButton
+                            x:Name="RemoveButton"
                             Margin="0 12 12 0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
+                            x:Load="{x:Bind xbind:Bools.Not(WhiteboardItem.IsEditing), Mode=OneWay}"
                             ForceRemoveCommand="{Binding ViewModel.ForceRemoveWhiteboardItemCommand, ElementName=PageRoot}"
                             IsCtrlKeyPressed="{Binding IsCtrlPressed, ElementName=PageRoot, Mode=OneWay}"
                             RemoveCommand="{Binding ViewModel.RemoveWhiteboardItemCommand, ElementName=PageRoot}"
@@ -81,6 +90,13 @@
                     </Grid>
                 </DataTemplate>
             </selectors:GridItemTemplateSelector.WhiteboardItemTemplate>
+            <selectors:GridItemTemplateSelector.SelectorTemplate>
+                <DataTemplate x:DataType="models:GridItemWrapper">
+                    <Grid Width="{x:Bind Width}" Height="{x:Bind Height}">
+                        <local:WhiteboardItemSelectorView Margin="10" ViewModel="{x:Bind Selector}" />
+                    </Grid>
+                </DataTemplate>
+            </selectors:GridItemTemplateSelector.SelectorTemplate>
         </selectors:GridItemTemplateSelector>
 
         <DataTemplate x:Key="SectionTemplate" x:DataType="viewmodels:WhiteboardSectionViewModel">

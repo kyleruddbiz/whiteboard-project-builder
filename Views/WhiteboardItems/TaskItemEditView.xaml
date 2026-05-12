@@ -1,26 +1,27 @@
 <UserControl
-    x:Class="WhiteboardProjectBuilder.Views.TaskItemEditView"
+    x:Class="WhiteboardProjectBuilder.Views.WhiteboardItems.TaskItemEditView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:WhiteboardProjectBuilder.Views"
+    xmlns:local="using:WhiteboardProjectBuilder.Views.WhiteboardItems"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
+    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels.WhiteboardItems"
+    xmlns:views="using:WhiteboardProjectBuilder.Views"
     d:DataContext="{d:DesignInstance Type=viewmodels:TaskItemViewModel}"
     mc:Ignorable="d">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Padding="16" Spacing="8">
-            <local:FloatingLabelTextBox
+            <views:FloatingLabelTextBox
                 x:Name="TitleTextBox"
                 Label="Title"
                 Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <local:FloatingLabelTextBox
+            <views:FloatingLabelTextBox
                 Label="Subtitle"
                 Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <local:ImageEditor
+            <views:ImageEditor
                 x:Name="MainImageEditor"
                 Width="{x:Bind ViewModel.ImageAreaWidth, Mode=OneWay}"
                 Height="{x:Bind ViewModel.ImageAreaHeight, Mode=OneWay}"

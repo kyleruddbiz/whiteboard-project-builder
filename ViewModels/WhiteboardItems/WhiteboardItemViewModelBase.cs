@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 
-namespace WhiteboardProjectBuilder.ViewModels;
+namespace WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
 public abstract partial class WhiteboardItemViewModelBase(WhiteboardItemWorkspaceViewModel workspace) : ObservableObject
 {

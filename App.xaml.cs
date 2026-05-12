@@ -41,10 +41,12 @@ public partial class App : Application
         services.AddSingleton<DataPersistenceService>();
         services.AddSingleton<ImageTransformService>();
         services.AddSingleton<ImageDimensionService>();
+        services.AddSingleton<PrintPagePackerService>();
 
         // Services with dependencies
         services.AddSingleton<SettingsService>();
         services.AddSingleton<ImageStorageService>();
+        services.AddSingleton<ClipboardService>();
         services.AddSingleton<WhiteboardItemRepository>();
         services.AddSingleton<PrintService>();
 
@@ -53,8 +55,6 @@ public partial class App : Application
         services.AddSingleton<MainPageViewModel>();
 
         // ViewModels - Transient (created on demand)
-        services.AddTransient<ProjectItemViewModel>();
-        services.AddTransient<TaskItemViewModel>();
         services.AddTransient<SettingsViewModel>();
 
         return services.BuildServiceProvider();

@@ -1,22 +1,24 @@
 using Microsoft.UI.Xaml.Media;
 using WhiteboardProjectBuilder.Constants;
-using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.Models;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
+using WhiteboardProjectBuilder.Views.WhiteboardItems;
 
 namespace WhiteboardProjectBuilder.Views;
 
 public sealed partial class PrintPageView : UserControl
 {
-    public static readonly DependencyProperty ItemsProperty =
+    public static readonly DependencyProperty LayoutProperty =
         DependencyProperty.Register(
-            nameof(Items),
-            typeof(List<IPrintSlot>),
+            nameof(Layout),
+            typeof(PrintPageLayout),
             typeof(PrintPageView),
-            new PropertyMetadata(null, OnItemsChanged));
+            new PropertyMetadata(null, OnLayoutChanged));
 
-    public List<IPrintSlot>? Items
+    public PrintPageLayout? Layout
     {
-        get => (List<IPrintSlot>?)GetValue(ItemsProperty);
-        set => SetValue(ItemsProperty, value);
+        get => (PrintPageLayout?)GetValue(LayoutProperty);
+        set => SetValue(LayoutProperty, value);
     }
 
     public PrintPageView()
@@ -24,7 +26,7 @@ public sealed partial class PrintPageView : UserControl
         InitializeComponent();
     }
 
-    private static void OnItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is PrintPageView view)
         {
@@ -36,39 +38,34 @@ public sealed partial class PrintPageView : UserControl
     {
         RootGrid.Children.Clear();
 
-        if (Items == null || Items.Count == 0)
-            return;
-
-        for (int i = 0; i < Math.Min(Items.Count, 4); i++)
+        if (Layout == null)
         {
-            var viewbox = new Viewbox()
-            {
-                Stretch = Stretch.Uniform,
-            };
+            return;
+        }
 
-            int row = i / 2;
-            int col = i % 2;
-
-            int topMargin = (row == 1) ? -4 : 0;
-            int leftMargin = 0;
-
-            viewbox.Margin = new Thickness(leftMargin, topMargin, 0, 0);
-
-            var slot = Items[i];
-            UserControl itemView = slot switch
+        foreach (var placement in Layout.Placements)
+        {
+            UserControl itemView = placement.Slot switch
             {
                 ProjectItemViewModel projectVm => new ProjectItemView { ViewModel = projectVm },
-                TaskSlotViewModel slotVm => new TaskSlotView { ViewModel = slotVm },
-                _ => throw new NotSupportedException($"Unsupported print slot type: {slot.GetType().Name}")
+                TaskItemViewModel taskVm => new TaskItemView { ViewModel = taskVm },
+                FullImageItemViewModel fullImageVm => new FullImageItemView { ViewModel = fullImageVm },
+                _ => throw new NotSupportedException($"Unsupported print slot type: {placement.Slot.GetType().Name}")
             };
 
-            itemView.Width = WhiteboardItemSizes.WidthOf(slot.LayoutSize);
-            itemView.Height = WhiteboardItemSizes.HeightOf(slot.LayoutSize);
+            itemView.Width = WhiteboardItemSizes.WidthOf(placement.Slot.LayoutSize);
+            itemView.Height = WhiteboardItemSizes.HeightOf(placement.Slot.LayoutSize);
 
-            viewbox.Child = itemView;
+            var viewbox = new Viewbox
+            {
+                Stretch = Stretch.Fill,
+                Child = itemView,
+            };
 
-            Grid.SetRow(viewbox, row);
-            Grid.SetColumn(viewbox, col);
+            Grid.SetRow(viewbox, placement.Row);
+            Grid.SetColumn(viewbox, placement.Col);
+            Grid.SetRowSpan(viewbox, placement.RowSpan);
+            Grid.SetColumnSpan(viewbox, placement.ColSpan);
 
             RootGrid.Children.Add(viewbox);
         }

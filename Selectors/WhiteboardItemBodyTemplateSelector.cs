@@ -1,4 +1,4 @@
-using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
 namespace WhiteboardProjectBuilder.Selectors;
 
@@ -6,6 +6,7 @@ public class WhiteboardItemBodyTemplateSelector : DataTemplateSelector
 {
     public DataTemplate? ProjectTemplate { get; set; }
     public DataTemplate? TaskItemTemplate { get; set; }
+    public DataTemplate? FullImageTemplate { get; set; }
 
     protected override DataTemplate? SelectTemplateCore(object item)
     {
@@ -13,6 +14,7 @@ public class WhiteboardItemBodyTemplateSelector : DataTemplateSelector
         {
             ProjectItemViewModel => ProjectTemplate,
             TaskItemViewModel => TaskItemTemplate,
+            FullImageItemViewModel => FullImageTemplate,
             _ => null
         };
     }

@@ -16,6 +16,8 @@ public sealed partial class WhiteboardSectionViewModel(
 
     public ObservableCollection<GridItemWrapper> Items { get; } = [];
 
+    public ObservableCollection<WhiteboardItemSelectorViewModel> Selectors { get; } = [];
+
     [ObservableProperty]
     private GridItemWrapper? selectedItem;
 
