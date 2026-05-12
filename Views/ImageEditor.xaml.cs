@@ -1,10 +1,8 @@
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Input;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Services;
 using Windows.Foundation;
 using Windows.System;
-using Windows.UI.Core;
 
 namespace WhiteboardProjectBuilder.Views;
 
@@ -12,19 +10,15 @@ public sealed partial class ImageEditor : UserControl
 {
     private const double ZoomSensitivityFactor = 300.0;
     private const double MaxZoomFactor = 3.0;
-    private const double AxisLockHysteresis = 2.5;
-    private const double AxisSwitchMaxDistance = 150.0;
     private const double ArrowKeyStepSize = 1.0;
 
     private static readonly ImageTransformService transformService = new();
 
     private bool isDragging = false;
     private Point startPoint;
-    private Point dragOrigin;
     private double startOffsetX;
     private double startOffsetY;
     private double startZoomFactor;
-    private LockedAxis? lockedAxis = null;
     private double imagePixelWidth;
     private double imagePixelHeight;
 
@@ -225,11 +219,9 @@ public sealed partial class ImageEditor : UserControl
     {
         isDragging = true;
         startPoint = e.GetCurrentPoint(Viewport).Position;
-        dragOrigin = startPoint;
         startOffsetX = OffsetX;
         startOffsetY = OffsetY;
         startZoomFactor = ZoomFactor;
-        lockedAxis = null;
         Viewport.CapturePointer(e.Pointer);
         e.Handled = true;
     }
@@ -245,57 +237,6 @@ public sealed partial class ImageEditor : UserControl
 
         if (EditMode == ImageEditMode.Pan)
         {
-            bool isShiftPressed = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
-
-            if (isShiftPressed)
-            {
-                double absDeltaX = Math.Abs(deltaX);
-                double absDeltaY = Math.Abs(deltaY);
-
-                double distanceFromOriginX = Math.Abs(currentPoint.X - dragOrigin.X);
-                double distanceFromOriginY = Math.Abs(currentPoint.Y - dragOrigin.Y);
-                double maxDistanceFromOrigin = Math.Max(distanceFromOriginX, distanceFromOriginY);
-
-                if (lockedAxis == null)
-                {
-                    // Initial lock: choose axis with larger movement
-                    if (absDeltaX > absDeltaY)
-                    {
-                        lockedAxis = LockedAxis.X;
-                    }
-                    else
-                    {
-                        lockedAxis = LockedAxis.Y;
-                    }
-                }
-                else if (maxDistanceFromOrigin <= AxisSwitchMaxDistance)
-                {
-                    // Only allow axis switching when close to origin
-                    if (lockedAxis == LockedAxis.X && absDeltaY > absDeltaX * AxisLockHysteresis)
-                    {
-                        lockedAxis = LockedAxis.Y;
-                    }
-                    else if (lockedAxis == LockedAxis.Y && absDeltaX > absDeltaY * AxisLockHysteresis)
-                    {
-                        lockedAxis = LockedAxis.X;
-                    }
-                }
-
-                // Apply axis lock
-                if (lockedAxis == LockedAxis.X)
-                {
-                    deltaY = 0;
-                }
-                else
-                {
-                    deltaX = 0;
-                }
-            }
-            else
-            {
-                lockedAxis = null;
-            }
-
             ApplyTransform(ZoomFactor, startOffsetX + deltaX, startOffsetY + deltaY);
 
             // Update start values for next movement segment
@@ -332,7 +273,6 @@ public sealed partial class ImageEditor : UserControl
     private void Viewport_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
         isDragging = false;
-        lockedAxis = null;
         Viewport.ReleasePointerCapture(e.Pointer);
         e.Handled = true;
     }
