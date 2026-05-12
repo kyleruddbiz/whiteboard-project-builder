@@ -2,6 +2,7 @@ using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Services;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using WinRT.Interop;

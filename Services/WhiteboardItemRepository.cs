@@ -1,6 +1,7 @@
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Models.Serialization;
 using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
 namespace WhiteboardProjectBuilder.Services;
 

@@ -1,4 +1,4 @@
-using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
 namespace WhiteboardProjectBuilder.Selectors;
 

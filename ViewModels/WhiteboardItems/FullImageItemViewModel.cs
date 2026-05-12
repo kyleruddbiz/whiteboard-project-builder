@@ -4,7 +4,7 @@ using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
 
-namespace WhiteboardProjectBuilder.ViewModels;
+namespace WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
 public partial class FullImageItemViewModel : WhiteboardItemViewModelBase, IPrintSlot, ISingleImageItem
 {

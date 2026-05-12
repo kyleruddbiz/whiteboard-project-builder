@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using WhiteboardProjectBuilder.Constants;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
 namespace WhiteboardProjectBuilder.Models;
 

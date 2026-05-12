@@ -3,7 +3,7 @@ using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
 
-namespace WhiteboardProjectBuilder.ViewModels;
+namespace WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
 public partial class TaskItemViewModel(WhiteboardItemWorkspaceViewModel workspace) : WhiteboardItemViewModelBase(workspace), IPrintSlot, ISingleImageItem, ITitledItem
 {

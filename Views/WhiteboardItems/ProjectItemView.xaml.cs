@@ -1,8 +1,8 @@
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
-using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
-namespace WhiteboardProjectBuilder.Views;
+namespace WhiteboardProjectBuilder.Views.WhiteboardItems;
 
 public sealed partial class ProjectItemView : UserControl
 {

@@ -1,12 +1,13 @@
 <UserControl
-    x:Class="WhiteboardProjectBuilder.Views.FullImageItemEditView"
+    x:Class="WhiteboardProjectBuilder.Views.WhiteboardItems.FullImageItemEditView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behaviors="using:WhiteboardProjectBuilder.Behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:WhiteboardProjectBuilder.Views"
+    xmlns:local="using:WhiteboardProjectBuilder.Views.WhiteboardItems"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
+    xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels.WhiteboardItems"
+    xmlns:views="using:WhiteboardProjectBuilder.Views"
     d:DataContext="{d:DesignInstance Type=viewmodels:FullImageItemViewModel}"
     KeyboardAcceleratorPlacementMode="Hidden"
     mc:Ignorable="d">
@@ -17,7 +18,7 @@
 
     <Border Padding="12" BorderBrush="#005FBA" BorderThickness="4">
         <Viewbox Stretch="Uniform">
-            <local:ImageEditor
+            <views:ImageEditor
                 x:Name="MainImageEditor"
                 Width="{x:Bind ViewModel.ImageEditorWidth, Mode=OneWay}"
                 Height="{x:Bind ViewModel.ImageEditorHeight, Mode=OneWay}"

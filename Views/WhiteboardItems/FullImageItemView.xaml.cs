@@ -1,24 +1,25 @@
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
-using WhiteboardProjectBuilder.ViewModels;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 
-namespace WhiteboardProjectBuilder.Views;
+namespace WhiteboardProjectBuilder.Views.WhiteboardItems;
 
-public sealed partial class TaskItemView : UserControl
+public sealed partial class FullImageItemView : UserControl
 {
-    public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-        nameof(ViewModel),
-        typeof(TaskItemViewModel),
-        typeof(TaskItemView),
-        new PropertyMetadata(null));
+    public static readonly DependencyProperty ViewModelProperty =
+        DependencyProperty.Register(
+            nameof(ViewModel),
+            typeof(FullImageItemViewModel),
+            typeof(FullImageItemView),
+            new PropertyMetadata(null));
 
-    public TaskItemViewModel ViewModel
+    public FullImageItemViewModel ViewModel
     {
-        get => (TaskItemViewModel)GetValue(ViewModelProperty)!;
+        get => (FullImageItemViewModel)GetValue(ViewModelProperty)!;
         set => SetValue(ViewModelProperty, value);
     }
 
-    public TaskItemView()
+    public FullImageItemView()
     {
         InitializeComponent();
     }
@@ -53,7 +54,7 @@ public sealed partial class TaskItemView : UserControl
         ViewModel.ReactivateCommand.Execute(null);
     }
 
-    private void TaskItemEditView_ImageReplaceRequested(object sender, EventArgs e)
+    private void FullImageItemEditView_ImageReplaceRequested(object? sender, EventArgs e)
     {
         ViewModel.ReplaceImageCommand.Execute(XamlRoot);
     }

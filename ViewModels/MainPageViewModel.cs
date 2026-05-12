@@ -9,6 +9,7 @@ using Microsoft.UI.Dispatching;
 using WhiteboardProjectBuilder.Enums;
 using WhiteboardProjectBuilder.Models;
 using WhiteboardProjectBuilder.Services;
+using WhiteboardProjectBuilder.ViewModels.WhiteboardItems;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace WhiteboardProjectBuilder.ViewModels;
