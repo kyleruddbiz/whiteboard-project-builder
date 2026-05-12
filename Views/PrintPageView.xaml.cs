@@ -57,13 +57,8 @@ public sealed partial class PrintPageView : UserControl
 
             var viewbox = new Viewbox
             {
-                Stretch = Stretch.Uniform,
+                Stretch = Stretch.Fill,
                 Child = itemView,
-                Margin = new Thickness(
-                    placement.Col > 0 ? -2 : 0,
-                    placement.Row > 0 ? -2 : 0,
-                    0,
-                    0)
             };
 
             Grid.SetRow(viewbox, placement.Row);

@@ -8,19 +8,23 @@
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels"
     mc:Ignorable="d">
 
-    <Grid
-        x:Name="RootGrid"
-        Padding="110 50"
-        Background="White">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="240" />
-            <RowDefinition Height="240" />
-            <RowDefinition Height="240" />
-            <RowDefinition Height="240" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300" />
-            <ColumnDefinition Width="300" />
-        </Grid.ColumnDefinitions>
+    <Grid>
+        <Grid
+            x:Name="RootGrid"
+            Width="600"
+            Height="960"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+        </Grid>
     </Grid>
 </UserControl>
