@@ -94,14 +94,14 @@ public partial class MainPageViewModel : ObservableObject
     {
         var section = Sections.First(s => s.Size == e.Size);
         section.Selectors.Add(e.Selector);
-        RebuildSection(section);
+        AddSelectorWrapper(section, e.Selector);
     }
 
     private void OnWorkspaceSelectorRemoved(object? sender, (WhiteboardItemSize Size, WhiteboardItemSelectorViewModel Selector) e)
     {
         var section = Sections.First(s => s.Size == e.Size);
         section.Selectors.Remove(e.Selector);
-        RebuildSection(section);
+        RemoveSelectorWrapper(section, e.Selector);
     }
 
     partial void OnSettingsChanged(SettingsViewModel? oldValue, SettingsViewModel newValue)
@@ -162,7 +162,34 @@ public partial class MainPageViewModel : ObservableObject
 
     private void WhiteboardItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        RebuildGridItems();
+        // Targeted Insert/Remove preserve GridView's per-item AddDeleteThemeTransition;
+        // Clear() collapses to a Reset notification, which the animation skips.
+        switch (e.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                if (e.NewItems != null)
+                {
+                    foreach (WhiteboardItemViewModelBase item in e.NewItems)
+                    {
+                        AddGridItem(item);
+                    }
+                }
+                break;
+
+            case NotifyCollectionChangedAction.Remove:
+                if (e.OldItems != null)
+                {
+                    foreach (WhiteboardItemViewModelBase item in e.OldItems)
+                    {
+                        RemoveGridItem(item);
+                    }
+                }
+                break;
+
+            default:
+                RebuildGridItems();
+                break;
+        }
     }
 
     private void OnWhiteboardItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -195,9 +222,18 @@ public partial class MainPageViewModel : ObservableObject
 
     private void OnWhiteboardItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(WhiteboardItemViewModelBase.IsArchived))
+        if (e.PropertyName == nameof(WhiteboardItemViewModelBase.IsArchived)
+            && sender is WhiteboardItemViewModelBase item
+            && !Settings.ShowArchived)
         {
-            RebuildGridItems();
+            if (item.IsArchived)
+            {
+                RemoveGridItem(item);
+            }
+            else
+            {
+                AddGridItem(item);
+            }
         }
     }
 
@@ -259,6 +295,97 @@ public partial class MainPageViewModel : ObservableObject
         LayoutSize = size,
         Content = null
     };
+
+    private void AddGridItem(WhiteboardItemViewModelBase item)
+    {
+        if (!Settings.ShowArchived && item.IsArchived)
+        {
+            return;
+        }
+
+        var section = Sections.FirstOrDefault(s => s.Size == item.LayoutSize);
+        if (section == null || section.Items.Any(w => ReferenceEquals(w.WhiteboardItem, item)))
+        {
+            return;
+        }
+
+        section.Items.Insert(WhiteboardItemInsertIndex(section), new GridItemWrapper
+        {
+            GridItemType = GridItemType.WhiteboardItem,
+            LayoutSize = item.LayoutSize,
+            Content = item
+        });
+    }
+
+    private void RemoveGridItem(WhiteboardItemViewModelBase item)
+    {
+        foreach (var section in Sections)
+        {
+            var wrapper = section.Items.FirstOrDefault(w => ReferenceEquals(w.WhiteboardItem, item));
+            if (wrapper != null)
+            {
+                section.Items.Remove(wrapper);
+                return;
+            }
+        }
+    }
+
+    private void AddSelectorWrapper(WhiteboardSectionViewModel section, WhiteboardItemSelectorViewModel selector)
+    {
+        section.Items.Insert(SelectorInsertIndex(section), new GridItemWrapper
+        {
+            GridItemType = GridItemType.Selector,
+            LayoutSize = section.Size,
+            Content = selector
+        });
+    }
+
+    private static void RemoveSelectorWrapper(WhiteboardSectionViewModel section, WhiteboardItemSelectorViewModel selector)
+    {
+        var wrapper = section.Items.FirstOrDefault(w => ReferenceEquals(w.Selector, selector));
+        if (wrapper != null)
+        {
+            section.Items.Remove(wrapper);
+        }
+    }
+
+    // Descending: [AddButton, ...items (newest first), ...selectors]; new item goes at index 1.
+    // Ascending:  [...items, ...selectors, AddButton]; new item goes before the first selector or trailing AddButton.
+    private int WhiteboardItemInsertIndex(WhiteboardSectionViewModel section)
+    {
+        if (Settings.IsSortDescending)
+        {
+            return 1;
+        }
+
+        for (int i = 0; i < section.Items.Count; i++)
+        {
+            var type = section.Items[i].GridItemType;
+            if (type == GridItemType.Selector || type == GridItemType.AddButton)
+            {
+                return i;
+            }
+        }
+        return section.Items.Count;
+    }
+
+    // Descending: selectors trail everything (no bottom AddButton). Ascending: selectors sit just before the trailing AddButton.
+    private int SelectorInsertIndex(WhiteboardSectionViewModel section)
+    {
+        if (Settings.IsSortDescending)
+        {
+            return section.Items.Count;
+        }
+
+        for (int i = section.Items.Count - 1; i >= 0; i--)
+        {
+            if (section.Items[i].GridItemType == GridItemType.AddButton)
+            {
+                return i;
+            }
+        }
+        return section.Items.Count;
+    }
 
     private async Task TriggerAutoSaveAsync()
     {
@@ -379,12 +506,28 @@ public partial class MainPageViewModel : ObservableObject
     {
         Settings.ShowArchived = !Settings.ShowArchived;
 
-        if (Settings.ShowArchived && !archivedItemsLoaded)
+        if (Settings.ShowArchived)
         {
-            await LoadArchivedItemsAsync();
+            if (!archivedItemsLoaded)
+            {
+                // LoadArchivedItemsAsync triggers WhiteboardItems.Add → AddGridItem per item.
+                await LoadArchivedItemsAsync();
+            }
+            else
+            {
+                foreach (var item in WhiteboardItems.Where(i => i.IsArchived))
+                {
+                    AddGridItem(item);
+                }
+            }
         }
-
-        RebuildGridItems();
+        else
+        {
+            foreach (var item in WhiteboardItems.Where(i => i.IsArchived).ToList())
+            {
+                RemoveGridItem(item);
+            }
+        }
     }
 
     private async Task LoadArchivedItemsAsync()
