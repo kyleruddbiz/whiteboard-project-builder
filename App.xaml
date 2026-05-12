@@ -30,6 +30,13 @@
             <SolidColorBrush x:Key="WhiteBrush" Color="White" />
             <SolidColorBrush x:Key="BlackBrush" Color="Black" />
 
+            <AcrylicBrush
+                x:Key="HoverOverlayAcrylicBrush"
+                FallbackColor="#594A3D2E"
+                Opacity=".97"
+                TintColor="AntiqueWhite"
+                TintOpacity="0.35" />
+
             <x:Double x:Key="AppFontSize">14</x:Double>
 
             <Style x:Key="MyLabel" TargetType="TextBlock">

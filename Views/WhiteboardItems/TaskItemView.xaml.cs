@@ -25,7 +25,7 @@ public sealed partial class TaskItemView : UserControl
 
     private void Overlay_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        AnimateHoverIndicator(HoverIndicator, 0.3);
+        AnimateHoverIndicator(HoverIndicator, 1.0);
     }
 
     private void Overlay_PointerExited(object sender, PointerRoutedEventArgs e)
@@ -40,7 +40,7 @@ public sealed partial class TaskItemView : UserControl
 
     private void ReactivateOverlay_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        AnimateHoverIndicator(ReactivateHoverIndicator, 0.3);
+        AnimateHoverIndicator(ReactivateHoverIndicator, 1.0);
     }
 
     private void ReactivateOverlay_PointerExited(object sender, PointerRoutedEventArgs e)

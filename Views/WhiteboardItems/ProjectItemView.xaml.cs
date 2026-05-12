@@ -28,7 +28,7 @@ public sealed partial class ProjectItemView : UserControl
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
-            AnimateHoverIndicator(indicator, 0.3);
+            AnimateHoverIndicator(indicator, 1.0);
         }
     }
 
@@ -54,7 +54,7 @@ public sealed partial class ProjectItemView : UserControl
     {
         if (sender is Border overlay && overlay.Child is Border indicator)
         {
-            AnimateHoverIndicator(indicator, 0.3);
+            AnimateHoverIndicator(indicator, 1.0);
         }
     }
 

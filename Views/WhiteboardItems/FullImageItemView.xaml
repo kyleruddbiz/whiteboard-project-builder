@@ -37,14 +37,14 @@
                 Tapped="Overlay_Tapped">
                 <Border
                     x:Name="HoverIndicator"
-                    Background="Black"
+                    Background="{StaticResource HoverOverlayAcrylicBrush}"
                     Opacity="0">
                     <FontIcon
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         FontSize="80"
                         Foreground="White"
-                        Glyph="" />
+                        Glyph="&#xE70F;" />
                 </Border>
             </Border>
 
@@ -58,7 +58,7 @@
                 Tapped="ReactivateOverlay_Tapped">
                 <Border
                     x:Name="ReactivateHoverIndicator"
-                    Background="Black"
+                    Background="{StaticResource HoverOverlayAcrylicBrush}"
                     Opacity="0">
                     <StackPanel
                         HorizontalAlignment="Center"
@@ -67,7 +67,7 @@
                         <FontIcon
                             FontSize="80"
                             Foreground="White"
-                            Glyph="" />
+                            Glyph="&#xE8AB;" />
                         <TextBlock
                             HorizontalAlignment="Center"
                             FontSize="24"
