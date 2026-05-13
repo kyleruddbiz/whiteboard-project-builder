@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels.WhiteboardItems"
     xmlns:views="using:WhiteboardProjectBuilder.Views"
+    behaviors:FocusFirstOnLoadedBehavior.IsEnabled="True"
     d:DataContext="{d:DesignInstance Type=viewmodels:FullImageItemViewModel}"
     KeyboardAcceleratorPlacementMode="Hidden"
     mc:Ignorable="d">
@@ -16,7 +17,10 @@
         <KeyboardAccelerator Key="Escape" behaviors:KeyboardAcceleratorCommandBehavior.Command="{x:Bind ViewModel.CancelEditingCommand}" />
     </UserControl.KeyboardAccelerators>
 
-    <Border Padding="12" BorderBrush="#005FBA" BorderThickness="4">
+    <Border
+        Padding="12"
+        BorderBrush="#005FBA"
+        BorderThickness="4">
         <Viewbox Stretch="Uniform">
             <views:ImageEditor
                 x:Name="MainImageEditor"

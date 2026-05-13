@@ -30,20 +30,6 @@ public sealed partial class ProjectItemEditView : UserControl
                 ViewModel = vm;
             }
         };
-
-        Loaded += ProjectItemEditView_Loaded;
-    }
-
-    private void ProjectItemEditView_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (string.IsNullOrEmpty(ViewModel?.Title))
-        {
-            TitleTextBox.Focus(FocusState.Programmatic);
-        }
-        else
-        {
-            MainImageEditor.SetFocus();
-        }
     }
 
     private void ImageEditor_ImageReplaceRequested(object? sender, EventArgs e)

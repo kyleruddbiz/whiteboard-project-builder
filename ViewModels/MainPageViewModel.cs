@@ -604,4 +604,31 @@ public partial class MainPageViewModel : ObservableObject
 
     [RelayCommand]
     private void ExitEditMode() => workspace.ExitEditMode();
+
+    [RelayCommand]
+    private void MoveToNextItem() => MoveSelection(forward: true);
+
+    [RelayCommand]
+    private void MoveToPreviousItem() => MoveSelection(forward: false);
+
+    private void MoveSelection(bool forward)
+    {
+        var ordered = Sections
+            .SelectMany(section => section.Items)
+            .Where(wrapper => wrapper.GridItemType == GridItemType.WhiteboardItem)
+            .Select(wrapper => wrapper.WhiteboardItem!)
+            .ToList();
+
+        if (ordered.Count == 0)
+        {
+            return;
+        }
+
+        int currentIndex = SelectedItem is null ? -1 : ordered.IndexOf(SelectedItem);
+        int nextIndex = forward
+            ? (currentIndex < 0 ? 0 : (currentIndex + 1) % ordered.Count)
+            : (currentIndex < 0 ? ordered.Count - 1 : (currentIndex - 1 + ordered.Count) % ordered.Count);
+
+        SelectedItem = ordered[nextIndex];
+    }
 }

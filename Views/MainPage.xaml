@@ -27,6 +27,7 @@
             Key="P"
             behaviors:KeyboardAcceleratorCommandBehavior.Command="{x:Bind ViewModel.PrintWhiteboardItemsCommand}"
             Modifiers="Control" />
+        <!--  Ctrl+Tab navigation lives in code-behind (PreviewKeyDown). Tab is consumed by focus traversal / TextBox input before KeyboardAccelerator fires, so the accelerator path can't catch it when a textbox has focus.  -->
     </Page.KeyboardAccelerators>
     <Page.Resources>
         <selectors:WhiteboardItemBodyTemplateSelector x:Key="WhiteboardItemBodyTemplateSelector">

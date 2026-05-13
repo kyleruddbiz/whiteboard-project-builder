@@ -48,6 +48,11 @@ public partial class MainPage : Page
         // Use AddHandler to listen to keyboard events even when handled by child elements
         AddHandler(KeyDownEvent, new KeyEventHandler(Page_KeyDown_Handler), true);
         AddHandler(KeyUpEvent, new KeyEventHandler(Page_KeyUp_Handler), true);
+
+        // PreviewKeyDown (tunneling) catches Ctrl+Tab before focused TextBoxes / the focus
+        // traversal layer consume it; KeyboardAccelerators don't fire reliably for Tab from
+        // inside a TextBox.
+        AddHandler(PreviewKeyDownEvent, new KeyEventHandler(Page_PreviewKeyDown_Handler), true);
     }
 
     private void MainPage_Loaded(object sender, RoutedEventArgs e)
@@ -109,6 +114,38 @@ public partial class MainPage : Page
         {
             IsCtrlPressed = false;
         }
+    }
+
+    private void Page_PreviewKeyDown_Handler(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Tab)
+        {
+            return;
+        }
+
+        bool isCtrlDown = InputKeyboardSource
+            .GetKeyStateForCurrentThread(VirtualKey.Control)
+            .HasFlag(CoreVirtualKeyStates.Down);
+
+        if (!isCtrlDown)
+        {
+            return;
+        }
+
+        bool isShiftDown = InputKeyboardSource
+            .GetKeyStateForCurrentThread(VirtualKey.Shift)
+            .HasFlag(CoreVirtualKeyStates.Down);
+
+        if (isShiftDown)
+        {
+            ViewModel.MoveToPreviousItemCommand.Execute(null);
+        }
+        else
+        {
+            ViewModel.MoveToNextItemCommand.Execute(null);
+        }
+
+        e.Handled = true;
     }
 
     private void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)

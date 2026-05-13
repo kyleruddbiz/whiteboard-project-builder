@@ -22,20 +22,6 @@ public sealed partial class TaskItemEditView : UserControl
     {
         InitializeComponent();
         DataContext = this;
-
-        Loaded += TaskItemEditView_Loaded;
-    }
-
-    private void TaskItemEditView_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (string.IsNullOrEmpty(ViewModel?.Title))
-        {
-            TitleTextBox.Focus(FocusState.Programmatic);
-        }
-        else
-        {
-            MainImageEditor.SetFocus();
-        }
     }
 
     private void ImageEditor_ImageReplaceRequested(object sender, EventArgs e)

@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodels="using:WhiteboardProjectBuilder.ViewModels.WhiteboardItems"
     xmlns:views="using:WhiteboardProjectBuilder.Views"
+    behaviors:FocusFirstOnLoadedBehavior.IsEnabled="True"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProjectItemViewModel}"
     KeyboardAcceleratorPlacementMode="Hidden"
     mc:Ignorable="d">
@@ -18,15 +19,9 @@
 
     <Border BorderBrush="#005FBA" BorderThickness="4">
         <StackPanel Padding="16" Spacing="12">
-            <views:FloatingLabelTextBox
-                x:Name="TitleTextBox"
-                Label="Title"
-                Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <views:FloatingLabelTextBox Label="Title" Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <views:FloatingLabelTextBox
-                x:Name="SubtitleTextBox"
-                Label="Subtitle"
-                Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <views:FloatingLabelTextBox Label="Subtitle" Text="{x:Bind ViewModel.Subtitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <StackPanel Spacing="8">
                 <TextBlock FontWeight="SemiBold" Text="Image" />
